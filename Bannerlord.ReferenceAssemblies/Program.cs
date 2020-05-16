@@ -172,7 +172,6 @@ namespace Bannerlord.ReferenceAssemblies
             DepotDownloader.Program.InitializeSteam(login, pass);
             ContentDownloader.steam3.RequestAppInfo(appid);
             var depots = ContentDownloader.GetSteam3AppSection(appid, EAppInfoSection.Depots);
-            ContentDownloader.Config.MaxDownloads = 4;
             var branches = depots["branches"];
             return branches.Children.Select(c => ConvertVersion(c.Name, c["buildid"].Value)).ToList();
             /*
@@ -192,6 +191,14 @@ namespace Bannerlord.ReferenceAssemblies
 
         private static void DownloadBranch(Branch branch)
         {
+            var folder = ExecutableFolder
+                .CreateFolder("depots", CreationCollisionOption.OpenIfExists)
+                .CreateFolder(depot.ToString(), CreationCollisionOption.OpenIfExists)
+                .CreateFolder(branch.BuildId.ToString(), CreationCollisionOption.OpenIfExists);
+
+            ContentDownloader.Config.MaxDownloads = 4;
+            ContentDownloader.Config.InstallDirectory = folder.Path;
+
             var fileList = ExecutableFolder.GetFile(filelist).Path;
             string[] files = null;
             try
