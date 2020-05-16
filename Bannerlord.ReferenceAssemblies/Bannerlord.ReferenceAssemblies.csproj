@@ -6,10 +6,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Assemblies.txt" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Content Include="Assemblies.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

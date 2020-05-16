@@ -39,7 +39,7 @@ namespace Bannerlord.ReferenceAssemblies
         private static string login;
         private static string pass;
         private static string gtoken;
-        private static readonly IFolder ExecutableFolder = new ApplicationRootFolder();
+        private static readonly IFolder ExecutableFolder = new FolderFromPath(AppDomain.CurrentDomain.BaseDirectory);
         public static void Main(string[] args)
         {
             login = args[1];
