@@ -55,8 +55,10 @@ namespace Bannerlord.ReferenceAssemblies
             Process.Start("dotnet", $"tool install gpr -g").WaitForExit();
 
 
-            Console.WriteLine("Checking branches...");
+
+            Console.WriteLine("Checking NuGet...");
             var packages = GetNugetVersions();
+            Console.WriteLine("Checking branches...");
             var branches = GetAllBranches();
 
             var coreNugetVersions = packages.TryGetValue("Bannerlord.ReferenceAssemblies.Core", out var v) ? v : new List<string>();
@@ -117,6 +119,7 @@ namespace Bannerlord.ReferenceAssemblies
 
         public static Dictionary<string, List<string>> GetNugetVersions()
         {
+            Console.WriteLine("Starting GPR...");
             var process = new Process
             {
                 StartInfo =
@@ -125,19 +128,17 @@ namespace Bannerlord.ReferenceAssemblies
                     Arguments = $"list -k {gtoken}",
                     UseShellExecute = false,
                     RedirectStandardOutput = true,
-                    RedirectStandardError = true
+                    CreateNoWindow = true
                 }
             };
-            process.OutputDataReceived += OutputHandler;
-            process.ErrorDataReceived += OutputHandler;
-            builder = new StringBuilder();
+            var lines = new List<string>();
             process.Start();
-            process.BeginOutputReadLine();
-            process.BeginErrorReadLine();
+            while (!process.StandardOutput.EndOfStream)
+                lines.Add(process.StandardOutput.ReadLine());
             process.WaitForExit();
-            var t = builder.ToString();
             var returnVal = new Dictionary<string, List<string>>();
-            foreach (var line in t.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries))
+            Console.WriteLine("Parsing GPR output...");
+            foreach (var line in lines)
             {
                 if (line.StartsWith("http") || line.StartsWith("[PRIVATE REPOSITORIES]"))
                     continue;
@@ -149,12 +150,6 @@ namespace Bannerlord.ReferenceAssemblies
 
             return returnVal;
         }
-        static StringBuilder builder = new StringBuilder();
-        static void OutputHandler(object sendingProcess, DataReceivedEventArgs outLine)
-        {
-            builder.AppendLine(outLine.Data);
-        }
-
         private static (string, string, string) ConvertVersion(string version, string buildId)
         {
             var letter = version[0];
