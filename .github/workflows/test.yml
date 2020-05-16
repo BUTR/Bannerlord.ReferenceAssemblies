@@ -3,7 +3,7 @@ name: Download
 on:
   push:
     branches: 
-      - master
+      - test1
   repository_dispatch:
     types:
       - build
@@ -23,5 +23,5 @@ jobs:
       with:
         dotnet-version: 3.1.100
 
-    - name: Build DepotDownloader
-      run: dotnet run Bannerlord.ReferenceAssemblies/Bannerlord.ReferenceAssemblies.csproj --configuration Release
+    - name: Run
+      run: dotnet run --project Bannerlord.ReferenceAssemblies/Bannerlord.ReferenceAssemblies.csproj --configuration Release --login ${{secrets.STEAM_LOGIN}} --pass ${{secrets.STEAM_PASSWORD}} --gtoken ${{secrets.GITHUB_TOKEN}}
