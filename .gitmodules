@@ -1,6 +1,3 @@
-[submodule "DepotDownloader"]
-	path = DepotDownloader
-	url = https://github.com/SteamRE/DepotDownloader
 [submodule "ReferenceAssemblyGenerator"]
 	path = ReferenceAssemblyGenerator
 	url = https://github.com/yyjdelete/ReferenceAssemblyGenerator.git

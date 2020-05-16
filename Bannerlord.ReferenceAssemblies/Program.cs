@@ -112,9 +112,7 @@ namespace Bannerlord.ReferenceAssemblies
 
             var file = ExecutableFolder.GetFile(filelist);
             var args = $"-app {appid} -depot {depot} -beta {branch.BuildId} -os {os} -osarch {osarch} -username {login} -password {pass} -filelist {file.Path} -dir {folder.Path}".Split(' ');
-            var type = Type.GetType("DepotDownloader.Program, DepotDownloader");
-            var mainMethod = type.GetMethod("Main", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
-            mainMethod.Invoke(null, new object[] { args });
+            DepotDownloader.Program.Main(args);
         }
 
         private static void GenerateReference(Branch branch, string moduleName, IFolder rootFolder)
@@ -131,7 +129,7 @@ namespace Bannerlord.ReferenceAssemblies
 
             foreach (var file in rootFolder.GetFolder("bin").GetFolder("Win64_Shipping_Client").GetModuleFiles(isCore))
             {
-                var args = $"-f|-o|{Path.Combine(outputFolder.Path, file.Name)}|{file.Path}".Split('|');
+                var args = $"-f|--keep-non-public|-o|{Path.Combine(outputFolder.Path, file.Name)}|{file.Path}".Split('|');
                 ReferenceAssemblyGenerator.CLI.Program.Main(args);
             }
         }
