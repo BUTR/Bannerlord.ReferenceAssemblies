@@ -250,7 +250,7 @@ namespace Bannerlord.ReferenceAssemblies
             foreach (var file in rootFolder.GetFolder("bin").GetFolder("Win64_Shipping_Client").GetModuleFiles(isCore))
             {
                 var args = $"-f|--keep-non-public|-o|{Path.Combine(outputFolder.Path, file.Name)}|{file.Path}".Split('|');
-                ReferenceAssemblyGenerator.CLI.Program.Main(args);
+                ReferenceAssemblyGenerator.Program.Main(args);
             }
         }
 

@@ -17,7 +17,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DepotDownloader\DepotDownloader\DepotDownloader.csproj" />
-    <ProjectReference Include="..\ReferenceAssemblyGenerator\ReferenceAssemblyGenerator.CLI\ReferenceAssemblyGenerator.CLI.csproj" />
+    <ProjectReference Include="..\ReferenceAssemblyGenerator\ReferenceAssemblyGenerator\ReferenceAssemblyGenerator.csproj" />
   </ItemGroup>
 
 </Project>
