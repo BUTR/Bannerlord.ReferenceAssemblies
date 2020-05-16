@@ -3,7 +3,7 @@ name: Download
 on:
   push:
     branches: 
-      - test1
+      - master
   repository_dispatch:
     types:
       - build
