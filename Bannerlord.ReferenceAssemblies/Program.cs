@@ -52,10 +52,6 @@ namespace Bannerlord.ReferenceAssemblies
             pass = args[3];
             gtoken = args[5];
 
-            Process.Start("dotnet", $"tool install gpr -g").WaitForExit();
-
-
-
             Console.WriteLine("Checking NuGet...");
             var packages = GetNugetVersions();
             Console.WriteLine("Checking branches...");
@@ -68,6 +64,13 @@ namespace Bannerlord.ReferenceAssemblies
                 if (string.IsNullOrEmpty(version) || coreNugetVersions.Contains(version))
                     continue;
                 toDownload.Add((version, branch, buildId));
+            }
+
+            if (toDownload.Count == 0)
+            {
+                Console.WriteLine("Generating no new version detected");
+                ContentDownloader.ShutdownSteam3();
+                return;
             }
 
             foreach (var (version, name, buildId) in toDownload)
@@ -119,16 +122,14 @@ namespace Bannerlord.ReferenceAssemblies
 
         public static Dictionary<string, List<string>> GetNugetVersions()
         {
-            Console.WriteLine("Starting GPR...");
             var process = new Process
             {
                 StartInfo =
                 {
                     FileName = "gpr",
-                    Arguments = $"list -k {gtoken}",
+                    Arguments = $"list  bannerlord-unofficial-modding-community  -k {gtoken}",
                     UseShellExecute = false,
                     RedirectStandardOutput = true,
-                    CreateNoWindow = true
                 }
             };
             var lines = new List<string>();
@@ -137,15 +138,13 @@ namespace Bannerlord.ReferenceAssemblies
                 lines.Add(process.StandardOutput.ReadLine());
             process.WaitForExit();
             var returnVal = new Dictionary<string, List<string>>();
-            Console.WriteLine("Parsing GPR output...");
             foreach (var line in lines)
             {
                 if (line.StartsWith("http") || line.StartsWith("[PRIVATE REPOSITORIES]"))
                     continue;
                 var line1 = line.Trim().Split(new [] { '(', ')' });
                 var versions = line1[2].Trim().TrimStart('[').TrimEnd(']').Split(' ', StringSplitOptions.RemoveEmptyEntries);
-                returnVal.Add(line1[0], versions.ToList());
-                Console.WriteLine($"Found package {line1[0]}, versions {string.Join(' ', versions)}");
+                returnVal.Add(line1[0].Trim(), versions.Select(v => v.Trim(',')).ToList());
             }
 
             return returnVal;
