@@ -8,7 +8,12 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
+using System.Text;
+using System.Text.RegularExpressions;
 using System.Web;
+using DepotDownloader;
+using SteamKit2;
 
 namespace Bannerlord.ReferenceAssemblies
 {
@@ -21,6 +26,7 @@ namespace Bannerlord.ReferenceAssemblies
         }
         private struct Branch
         {
+            public string Version { get; set; }
             public string Name { get; set; }
             public uint BuildId { get; set; }
         }
@@ -31,11 +37,11 @@ namespace Bannerlord.ReferenceAssemblies
             isCore ? folder.GetFiles("TaleWorlds.*") : folder.GetFiles();
 
         private static readonly string packageName = "Bannerlord.ReferenceAssemblies";
-        private static readonly string appid = "261550";
+        private static readonly uint appid = 261550;
         private static readonly string os = "windows";
         private static readonly string osarch = "64";
         private static readonly string filelist = "Assemblies.txt";
-        private static readonly string depot = "261551";
+        private static readonly uint depot = 261551;
         private static string login;
         private static string pass;
         private static string gtoken;
@@ -46,23 +52,39 @@ namespace Bannerlord.ReferenceAssemblies
             pass = args[3];
             gtoken = args[5];
 
+            Process.Start("dotnet", $"tool install gpr -g").WaitForExit();
+
+
             Console.WriteLine("Checking branches...");
+            var packages = GetNugetVersions();
             var branches = GetAllBranches();
-            foreach (var branchInfo in branches)
-                DownloadBranch(new Branch() { Name = branchInfo.Name, BuildId = branchInfo.BuildIds.First()} );
+
+            var coreNugetVersions = packages.TryGetValue("Bannerlord.ReferenceAssemblies.Core", out var v) ? v : new List<string>();
+            var toDownload = new List<(string, string, string)>();
+            foreach (var (version, branch, buildId) in branches)
+            {
+                if (string.IsNullOrEmpty(version) || coreNugetVersions.Contains(version))
+                    continue;
+                toDownload.Add((version, branch, buildId));
+            }
+
+            foreach (var (version, name, buildId) in toDownload)
+                DownloadBranch(new Branch() { Version = version, Name = name, BuildId = uint.TryParse(buildId, out var r) ? r : 0 } );
+            ContentDownloader.ShutdownSteam3();
 
             Console.WriteLine("Generating references...");
-            foreach (var branchInfo in branches)
+            foreach (var (version, name, buildId) in toDownload)
             {
                 var branch = new Branch()
                 {
-                    Name = branchInfo.Name,
-                    BuildId = branchInfo.BuildIds.First()
+                    Version = version,
+                    Name = name,
+                    BuildId = uint.TryParse(buildId, out var r) ? r : 0
                 };
 
                 var rootFolder = ExecutableFolder
                     .GetFolder("depots")
-                    .GetFolder(depot)
+                    .GetFolder(depot.ToString())
                     .GetFolder(branch.BuildId.ToString());
 
                 GenerateReference(branch, "", rootFolder);
@@ -71,17 +93,18 @@ namespace Bannerlord.ReferenceAssemblies
             }
 
             Console.WriteLine("Generating packages...");
-            foreach (var branchInfo in branches)
+            foreach (var (version, name, buildId) in toDownload)
             {
                 var branch = new Branch()
                 {
-                    Name = branchInfo.Name,
-                    BuildId = branchInfo.BuildIds.First()
+                    Version = version,
+                    Name = name,
+                    BuildId = uint.TryParse(buildId, out var r) ? r : 0
                 };
 
                 var rootFolder = ExecutableFolder
                     .GetFolder("ref")
-                    .GetFolder(depot)
+                    .GetFolder(depot.ToString())
                     .GetFolder(branch.BuildId.ToString());
 
                 GenerateNuget(branch, "", rootFolder);
@@ -92,27 +115,135 @@ namespace Bannerlord.ReferenceAssemblies
             PublishNuget();
         }
 
-        private static List<BranchInfo> GetAllBranches() => new List<BranchInfo>()
+        public static Dictionary<string, List<string>> GetNugetVersions()
         {
-            new BranchInfo()
+            var process = new Process
             {
-                Name = "1.4.0.5028281-e",
-                BuildIds = new List<uint>()
+                StartInfo =
                 {
-                    5028281
+                    FileName = "gpr",
+                    Arguments = $"list -k {gtoken}",
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true
                 }
+            };
+            process.OutputDataReceived += OutputHandler;
+            process.ErrorDataReceived += OutputHandler;
+            builder = new StringBuilder();
+            process.Start();
+            process.BeginOutputReadLine();
+            process.BeginErrorReadLine();
+            process.WaitForExit();
+            var t = builder.ToString();
+            var returnVal = new Dictionary<string, List<string>>();
+            foreach (var line in t.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries))
+            {
+                if (line.StartsWith("http"))
+                    continue;
+                var line1 = line.Trim().Split(new [] { '(', ')' });
+                var versions = line1[2].Trim().TrimStart('[').TrimEnd(']').Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                returnVal.Add(line1[0], versions.ToList());
             }
-        };
+
+            return returnVal;
+        }
+        static StringBuilder builder = new StringBuilder();
+        static void OutputHandler(object sendingProcess, DataReceivedEventArgs outLine)
+        {
+            builder.AppendLine(outLine.Data);
+        }
+
+        private static (string, string, string) ConvertVersion(string version, string buildId)
+        {
+            var letter = version[0];
+            if (char.IsDigit(version[1]))
+            {
+                return ($"{version[1..]}.{buildId}-{letter}", version, buildId);
+            }
+            else
+            {
+                return ("", version, buildId);
+            }
+        }
+        private static List<(string, string, string)> GetAllBranches()
+        {
+            AccountSettingsStore.LoadFromFile("account.config");
+            DepotDownloader.Program.InitializeSteam(login, pass);
+            ContentDownloader.steam3.RequestAppInfo(appid);
+            var depots = ContentDownloader.GetSteam3AppSection(appid, EAppInfoSection.Depots);
+            ContentDownloader.Config.MaxDownloads = 4;
+            var branches = depots["branches"];
+            return branches.Children.Select(c => ConvertVersion(c.Name, c["buildid"].Value)).ToList();
+            /*
+            return new List<BranchInfo>()
+            {
+                new BranchInfo()
+                {
+                    Name = "1.4.0.5028281-e",
+                    BuildIds = new List<uint>()
+                    {
+                        5028281
+                    }
+                }
+            };
+            */
+        }
+
         private static void DownloadBranch(Branch branch)
         {
-            var folder = ExecutableFolder
-                    .CreateFolder("depots", CreationCollisionOption.OpenIfExists)
-                    .CreateFolder(depot, CreationCollisionOption.OpenIfExists)
-                    .CreateFolder(branch.BuildId.ToString(), CreationCollisionOption.OpenIfExists);
+            var fileList = ExecutableFolder.GetFile(filelist).Path;
+            string[] files = null;
+            try
+            {
+                string fileListData = File.ReadAllText(fileList);
+                files = fileListData.Split(new char[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
 
-            var file = ExecutableFolder.GetFile(filelist);
-            var args = $"-app {appid} -depot {depot} -beta {branch.BuildId} -os {os} -osarch {osarch} -username {login} -password {pass} -filelist {file.Path} -dir {folder.Path}".Split(' ');
-            DepotDownloader.Program.Main(args);
+                ContentDownloader.Config.UsingFileList = true;
+                ContentDownloader.Config.FilesToDownload = new List<string>();
+                ContentDownloader.Config.FilesToDownloadRegex = new List<Regex>();
+
+                var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+                foreach (var fileEntry in files)
+                {
+                    try
+                    {
+                        string fileEntryProcessed;
+                        if (isWindows)
+                        {
+                            // On Windows, ensure that forward slashes can match either forward or backslashes in depot paths
+                            fileEntryProcessed = fileEntry.Replace("/", "[\\\\|/]");
+                        }
+                        else
+                        {
+                            // On other systems, treat / normally
+                            fileEntryProcessed = fileEntry;
+                        }
+                        Regex rgx = new Regex(fileEntryProcessed, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+                        ContentDownloader.Config.FilesToDownloadRegex.Add(rgx);
+                    }
+                    catch
+                    {
+                        // For anything that can't be processed as a Regex, allow both forward and backward slashes to match
+                        // on Windows
+                        if (isWindows)
+                        {
+                            ContentDownloader.Config.FilesToDownload.Add(fileEntry.Replace("/", "\\"));
+                        }
+                        ContentDownloader.Config.FilesToDownload.Add(fileEntry);
+                        continue;
+                    }
+                }
+
+                Console.WriteLine("Using filelist: '{0}'.", fileList);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Warning: Unable to load filelist: {0}", ex.ToString());
+            }
+
+            ContentDownloader.DownloadAppAsync(appid, depot, ContentDownloader.INVALID_MANIFEST_ID, branch.Name, os,
+                osarch, null, false, true).ConfigureAwait(false).GetAwaiter().GetResult();
         }
 
         private static void GenerateReference(Branch branch, string moduleName, IFolder rootFolder)
@@ -121,7 +252,7 @@ namespace Bannerlord.ReferenceAssemblies
 
             var outputFolder = ExecutableFolder
                 .CreateFolder("ref", CreationCollisionOption.OpenIfExists)
-                .CreateFolder(depot, CreationCollisionOption.OpenIfExists)
+                .CreateFolder(depot.ToString(), CreationCollisionOption.OpenIfExists)
                 .CreateFolder(branch.BuildId.ToString(), CreationCollisionOption.OpenIfExists)
                 .GetModuleFolder(moduleName, isCore)
                 .CreateFolder("bin", CreationCollisionOption.OpenIfExists)
@@ -139,7 +270,7 @@ namespace Bannerlord.ReferenceAssemblies
 &lt;package&gt;
     &lt;metadata minClientVersion=&quot;3.3&quot;&gt;
         &lt;id&gt;{packageName}.{moduleName}&lt;/id&gt;
-        &lt;version&gt;{branch.Name}&lt;/version&gt;
+        &lt;version&gt;{branch.Version}&lt;/version&gt;
         &lt;title&gt;Bannerlord Game Reference Assemblies&lt;/title&gt;
         &lt;authors&gt;The Mount &amp;amp; Blade Development Community&lt;/authors&gt;
         &lt;description&gt;Contains stripped metadata-only libraries for building against Mount &amp;amp; Blade II: Bannerlord.&lt;/description&gt;
@@ -173,7 +304,7 @@ namespace Bannerlord.ReferenceAssemblies
 
             var outputFolder = ExecutableFolder
                 .CreateFolder("nuget", CreationCollisionOption.OpenIfExists)
-                .CreateFolder(depot, CreationCollisionOption.OpenIfExists)
+                .CreateFolder(depot.ToString(), CreationCollisionOption.OpenIfExists)
                 .CreateFolder(branch.BuildId.ToString(), CreationCollisionOption.OpenIfExists)
                 .CreateFolder(name, CreationCollisionOption.OpenIfExists);
             var refFolder = outputFolder.CreateFolder("ref", CreationCollisionOption.OpenIfExists);
@@ -197,8 +328,6 @@ namespace Bannerlord.ReferenceAssemblies
 
         public static void PublishNuget()
         {
-            Process.Start("dotnet", $"tool install gpr -g --version 0.1.13-beta").WaitForExit();
-
             foreach (var file in ExecutableFolder.GetFolder("final").GetFiles("*.nupkg"))
                 Process.Start("gpr", $"push {file.Path} -k {gtoken}").WaitForExit();
         }
