@@ -1,29 +1,37 @@
-﻿using PCLExt.FileStorage;
+﻿using DepotDownloader;
+
+using PCLExt.FileStorage;
 using PCLExt.FileStorage.Extensions;
 using PCLExt.FileStorage.Folders;
+
+using SteamKit2;
 
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
-using DepotDownloader;
-using SteamKit2;
 
 namespace Bannerlord.ReferenceAssemblies
 {
+    /// <summary>
+    /// 1. Check NuGet feed to get all generated versions
+    /// 2. Check Steam for game branches
+    /// 3. Compare NuGet list with the current branches
+    /// 4. Download all new versions from Steam with out file filter
+    /// 5. Generate reference assemblies from th downloaded files
+    /// 6. Generate nuspec and csproj files
+    /// 7. Use dotnet pack to generate the nupgk
+    /// 8. Upload packages to feed
+    ///
+    /// PCLExt was used because it's good for prototyping IMO
+    /// Ideally, should be replaced by scripts in the future
+    /// </summary>
     public static class Program
     {
-        private struct BranchInfo
-        {
-            public string Name { get; set; }
-            public List<uint> BuildIds { get; set; }
-        }
         private struct Branch
         {
             public string Version { get; set; }
@@ -57,36 +65,24 @@ namespace Bannerlord.ReferenceAssemblies
             Console.WriteLine("Checking branches...");
             var branches = GetAllBranches();
 
+            Console.WriteLine("Getting new versions...");
             var coreNugetVersions = packages.TryGetValue("Bannerlord.ReferenceAssemblies.Core", out var v) ? v : new List<string>();
-            var toDownload = new List<(string, string, string)>();
-            foreach (var (version, branch, buildId) in branches)
-            {
-                if (string.IsNullOrEmpty(version) || coreNugetVersions.Contains(version))
-                    continue;
-                toDownload.Add((version, branch, buildId));
-            }
-
+            var toDownload = branches.Where(branch => !string.IsNullOrEmpty(branch.Version) && !coreNugetVersions.Contains(branch.Version)).ToList();
             if (toDownload.Count == 0)
             {
-                Console.WriteLine("Generating no new version detected");
+                Console.WriteLine("No new version detected! Exiting...");
                 ContentDownloader.ShutdownSteam3();
                 return;
             }
 
-            foreach (var (version, name, buildId) in toDownload)
-                DownloadBranch(new Branch() { Version = version, Name = name, BuildId = uint.TryParse(buildId, out var r) ? r : 0 } );
+            Console.WriteLine("Checking downloading...");
+            foreach (var branch in toDownload)
+                DownloadBranch(branch);
             ContentDownloader.ShutdownSteam3();
 
             Console.WriteLine("Generating references...");
-            foreach (var (version, name, buildId) in toDownload)
+            foreach (var branch in toDownload)
             {
-                var branch = new Branch()
-                {
-                    Version = version,
-                    Name = name,
-                    BuildId = uint.TryParse(buildId, out var r) ? r : 0
-                };
-
                 var rootFolder = ExecutableFolder
                     .GetFolder("depots")
                     .GetFolder(depot.ToString())
@@ -98,15 +94,8 @@ namespace Bannerlord.ReferenceAssemblies
             }
 
             Console.WriteLine("Generating packages...");
-            foreach (var (version, name, buildId) in toDownload)
+            foreach (var branch in toDownload)
             {
-                var branch = new Branch()
-                {
-                    Version = version,
-                    Name = name,
-                    BuildId = uint.TryParse(buildId, out var r) ? r : 0
-                };
-
                 var rootFolder = ExecutableFolder
                     .GetFolder("ref")
                     .GetFolder(depot.ToString())
@@ -117,6 +106,7 @@ namespace Bannerlord.ReferenceAssemblies
                     GenerateNuget(branch, module.Name, module);
             }
 
+            Console.WriteLine("Publishing...");
             PublishNuget();
         }
 
@@ -149,19 +139,29 @@ namespace Bannerlord.ReferenceAssemblies
 
             return returnVal;
         }
-        private static (string, string, string) ConvertVersion(string version, string buildId)
+        private static Branch ConvertVersion(string version, string buildId)
         {
             var letter = version[0];
             if (char.IsDigit(version[1]))
             {
-                return ($"{version[1..]}.{buildId}-{letter}", version, buildId);
+                return new Branch()
+                {
+                    Name = version,
+                    Version = $"{version[1..]}.{buildId}-{letter}",
+                    BuildId = uint.TryParse(buildId, out var r) ? r : 0
+                };
             }
             else
             {
-                return ("", version, buildId);
+                return new Branch()
+                {
+                    Name = version,
+                    Version = "",
+                    BuildId = uint.TryParse(buildId, out var r) ? r : 0
+                };
             }
         }
-        private static List<(string, string, string)> GetAllBranches()
+        private static List<Branch> GetAllBranches()
         {
             AccountSettingsStore.LoadFromFile("account.config");
             DepotDownloader.Program.InitializeSteam(login, pass);
@@ -169,19 +169,6 @@ namespace Bannerlord.ReferenceAssemblies
             var depots = ContentDownloader.GetSteam3AppSection(appid, EAppInfoSection.Depots);
             var branches = depots["branches"];
             return branches.Children.Select(c => ConvertVersion(c.Name, c["buildid"].Value)).ToList();
-            /*
-            return new List<BranchInfo>()
-            {
-                new BranchInfo()
-                {
-                    Name = "1.4.0.5028281-e",
-                    BuildIds = new List<uint>()
-                    {
-                        5028281
-                    }
-                }
-            };
-            */
         }
 
         private static void DownloadBranch(Branch branch)
