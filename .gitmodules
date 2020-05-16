@@ -3,4 +3,4 @@
 	url = https://github.com/SteamRE/DepotDownloader
 [submodule "ReferenceAssemblyGenerator"]
 	path = ReferenceAssemblyGenerator
-	url = https://github.com/ImperialPlugins/ReferenceAssemblyGenerator
+	url = https://github.com/yyjdelete/ReferenceAssemblyGenerator.git
