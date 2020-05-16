@@ -161,14 +161,14 @@ namespace Bannerlord.ReferenceAssemblies
                 };
             }
         }
-        private static List<Branch> GetAllBranches()
+        private static IEnumerable<Branch> GetAllBranches()
         {
             AccountSettingsStore.LoadFromFile("account.config");
             DepotDownloader.Program.InitializeSteam(login, pass);
             ContentDownloader.steam3.RequestAppInfo(appid);
             var depots = ContentDownloader.GetSteam3AppSection(appid, EAppInfoSection.Depots);
             var branches = depots["branches"];
-            return branches.Children.Select(c => ConvertVersion(c.Name, c["buildid"].Value)).ToList();
+            return branches.Children.Select(c => ConvertVersion(c.Name, c["buildid"].Value));
         }
 
         private static void DownloadBranch(Branch branch)
