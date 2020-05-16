@@ -24,8 +24,4 @@ jobs:
         dotnet-version: 3.1.100
 
     - name: Build DepotDownloader
-      run: dotnet build DepotDownloader/DepotDownloader.sln --configuration Release
-
-    - name: Download
-      run: dotnet DepotDownloader/DepotDownloader/bin/Release/netcoreapp2.0/DepotDownloader.dll -app 261550 -depot 261551 -os windows -osarch 64 -username ${{secrets.STEAM_LOGIN}} -password ${{secrets.STEAM_PASSWORD}} -filelist Assemblies.txt
-      
+      run: dotnet run Bannerlord.ReferenceAssemblies/Bannerlord.ReferenceAssemblies.csproj --configuration Release
