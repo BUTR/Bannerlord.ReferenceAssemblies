@@ -15,34 +15,20 @@ jobs:
     - uses: actions/delete-package-versions@v1
       with:
         package-name: Bannerlord.ReferenceAssemblies.Core
+        num-old-versions-to-delete: 30
     - uses: actions/delete-package-versions@v1
       with:
         package-name: Bannerlord.ReferenceAssemblies.StoryMode
+        num-old-versions-to-delete: 30
     - uses: actions/delete-package-versions@v1
       with:
         package-name: Bannerlord.ReferenceAssemblies.Native
+        num-old-versions-to-delete: 30
     - uses: actions/delete-package-versions@v1
       with:
         package-name: Bannerlord.ReferenceAssemblies.CustomBattle
+        num-old-versions-to-delete: 30
     - uses: actions/delete-package-versions@v1
       with:
         package-name: Bannerlord.ReferenceAssemblies.SandBox
-
-    - name: Checkout Repository
-      uses: actions/checkout@v2
-      with:
-        submodules: 'recursive'
-      
-    - name: Setup .NET Core (3.1.100)
-      uses: actions/setup-dotnet@master
-      with:
-        dotnet-version: 3.1.100
-
-    - name: Run
-      run: dotnet tool install gpr -g
-
-    - name: Run
-      run: gpr list -k ${{secrets.GITHUB_TOKEN}}
-
-    - name: Run
-      run: dotnet run --project Bannerlord.ReferenceAssemblies/Bannerlord.ReferenceAssemblies.csproj --configuration Release --login ${{secrets.STEAM_LOGIN}} --pass ${{secrets.STEAM_PASSWORD}} --gtoken ${{secrets.GITHUB_TOKEN}}
+        num-old-versions-to-delete: 30
