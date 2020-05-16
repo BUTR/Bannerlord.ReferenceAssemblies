@@ -1,4 +1,4 @@
-name: Download
+name: GenerateReferences
 
 on:
   push:
@@ -12,22 +12,6 @@ jobs:
   build:   
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/delete-package-versions@v1
-      with:
-        package-name: Bannerlord.ReferenceAssemblies.Core
-    - uses: actions/delete-package-versions@v1
-      with:
-        package-name: Bannerlord.ReferenceAssemblies.StoryMode
-    - uses: actions/delete-package-versions@v1
-      with:
-        package-name: Bannerlord.ReferenceAssemblies.Native
-    - uses: actions/delete-package-versions@v1
-      with:
-        package-name: Bannerlord.ReferenceAssemblies.CustomBattle
-    - uses: actions/delete-package-versions@v1
-      with:
-        package-name: Bannerlord.ReferenceAssemblies.SandBox
-
     - name: Checkout Repository
       uses: actions/checkout@v2
       with:

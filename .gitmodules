@@ -1,6 +1,6 @@
-[submodule "ReferenceAssemblyGenerator"]
-	path = ReferenceAssemblyGenerator
-	url = https://github.com/yyjdelete/ReferenceAssemblyGenerator.git
 [submodule "DepotDownloader"]
 	path = DepotDownloader
 	url = https://github.com/Bannerlord-Unofficial-Modding-Community/DepotDownloader
+[submodule "ReferenceAssemblyGenerator"]
+	path = ReferenceAssemblyGenerator
+	url = https://github.com/Tyler-IN/ReferenceAssemblyGenerator

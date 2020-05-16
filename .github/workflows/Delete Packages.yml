@@ -1,0 +1,29 @@
+name: Delete Packages
+
+on:
+  push:
+    branches: 
+      - deletepackages
+  repository_dispatch:
+    types:
+      - build
+  
+jobs:
+  build:   
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/delete-package-versions@v1
+      with:
+        package-name: Bannerlord.ReferenceAssemblies.Core
+    - uses: actions/delete-package-versions@v1
+      with:
+        package-name: Bannerlord.ReferenceAssemblies.StoryMode
+    - uses: actions/delete-package-versions@v1
+      with:
+        package-name: Bannerlord.ReferenceAssemblies.Native
+    - uses: actions/delete-package-versions@v1
+      with:
+        package-name: Bannerlord.ReferenceAssemblies.CustomBattle
+    - uses: actions/delete-package-versions@v1
+      with:
+        package-name: Bannerlord.ReferenceAssemblies.SandBox
