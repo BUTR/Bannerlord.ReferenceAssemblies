@@ -139,11 +139,12 @@ namespace Bannerlord.ReferenceAssemblies
             var returnVal = new Dictionary<string, List<string>>();
             foreach (var line in t.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries))
             {
-                if (line.StartsWith("http"))
+                if (line.StartsWith("http") || line.StartsWith("[PRIVATE REPOSITORIES]"))
                     continue;
                 var line1 = line.Trim().Split(new [] { '(', ')' });
                 var versions = line1[2].Trim().TrimStart('[').TrimEnd(']').Split(' ', StringSplitOptions.RemoveEmptyEntries);
                 returnVal.Add(line1[0], versions.ToList());
+                Console.WriteLine($"Found package {line1[0]}, versions {string.Join(' ', versions)}");
             }
 
             return returnVal;
@@ -287,7 +288,10 @@ namespace Bannerlord.ReferenceAssemblies
         &lt;repository type=&quot;git&quot; url=&quot;https://github.com/Bannerlord-Unofficial-Modding-Community/Bannerlord.ReferenceAssemblies.git&quot;  /&gt;
     &lt;/metadata&gt;
     &lt;files&gt;
-        &lt;file src=&quot;ref\*.dll&quot; target=&quot;ref&quot;/&gt;
+        &lt;file src=&quot;ref\net472\*.exe&quot; target=&quot;ref&quot;/&gt;
+        &lt;file src=&quot;ref\net472\*.dll&quot; target=&quot;ref&quot;/&gt;
+        &lt;file src=&quot;ref\netstandard2.0\*.exe&quot; target=&quot;ref&quot;/&gt;
+        &lt;file src=&quot;ref\netstandard2.0\*.dll&quot; target=&quot;ref&quot;/&gt;
     &lt;/files&gt;
 &lt;/package&gt;
 ";
