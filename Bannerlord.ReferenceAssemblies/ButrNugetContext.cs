@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using PCLExt.FileStorage;
 using PCLExt.FileStorage.Folders;
 
@@ -19,10 +21,11 @@ namespace Bannerlord.ReferenceAssemblies
             => _githubToken = githubToken;
 
         public void Publish()
-        {
-            foreach (var file in ExecutableFolder.GetFolder("final").GetFiles("*.nupkg"))
-                Process.Start("gpr", $"push {file.Path} -k {_githubToken}")!.WaitForExit();
-        }
+            => ExecutableFolder.GetFolder("final").GetFiles("*.nupkg")
+                .AsParallel()
+                .WithDegreeOfParallelism(8)
+                .Select(file => Process.Start("gpr", $"push {file.Path} -k {_githubToken}"))
+                .ForAll(proc => proc.WaitForExit());
 
         public IReadOnlyDictionary<string, IReadOnlyList<string>> GetVersions(string userOrOrg)
         {
