@@ -12,6 +12,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Web;
+using ReferenceAssemblyGenerator;
 
 namespace Bannerlord.ReferenceAssemblies
 {
@@ -51,6 +52,8 @@ namespace Bannerlord.ReferenceAssemblies
         private static ButrNugetContext _butrNuget;
 
         private static readonly bool IsWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+
+        private static readonly AssemblyProcessor RefAsmProc = new AssemblyProcessor();
 
         public static void Main(string[] args)
         {
@@ -199,8 +202,12 @@ namespace Bannerlord.ReferenceAssemblies
 
             foreach (var file in rootFolder.GetFolder("bin").GetFolder("Win64_Shipping_Client").GetModuleFiles(isCore))
             {
-                var args = new[] {"-f", "-o", $"{Path.Combine(outputFolder.Path, file.Name)}", $"{file.Path}"};
-                ReferenceAssemblyGenerator.Program.Main(args);
+                RefAsmProc.Process(new Options
+                {
+                    Force = true,
+                    OutputFile = Path.Combine(outputFolder.Path, file.Name),
+                    AssemblyPath = file.Path
+                });
             }
         }
 
