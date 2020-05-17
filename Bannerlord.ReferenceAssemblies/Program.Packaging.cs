@@ -1,7 +1,5 @@
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Text.RegularExpressions;
-using System.Web;
 using PCLExt.FileStorage;
 using PCLExt.FileStorage.Extensions;
 
@@ -66,6 +64,7 @@ namespace Bannerlord.ReferenceAssemblies
             var outputFolder1 = ExecutableFolder
                 .CreateFolder("final", CreationCollisionOption.OpenIfExists);
 
+            ProcessHelpers.Run("dotnet", $"pack -o \"{outputFolder1.Path}\"", outputFolder.Path);
             Process.Start(new ProcessStartInfo("dotnet", $"pack -o {outputFolder1.Path}")
             {
                 WorkingDirectory = outputFolder.Path

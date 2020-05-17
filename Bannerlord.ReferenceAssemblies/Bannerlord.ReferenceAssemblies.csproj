@@ -15,14 +15,6 @@
         <PackageReference Include="PCLExt.FileStorage-devel" Version="1.5.0.294" />
         <PackageReference Include="Fody" Version="6.1.1" PrivateAssets="all" />
         <PackageReference Include="Resourcer.Fody" Version="1.8.0" PrivateAssets="all" />
-        <PackageReference Include="ReferenceAssemblyGenerator" Version="2.0.0">
-            <GeneratePathProperty>true</GeneratePathProperty>
-        </PackageReference>
-    </ItemGroup>
-    <ItemGroup>
-        <Reference Include="$(PkgReferenceAssemblyGenerator)\tools\netcoreapp3.1\any\ReferenceAssemblyGenerator.dll">
-            <HintPath>%(Identity)</HintPath>
-        </Reference>
     </ItemGroup>
 
     <ItemGroup>

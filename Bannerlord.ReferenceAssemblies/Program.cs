@@ -1,18 +1,15 @@
 ﻿using DepotDownloader;
 using PCLExt.FileStorage;
-using PCLExt.FileStorage.Extensions;
 using PCLExt.FileStorage.Folders;
 using SteamKit2;
 using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
-using System.Web;
-using ReferenceAssemblyGenerator;
+using static Bannerlord.ReferenceAssemblies.ProcessHelpers;
 
 namespace Bannerlord.ReferenceAssemblies
 {
@@ -52,8 +49,6 @@ namespace Bannerlord.ReferenceAssemblies
         private static ButrNugetContext _butrNuget;
 
         private static readonly bool IsWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-
-        private static readonly AssemblyProcessor RefAsmProc = new AssemblyProcessor();
 
         public static void Main(string[] args)
         {
@@ -101,6 +96,14 @@ namespace Bannerlord.ReferenceAssemblies
             foreach (var branch in toDownload)
                 DownloadBranch(branch);
             ContentDownloader.ShutdownSteam3();
+        }
+
+        private static string GetAssembliesVersion(string path)
+        {
+            if (Run("dotnet", $"tool getblver -- \"{path}\"", out var versionStr) != 0)
+                throw new NotImplementedException("Resolving assemblies version failed.");
+
+            return versionStr;
         }
 
         private static void GenerateReferences(IEnumerable<Branch> toDownload)
@@ -202,12 +205,8 @@ namespace Bannerlord.ReferenceAssemblies
 
             foreach (var file in rootFolder.GetFolder("bin").GetFolder("Win64_Shipping_Client").GetModuleFiles(isCore))
             {
-                RefAsmProc.Process(new Options
-                {
-                    Force = true,
-                    OutputFile = Path.Combine(outputFolder.Path, file.Name),
-                    AssemblyPath = file.Path
-                });
+                if (Run("dotnet", $"tool refgen -- -f -o \"{Path.Combine(outputFolder.Path, file.Name)}\" \"{file.Path}\"") != 0)
+                    throw new NotImplementedException("Generating reference assemblies failed.");
             }
         }
 
