@@ -10,9 +10,7 @@ namespace Bannerlord.ReferenceAssemblies
         {
             using var proc = Process.Start(new ProcessStartInfo(fileName, args)
             {
-                WorkingDirectory = workingDirectory ?? "",
-                RedirectStandardOutput = true,
-                RedirectStandardError = true
+                WorkingDirectory = workingDirectory ?? ""
             });
             proc!.WaitForExit();
             return proc.ExitCode;
@@ -23,8 +21,7 @@ namespace Bannerlord.ReferenceAssemblies
             using var proc = Process.Start(new ProcessStartInfo(fileName, args)
             {
                 WorkingDirectory = workingDirectory ?? "",
-                RedirectStandardOutput = true,
-                RedirectStandardError = true
+                RedirectStandardOutput = true
             });
             proc!.WaitForExit();
             stdOut = proc.StandardOutput.ReadToEnd();
