@@ -80,6 +80,10 @@ namespace Bannerlord.ReferenceAssemblies
                 return;
             }
 
+            Console.WriteLine("New versions:");
+            foreach (var br in toDownload)
+                Console.WriteLine($"{br.Name}: {br.Version} ({br.BuildId})");
+
             Console.WriteLine("Checking downloading...");
             DownloadBranches(toDownload);
 
