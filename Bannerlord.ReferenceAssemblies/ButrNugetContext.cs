@@ -31,7 +31,7 @@ namespace Bannerlord.ReferenceAssemblies
         {
             if (ProcessHelpers.Run("dotnet", $"gpr list {userOrOrg} -k {_githubToken}", out var output) != 0)
                 Console.WriteLine();
-            var lines = output.Split('\r', '\n', StringSplitOptions.RemoveEmptyEntries);
+            var lines = output.Split(new[] {'\r', '\n'}, StringSplitOptions.RemoveEmptyEntries);
             var returnVal = new Dictionary<string, IReadOnlyList<string>>();
             foreach (var line in lines)
             {
