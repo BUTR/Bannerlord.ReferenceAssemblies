@@ -24,23 +24,21 @@ namespace Bannerlord.ReferenceAssemblies
                 Process.Start("gpr", $"push {file.Path} -k {_githubToken}")!.WaitForExit();
         }
 
-        public IReadOnlyDictionary<string, IReadOnlyList<string>> GetVersions()
+        public IReadOnlyDictionary<string, IReadOnlyList<string>> GetVersions(string userOrOrg)
         {
+            if (ProcessHelpers.Run("dotnet", $"gpr list {userOrOrg} -k {_githubToken}", out var output) != 0)
+                Console.WriteLine();
             var process = new Process
             {
                 StartInfo =
                 {
-                    FileName = "gpr",
-                    Arguments = $"list bannerlord-unofficial-modding-community  -k {_githubToken}",
+                    FileName = "dotnet",
+                    Arguments = $"gpr list {userOrOrg} -k {_githubToken}",
                     UseShellExecute = false,
                     RedirectStandardOutput = true,
                 }
             };
-            var lines = new List<string>();
-            process.Start();
-            while (!process.StandardOutput.EndOfStream)
-                lines.Add(process.StandardOutput.ReadLine());
-            process.WaitForExit();
+            var lines = output.Split('\r', '\n', StringSplitOptions.RemoveEmptyEntries);
             var returnVal = new Dictionary<string, IReadOnlyList<string>>();
             foreach (var line in lines)
             {

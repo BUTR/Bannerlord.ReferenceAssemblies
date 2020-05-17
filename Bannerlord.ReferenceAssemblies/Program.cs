@@ -50,6 +50,8 @@ namespace Bannerlord.ReferenceAssemblies
 
         private static readonly bool IsWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
 
+        private static readonly string OrgName = "bannerlord-unofficial-tools-resources";
+
         public static void Main(string[] args)
         {
             _login = args[1];
@@ -57,7 +59,7 @@ namespace Bannerlord.ReferenceAssemblies
             _butrNuget = new ButrNugetContext(args[5]);
 
             Console.WriteLine("Checking NuGet...");
-            var packages = _butrNuget.GetVersions();
+            var packages = _butrNuget.GetVersions(OrgName);
             Console.WriteLine("Checking branches...");
             var branches = GetAllBranches();
 
@@ -100,7 +102,7 @@ namespace Bannerlord.ReferenceAssemblies
 
         private static string GetAssembliesVersion(string path)
         {
-            if (Run("dotnet", $"tool getblver -- \"{path}\"", out var versionStr) != 0)
+            if (Run("dotnet", $"getblver \"{path}\"", out var versionStr) != 0)
                 throw new NotImplementedException("Resolving assemblies version failed.");
 
             return versionStr;
@@ -205,7 +207,7 @@ namespace Bannerlord.ReferenceAssemblies
 
             foreach (var file in rootFolder.GetFolder("bin").GetFolder("Win64_Shipping_Client").GetModuleFiles(isCore))
             {
-                if (Run("dotnet", $"tool refgen -- -f -o \"{Path.Combine(outputFolder.Path, file.Name)}\" \"{file.Path}\"") != 0)
+                if (Run("dotnet", $"refgen -f -o \"{Path.Combine(outputFolder.Path, file.Name)}\" \"{file.Path}\"") != 0)
                     throw new NotImplementedException("Generating reference assemblies failed.");
             }
         }
