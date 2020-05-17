@@ -60,6 +60,10 @@ namespace Bannerlord.ReferenceAssemblies
 
             Console.WriteLine("Checking NuGet...");
             var packages = _butrNuget.GetVersions(OrgName);
+
+            foreach (var pkg in packages)
+                Console.WriteLine($"{pkg.Key}: [{string.Join(", ", pkg.Value)}]");
+
             Console.WriteLine("Checking branches...");
             var branches = GetAllBranches();
 
