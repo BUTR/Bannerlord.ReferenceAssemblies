@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<package>
+    <metadata minClientVersion="3.3">
+        <id>{{packageName}}.{{versionPrefix}}</id>
+        <version>{{packageVersion}}</version>
+        <title>Bannerlord Game Reference Assemblies</title>
+        <authors>The Mount &amp; Blade Development Community</authors>
+        <description>Contains stripped metadata-only libraries for building against Mount &amp;amp; Blade II: Bannerlord.</description>
+        <developmentDependency>true</developmentDependency>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <repository type="git" url="https://github.com/Bannerlord-Unofficial-Tools-Resources/Bannerlord.ReferenceAssemblies.git" />
+        <tags>bannerlord game reference assemblies build:{{buildId}} {{appVersion}}</tags>
+    </metadata>
+    <dependencies>
+        {{dependenciesXml}}
+    </dependencies>
+</package>

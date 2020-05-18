@@ -1,8 +1,10 @@
 namespace Bannerlord.ReferenceAssemblies
 {
 
-    internal struct Branch
+    internal struct SteamAppBranch
     {
+
+        public char Prefix => Version?[0] ?? 'd';
 
         public string Version { get; set; }
 

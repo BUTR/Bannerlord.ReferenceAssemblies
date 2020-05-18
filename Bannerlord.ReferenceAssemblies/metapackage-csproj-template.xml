@@ -2,8 +2,8 @@
 
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <TargetFramework>netstandard2.0</TargetFramework>
-        <NuspecFile>{{packageName}}.{{moduleName}}.nuspec</NuspecFile>
+        <TargetFramework>net472</TargetFramework>
+        <NuspecFile>{{packageName}}.{{versionPrefix}}.nuspec</NuspecFile>
 
         <NoBuild>true</NoBuild>
         <NoRestore>true</NoRestore>

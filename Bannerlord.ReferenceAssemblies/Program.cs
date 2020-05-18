@@ -1,4 +1,4 @@
-using DepotDownloader;
+﻿using DepotDownloader;
 using PCLExt.FileStorage;
 using PCLExt.FileStorage.Folders;
 using SteamKit2;
@@ -7,8 +7,8 @@ using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using static Bannerlord.ReferenceAssemblies.ProcessHelpers;
 
 namespace Bannerlord.ReferenceAssemblies
@@ -34,9 +34,9 @@ namespace Bannerlord.ReferenceAssemblies
 
         private static readonly uint steamAppId = 261550;
 
-        private static readonly string steamOS = "windows";
+        private static readonly string os = "windows";
 
-        private static readonly string steamOSArch = "64";
+        private static readonly string osArch = "64";
 
         private static readonly uint steamDepotId = 261551;
 
@@ -48,45 +48,58 @@ namespace Bannerlord.ReferenceAssemblies
 
         private static ButrNugetContext _butrNuget;
 
-        private static readonly bool IsWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+        private static readonly string OrgName = "Bannerlord-Unofficial-Tools-Resources";
 
-        private static readonly string OrgName = "bannerlord-unofficial-tools-resources";
-
-        public static void Main(string[] args)
+        public static async Task<int> Main(string[] args)
         {
             _login = args[1];
             _pass = args[3];
             _butrNuget = new ButrNugetContext(args[5]);
 
             Console.WriteLine("Checking NuGet...");
-            var packages = _butrNuget.GetVersions(OrgName);
+            var packages = await _butrNuget.GetVersionsAsync(OrgName);
 
-            foreach (var (name, packageList) in packages)
-                Console.WriteLine($"{name}: [{string.Join(", ", packageList)}]");
+            foreach (var (key, value) in packages)
+                Console.WriteLine($"{key}: [{string.Join(", ", value)}]");
 
             Console.WriteLine("Checking branches...");
-            var branches = GetAllBranches();
+            var branches = GetAllBranches().ToList();
 
             Console.WriteLine("Getting new versions...");
-            var coreNugetVersions
-                = packages.TryGetValue("Bannerlord.ReferenceAssemblies.Core", out var v)
-                    ? v
-                    : Array.Empty<ButrNuGetPackage>();
+            var prefixes = new HashSet<char>(branches.Select(branch => branch.Prefix));
+            prefixes.Remove('d');
+
+            var coreVersions
+                = prefixes.ToDictionary(prefix => prefix, prefix
+                    => packages.TryGetValue($"Bannerlord.ReferenceAssemblies.{prefix}", out var pkg)
+                        ? pkg.Select(x => x.BuildId)
+                        : Array.Empty<uint>());
+
+            var publicBranch = branches.First(branch => branch.Name == "public");
+            var otherBranches = branches.Where(branch => branch.Prefix != 'd');
+            var matchedPublicBranch = otherBranches.FirstOrDefault(branch => branch.BuildId == publicBranch.BuildId);
+            if (matchedPublicBranch.BuildId == 0)
+            {
+                // ReSharper disable once MethodHasAsyncOverload
+                Console.Error.WriteLine("Public Branch does not match any branch!");
+                throw new NotImplementedException();
+            }
+
+            Console.WriteLine($"Public Branch Matches: {matchedPublicBranch.Name}");
 
             var toDownload
-                = branches.Where(branch => !string.IsNullOrEmpty(branch.Version)
-                    && coreNugetVersions.All(n => n.Version != branch.Version)).ToList();
+                = branches.Where(branch => branch.Prefix != 'd' && coreVersions[branch.Prefix].Contains(branch.BuildId)).ToList();
 
             if (toDownload.Count == 0)
             {
                 Console.WriteLine("No new version detected! Exiting...");
                 ContentDownloader.ShutdownSteam3();
-                return;
+                return 0;
             }
 
             Console.WriteLine("New versions:");
             foreach (var br in toDownload)
-                Console.WriteLine($"{br.Name}: {br.Version} ({br.BuildId})");
+                Console.WriteLine($"{br.Name} {br.Version}: ({br.BuildId})");
 
             Console.WriteLine("Checking downloading...");
             DownloadBranches(toDownload);
@@ -99,9 +112,11 @@ namespace Bannerlord.ReferenceAssemblies
 
             Console.WriteLine("Publishing...");
             _butrNuget.Publish();
+
+            return 0;
         }
 
-        private static void DownloadBranches(IEnumerable<Branch> toDownload)
+        private static void DownloadBranches(IEnumerable<SteamAppBranch> toDownload)
         {
             foreach (var branch in toDownload)
                 DownloadBranch(branch);
@@ -116,7 +131,7 @@ namespace Bannerlord.ReferenceAssemblies
             return versionStr;
         }
 
-        private static void GenerateReferences(IEnumerable<Branch> toDownload)
+        private static void GenerateReferences(IEnumerable<SteamAppBranch> toDownload)
         {
             foreach (var branch in toDownload)
             {
@@ -125,20 +140,36 @@ namespace Bannerlord.ReferenceAssemblies
                     .GetFolder(steamDepotId.ToString())
                     .GetFolder(branch.BuildId.ToString());
 
-                GenerateReference(branch, "", rootFolder);
+                var coreOutputFolder = rootFolder
+                    .GetModuleFolder("")
+                    .CreateFolder("bin", CreationCollisionOption.OpenIfExists)
+                    .CreateFolder("Win64_Shipping_Client", CreationCollisionOption.OpenIfExists);
+
+                // core
+                GenerateReference(branch, "", rootFolder, coreOutputFolder);
+
+                // official modules
                 foreach (var module in rootFolder.GetFolder("Modules").GetFolders())
-                    GenerateReference(branch, module.Name, module);
+                {
+                    var name = module.Name;
+                    var moduleOutputFolder = rootFolder
+                        .GetModuleFolder(name, false)
+                        .CreateFolder("bin", CreationCollisionOption.OpenIfExists)
+                        .CreateFolder("Win64_Shipping_Client", CreationCollisionOption.OpenIfExists);
+                    GenerateReference(branch, name, module, moduleOutputFolder);
+                }
             }
         }
 
-        private static Branch ConvertVersion(string version, string buildId) => new Branch()
-        {
-            Name = version,
-            Version = char.IsDigit(version[1]) ? $"{version[1..]}.{buildId}-{version[0]}" : "",
-            BuildId = uint.TryParse(buildId, out var r) ? r : 0
-        };
+        private static SteamAppBranch ConvertVersion(string version, string buildId)
+            => new SteamAppBranch()
+            {
+                Name = version,
+                Version = ButrNuGetPackage.ParseAppVersion(version),
+                BuildId = uint.TryParse(buildId, out var r) ? r : 0
+            };
 
-        private static IEnumerable<Branch> GetAllBranches()
+        private static IEnumerable<SteamAppBranch> GetAllBranches()
         {
             AccountSettingsStore.LoadFromFile("account.config");
             DepotDownloader.Program.InitializeSteam(_login, _pass);
@@ -148,12 +179,12 @@ namespace Bannerlord.ReferenceAssemblies
             return branches.Children.Select(c => ConvertVersion(c.Name, c["buildid"].Value));
         }
 
-        private static void DownloadBranch(Branch branch)
+        private static void DownloadBranch(SteamAppBranch steamAppBranch)
         {
             var folder = ExecutableFolder
                 .CreateFolder("depots", CreationCollisionOption.OpenIfExists)
                 .CreateFolder(steamDepotId.ToString(), CreationCollisionOption.OpenIfExists)
-                .CreateFolder(branch.BuildId.ToString(), CreationCollisionOption.OpenIfExists);
+                .CreateFolder(steamAppBranch.BuildId.ToString(), CreationCollisionOption.OpenIfExists);
 
             ContentDownloader.Config.MaxDownloads = 4;
             ContentDownloader.Config.InstallDirectory = folder.Path;
@@ -185,21 +216,13 @@ namespace Bannerlord.ReferenceAssemblies
                 Console.WriteLine($"Warning: Unable to load file filters: {ex}");
             }
 
-            ContentDownloader.DownloadAppAsync(steamAppId, steamDepotId, ContentDownloader.INVALID_MANIFEST_ID, branch.Name, steamOS,
-                steamOSArch, null, false, true).ConfigureAwait(false).GetAwaiter().GetResult();
+            ContentDownloader.DownloadAppAsync(steamAppId, steamDepotId, ContentDownloader.INVALID_MANIFEST_ID, steamAppBranch.Name, os,
+                osArch, null, false, true).ConfigureAwait(false).GetAwaiter().GetResult();
         }
 
-        private static void GenerateReference(Branch branch, string moduleName, IFolder rootFolder)
+        private static void GenerateReference(SteamAppBranch steamAppBranch, string moduleName, IFolder rootFolder, IFolder outputFolder)
         {
             var isCore = string.IsNullOrEmpty(moduleName);
-
-            var outputFolder = ExecutableFolder
-                .CreateFolder("ref", CreationCollisionOption.OpenIfExists)
-                .CreateFolder(steamDepotId.ToString(), CreationCollisionOption.OpenIfExists)
-                .CreateFolder(branch.BuildId.ToString(), CreationCollisionOption.OpenIfExists)
-                .GetModuleFolder(moduleName, isCore)
-                .CreateFolder("bin", CreationCollisionOption.OpenIfExists)
-                .CreateFolder("Win64_Shipping_Client", CreationCollisionOption.OpenIfExists);
 
             foreach (var file in rootFolder.GetFolder("bin").GetFolder("Win64_Shipping_Client").GetModuleFiles(isCore))
             {

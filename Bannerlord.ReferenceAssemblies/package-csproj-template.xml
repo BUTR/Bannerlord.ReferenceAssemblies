@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>net472</TargetFramework>
+        <NuspecFile>{{packageName}}.{{versionPrefix}}.nuspec</NuspecFile>
+
+        <NoBuild>true</NoBuild>
+        <NoRestore>true</NoRestore>
+    </PropertyGroup>
+</Project>

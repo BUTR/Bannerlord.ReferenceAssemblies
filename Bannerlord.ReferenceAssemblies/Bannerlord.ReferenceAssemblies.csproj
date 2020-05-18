@@ -7,11 +7,15 @@
 
     <ItemGroup>
         <EmbeddedResource Include="FileFilters.regexp" />
-        <EmbeddedResource Include="csproj-template.xml" />
-        <EmbeddedResource Include="nuspec-template.xml" />
+        <EmbeddedResource Include="package-csproj-template.xml" />
+        <EmbeddedResource Include="metapackage-csproj-template.xml" />
+        <EmbeddedResource Include="metapackage-nuspec-template.xml" />
+        <EmbeddedResource Include="package-nuspec-template.xml" />
     </ItemGroup>
 
     <ItemGroup>
+        <PackageReference Include="JetBrains.Annotations" Version="2020.1.0" PrivateAssets="all" />
+        <PackageReference Include="NuGet.Configuration" Version="5.5.1" />
         <PackageReference Include="NuGet.Protocol" Version="5.5.1" />
         <PackageReference Include="PCLExt.FileStorage-devel" Version="1.5.0.294" />
         <PackageReference Include="Fody" Version="6.1.1" PrivateAssets="all" />
@@ -20,7 +24,15 @@
 
     <ItemGroup>
         <ProjectReference Include="..\DepotDownloader\DepotDownloader\DepotDownloader.csproj" />
-        <ProjectReference Include="..\ReferenceAssemblyGenerator\ReferenceAssemblyGenerator\ReferenceAssemblyGenerator.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Update="ButrNuGetPackage.Comparison.cs">
+        <DependentUpon>ButrNuGetPackage.cs</DependentUpon>
+      </Compile>
+      <Compile Update="ButrNuGetPackage.Parsing.cs">
+        <DependentUpon>ButrNuGetPackage.cs</DependentUpon>
+      </Compile>
     </ItemGroup>
 
 </Project>
