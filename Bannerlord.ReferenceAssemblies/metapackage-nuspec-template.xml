@@ -11,10 +11,10 @@
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <repository type="git" url="https://github.com/Bannerlord-Unofficial-Tools-Resources/Bannerlord.ReferenceAssemblies.git"/>
         <tags>bannerlord game reference assemblies buildId:{{buildId}} depotId:{{depotId}} appId:{{appId}}</tags>
+        <dependencies>
+            {{dependenciesXml}}
+        </dependencies>
     </metadata>
-    <dependencies>
-{{dependenciesXml}}
-    </dependencies>
     <files>
         <file src="*" exclude="*" />
     </files>
