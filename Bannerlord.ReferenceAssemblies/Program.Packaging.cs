@@ -40,7 +40,7 @@ namespace Bannerlord.ReferenceAssemblies
                     {"moduleName", moduleName},
                     {"appVersion", steamAppBranch.Version},
                     {"buildId", steamAppBranch.BuildId.ToString()},
-                    {"versionPrefix", steamAppBranch.Prefix == 'v' ? "" : $".{steamAppBranch.Prefix}"},
+                    {"versionPrefix", steamAppBranch.Prefix == 'v' ? "" : $".{steamAppBranch.SpecialVersionType}"},
                     {"packageVersion", steamAppBranch.Version.Substring(1)}
                 });
 
@@ -50,7 +50,7 @@ namespace Bannerlord.ReferenceAssemblies
                 {
                     {"packageName", PackageName},
                     {"moduleName", moduleName},
-                    {"versionPrefix", steamAppBranch.Prefix == 'v' ? "" : $".{steamAppBranch.Prefix.ToString()}"},
+                    {"versionPrefix", steamAppBranch.Prefix == 'v' ? "" : $".{steamAppBranch.SpecialVersionType}"},
                     {"packageVersion", steamAppBranch.Version.Substring(1)}
                 });
 

@@ -3,7 +3,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <TargetFramework>net472</TargetFramework>
-        <NuspecFile>{{packageName}}.{{versionPrefix}}.nuspec</NuspecFile>
+        <NuspecFile>{{packageName}}{{versionPrefix}}.nuspec</NuspecFile>
 
         <NoBuild>true</NoBuild>
         <NoRestore>true</NoRestore>

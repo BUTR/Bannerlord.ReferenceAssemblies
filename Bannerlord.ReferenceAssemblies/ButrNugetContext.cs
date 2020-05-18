@@ -38,7 +38,7 @@ namespace Bannerlord.ReferenceAssemblies
                 .Select(file => Process.Start("dotnet", $"gpr push {file.Path} -k {_githubToken}"))
                 .ForAll(proc => proc.WaitForExit());
 
-        public async Task<IReadOnlyDictionary<string, IReadOnlyList<ButrNuGetPackage>>> GetVersionsAsync(string userOrOrg, CancellationToken ct = default)
+        public async Task<IReadOnlyDictionary<string, IReadOnlyList<ButrNuGetPackage>>> GetVersionsAsync(string userOrOrg, CancellationToken ct)
         {
             var sources = NugetPackageSourceProvider.LoadPackageSources().ToList();
             var packageSource = sources.FirstOrDefault(x => x.Name == "Source");

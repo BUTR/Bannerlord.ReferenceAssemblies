@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using static Bannerlord.ReferenceAssemblies.ProcessHelpers;
 
@@ -67,7 +68,7 @@ namespace Bannerlord.ReferenceAssemblies
 
             Console.WriteLine("Getting new versions...");
             var prefixes = new HashSet<char>(branches.Select(branch => branch.Prefix));
-            prefixes.Remove('d');
+            prefixes.Remove('i');
 
             var coreVersions
                 = prefixes.ToDictionary(prefix => prefix, prefix
@@ -76,7 +77,7 @@ namespace Bannerlord.ReferenceAssemblies
                         : Array.Empty<uint>());
 
             var publicBranch = branches.First(branch => branch.Name == "public");
-            var otherBranches = branches.Where(branch => branch.Prefix != 'd');
+            var otherBranches = branches.Where(branch => branch.Prefix != 'i');
             var matchedPublicBranch = otherBranches.FirstOrDefault(branch => branch.BuildId == publicBranch.BuildId);
             if (matchedPublicBranch.BuildId == 0)
             {
@@ -88,7 +89,7 @@ namespace Bannerlord.ReferenceAssemblies
             Console.WriteLine($"Public Branch Matches: {matchedPublicBranch.Name}");
 
             var toDownload
-                = branches.Where(branch => branch.Prefix != 'd' && coreVersions[branch.Prefix].Contains(branch.BuildId)).ToList();
+                = branches.Where(branch => branch.Prefix != 'i' && coreVersions[branch.Prefix].Contains(branch.BuildId)).ToList();
 
             if (toDownload.Count == 0)
             {
@@ -179,7 +180,7 @@ namespace Bannerlord.ReferenceAssemblies
             return branches.Children.Select(c => ConvertVersion(c.Name, c["buildid"].Value));
         }
 
-        private static void DownloadBranch(SteamAppBranch steamAppBranch)
+        private static async Task DownloadBranchAsync(SteamAppBranch steamAppBranch, CancellationToken ct)
         {
             var folder = ExecutableFolder
                 .CreateFolder("depots", CreationCollisionOption.OpenIfExists)
@@ -216,8 +217,8 @@ namespace Bannerlord.ReferenceAssemblies
                 Console.WriteLine($"Warning: Unable to load file filters: {ex}");
             }
 
-            ContentDownloader.DownloadAppAsync(steamAppId, steamDepotId, ContentDownloader.INVALID_MANIFEST_ID, steamAppBranch.Name, os,
-                osArch, null, false, true).ConfigureAwait(false).GetAwaiter().GetResult();
+            await ContentDownloader.DownloadAppAsync(steamAppId, steamDepotId, ContentDownloader.INVALID_MANIFEST_ID, steamAppBranch.Name, os,
+                osArch, null, false, true, ct).ConfigureAwait(false).GetAwaiter();
         }
 
         private static void GenerateReference(SteamAppBranch steamAppBranch, string moduleName, IFolder rootFolder, IFolder outputFolder)
