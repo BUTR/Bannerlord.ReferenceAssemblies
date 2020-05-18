@@ -56,11 +56,11 @@ namespace Bannerlord.ReferenceAssemblies
 
         private static string GenerateMetaNuspec(SteamAppBranch steamAppBranch, IEnumerable<string> deps)
         {
-            var versionPrefix = steamAppBranch.Prefix.ToString();
+            var versionPrefix = steamAppBranch.Prefix == 'v' ? "" : $".{steamAppBranch.SpecialVersionType}";
             var packageVersion = steamAppBranch.Version.Substring(1);
             var dependenciesXml = deps.Select(dep
                 => new XElement("dependency",
-                    new XAttribute("id", $"{PackageName}.{dep}.{versionPrefix}"),
+                    new XAttribute("id", $"{PackageName}.{dep}{versionPrefix}"),
                     new XAttribute("version", packageVersion))).ToString();
             return TemplateHelpers.ApplyTemplate(Resourcer.Resource.AsString("metapackage-nuspec-template.xml"),
                 new Dictionary<string, string>
@@ -79,7 +79,7 @@ namespace Bannerlord.ReferenceAssemblies
                 new Dictionary<string, string>
                 {
                     {"packageName", PackageName},
-                    {"versionPrefix", steamAppBranch.Prefix.ToString()}
+                    {"versionPrefix", steamAppBranch.Prefix == 'v' ? "" : $".{steamAppBranch.SpecialVersionType}"}
                 });
 
         private static void GenerateNupkg(SteamAppBranch steamAppBranch, string moduleName, IFolder rootFolder)

@@ -53,12 +53,24 @@ namespace Bannerlord.ReferenceAssemblies
 
         public static async Task<int> Main(string[] args)
         {
+            var ctrlC = new CancellationTokenSource();
+            Console.CancelKeyPress += (sender, eventArgs) =>
+            {
+                if (eventArgs.SpecialKey != ConsoleSpecialKey.ControlC)
+                    return;
+
+                ctrlC.Cancel();
+                eventArgs.Cancel = true;
+            };
+
+            var ct = ctrlC.Token;
+            
             _login = args[1];
             _pass = args[3];
             _butrNuget = new ButrNugetContext(args[5]);
 
             Console.WriteLine("Checking NuGet...");
-            var packages = await _butrNuget.GetVersionsAsync(OrgName);
+            var packages = await _butrNuget.GetVersionsAsync(OrgName, ct);
 
             foreach (var (key, value) in packages)
                 Console.WriteLine($"{key}: [{string.Join(", ", value)}]");
@@ -103,7 +115,7 @@ namespace Bannerlord.ReferenceAssemblies
                 Console.WriteLine($"{br.Name} {br.Version}: ({br.BuildId})");
 
             Console.WriteLine("Checking downloading...");
-            DownloadBranches(toDownload);
+            await DownloadBranchesAsync(toDownload, ct);
 
             Console.WriteLine("Generating references...");
             GenerateReferences(toDownload);
@@ -117,10 +129,9 @@ namespace Bannerlord.ReferenceAssemblies
             return 0;
         }
 
-        private static void DownloadBranches(IEnumerable<SteamAppBranch> toDownload)
+        private static async Task DownloadBranchesAsync(IEnumerable<SteamAppBranch> toDownload, CancellationToken ct)
         {
-            foreach (var branch in toDownload)
-                DownloadBranch(branch);
+            await Task.WhenAll( toDownload.Select(branch => DownloadBranchAsync(branch, ct) ) ).ConfigureAwait(false);
             ContentDownloader.ShutdownSteam3();
         }
 
@@ -218,7 +229,7 @@ namespace Bannerlord.ReferenceAssemblies
             }
 
             await ContentDownloader.DownloadAppAsync(steamAppId, steamDepotId, ContentDownloader.INVALID_MANIFEST_ID, steamAppBranch.Name, os,
-                osArch, null, false, true, ct).ConfigureAwait(false).GetAwaiter();
+                osArch, null, false, true, ct).ConfigureAwait(false);
         }
 
         private static void GenerateReference(SteamAppBranch steamAppBranch, string moduleName, IFolder rootFolder, IFolder outputFolder)
