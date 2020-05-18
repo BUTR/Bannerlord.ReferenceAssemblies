@@ -104,8 +104,6 @@ namespace Bannerlord.ReferenceAssemblies
             var toDownload
                 = branches.Where(branch => branch.Prefix != BranchType.Unknown && !coreVersions[branch.Prefix].Contains(branch.BuildId)).ToList();
 
-            toDownload = toDownload.Take(1).ToList();
-
             if (toDownload.Count == 0)
             {
                 Trace.WriteLine("No new version detected! Exiting...");
