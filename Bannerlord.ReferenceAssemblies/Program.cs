@@ -5,6 +5,7 @@ using SteamKit2;
 using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -64,21 +65,23 @@ namespace Bannerlord.ReferenceAssemblies
             };
 
             var ct = ctrlC.Token;
-            
+
+            Trace.Listeners.Add(new CustomTraceListener(Console.Out));
+
             _login = args[1];
             _pass = args[3];
             _butrNuget = new ButrNugetContext(args[5]);
 
-            Console.WriteLine("Checking NuGet...");
+            Trace.WriteLine("Checking NuGet...");
             var packages = await _butrNuget.GetVersionsAsync(OrgName, ct);
 
             foreach (var (key, value) in packages)
-                Console.WriteLine($"{key}: [{string.Join(", ", value)}]");
+                Trace.WriteLine($"{key}: [{string.Join(", ", value)}]");
 
-            Console.WriteLine("Checking branches...");
+            Trace.WriteLine("Checking branches...");
             var branches = GetAllBranches().ToList();
 
-            Console.WriteLine("Getting new versions...");
+            Trace.WriteLine("Getting new versions...");
             var prefixes = new HashSet<char>(branches.Select(branch => branch.Prefix));
             prefixes.Remove('i');
 
@@ -94,36 +97,36 @@ namespace Bannerlord.ReferenceAssemblies
             if (matchedPublicBranch.BuildId == 0)
             {
                 // ReSharper disable once MethodHasAsyncOverload
-                Console.Error.WriteLine("Public Branch does not match any branch!");
+                Trace.WriteLine("Public Branch does not match any branch!");
                 throw new NotImplementedException();
             }
 
-            Console.WriteLine($"Public Branch Matches: {matchedPublicBranch.Name}");
+            Trace.WriteLine($"Public Branch Matches: {matchedPublicBranch.Name}");
 
             var toDownload
                 = branches.Where(branch => branch.Prefix != 'i' && coreVersions[branch.Prefix].Contains(branch.BuildId)).ToList();
 
             if (toDownload.Count == 0)
             {
-                Console.WriteLine("No new version detected! Exiting...");
+                Trace.WriteLine("No new version detected! Exiting...");
                 ContentDownloader.ShutdownSteam3();
                 return 0;
             }
 
-            Console.WriteLine("New versions:");
+            Trace.WriteLine("New versions:");
             foreach (var br in toDownload)
-                Console.WriteLine($"{br.Name} {br.Version}: ({br.BuildId})");
+                Trace.WriteLine($"{br.Name} {br.Version}: ({br.BuildId})");
 
-            Console.WriteLine("Checking downloading...");
+            Trace.WriteLine("Checking downloading...");
             await DownloadBranchesAsync(toDownload, ct);
 
-            Console.WriteLine("Generating references...");
+            Trace.WriteLine("Generating references...");
             GenerateReferences(toDownload);
 
-            Console.WriteLine("Generating packages...");
+            Trace.WriteLine("Generating packages...");
             GeneratePackages(toDownload);
 
-            Console.WriteLine("Publishing...");
+            Trace.WriteLine("Publishing...");
             _butrNuget.Publish();
 
             return 0;
@@ -131,7 +134,7 @@ namespace Bannerlord.ReferenceAssemblies
 
         private static async Task DownloadBranchesAsync(IEnumerable<SteamAppBranch> toDownload, CancellationToken ct)
         {
-            await Task.WhenAll( toDownload.Select(branch => DownloadBranchAsync(branch, ct) ) ).ConfigureAwait(false);
+            await Task.WhenAll(toDownload.Select(branch => DownloadBranchAsync(branch, ct))).ConfigureAwait(false);
             ContentDownloader.ShutdownSteam3();
         }
 
@@ -217,15 +220,16 @@ namespace Bannerlord.ReferenceAssemblies
                     ContentDownloader.Config.FilesToDownloadRegex.Add(rx);
                 }
 
-                Console.WriteLine("Using file filters:");
-                using var tw = new IndentedTextWriter(Console.Out);
-                ++tw.Indent;
+                Trace.WriteLine("Using file filters:");
+                
+                ++Trace.IndentLevel;
                 foreach (var file in fileRxs)
-                    tw.WriteLine(file);
+                    Trace.WriteLine(file);
+                --Trace.IndentLevel;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Warning: Unable to load file filters: {ex}");
+                Trace.WriteLine($"Warning: Unable to load file filters: {ex}");
             }
 
             await ContentDownloader.DownloadAppAsync(steamAppId, steamDepotId, ContentDownloader.INVALID_MANIFEST_ID, steamAppBranch.Name, os,
