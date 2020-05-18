@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
@@ -12,6 +12,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <PackageReference Include="NuGet.Protocol" Version="5.5.1" />
         <PackageReference Include="PCLExt.FileStorage-devel" Version="1.5.0.294" />
         <PackageReference Include="Fody" Version="6.1.1" PrivateAssets="all" />
         <PackageReference Include="Resourcer.Fody" Version="1.8.0" PrivateAssets="all" />
