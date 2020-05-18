@@ -14,14 +14,15 @@ namespace Bannerlord.ReferenceAssemblies
         private readonly StringBuilder _buffer = new StringBuilder();
         
         private readonly Stopwatch _stopwatch = Stopwatch.StartNew();
-        
+
+        private static readonly double StopwatchFrequencyFp = (double)Stopwatch.Frequency;
+
         private string LinePrefix
         {
             get
             {
                 var ticks = _stopwatch.ElapsedTicks;
-                var freq = Stopwatch.Frequency;
-                return $"[{ticks / freq}.{ticks % freq:0000000000}] ";
+                return $"[{ticks / StopwatchFrequencyFp:F10}] ";
             }
         }
 
