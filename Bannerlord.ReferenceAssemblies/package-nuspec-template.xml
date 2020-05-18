@@ -2,7 +2,7 @@
 
 <package>
     <metadata minClientVersion="3.3">
-        <id>{{packageName}}.{{moduleName}}.{{versionPrefix}}</id>
+        <id>{{packageName}}.{{moduleName}}{{versionPrefix}}</id>
         <version>{{packageVersion}}</version>
         <title>Bannerlord Game Reference Assemblies</title>
         <authors>The Mount &amp; Blade Development Community</authors>

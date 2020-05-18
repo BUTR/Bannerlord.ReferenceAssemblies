@@ -40,7 +40,7 @@ namespace Bannerlord.ReferenceAssemblies
                     {"moduleName", moduleName},
                     {"appVersion", steamAppBranch.Version},
                     {"buildId", steamAppBranch.BuildId.ToString()},
-                    {"versionPrefix", steamAppBranch.Prefix.ToString()},
+                    {"versionPrefix", steamAppBranch.Prefix == 'v' ? "" : $".{steamAppBranch.Prefix}"},
                     {"packageVersion", steamAppBranch.Version.Substring(1)}
                 });
 
@@ -50,7 +50,7 @@ namespace Bannerlord.ReferenceAssemblies
                 {
                     {"packageName", PackageName},
                     {"moduleName", moduleName},
-                    {"versionPrefix", steamAppBranch.Prefix.ToString()},
+                    {"versionPrefix", steamAppBranch.Prefix == 'v' ? "" : $".{steamAppBranch.Prefix.ToString()}"},
                     {"packageVersion", steamAppBranch.Version.Substring(1)}
                 });
 
@@ -114,9 +114,9 @@ namespace Bannerlord.ReferenceAssemblies
                 WorkingDirectory = outputFolder.Path
             })!.WaitForExit();
         }
+
         private static void GenerateMetaNupkg(SteamAppBranch steamAppBranch, IFolder rootFolder, IEnumerable<string> deps)
         {
-
             var outputFolder = ExecutableFolder
                 .CreateFolder("nuget", CreationCollisionOption.OpenIfExists)
                 .CreateFolder(steamDepotId.ToString(), CreationCollisionOption.OpenIfExists)
