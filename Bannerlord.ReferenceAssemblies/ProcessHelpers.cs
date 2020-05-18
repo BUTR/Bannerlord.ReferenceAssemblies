@@ -6,7 +6,7 @@ namespace Bannerlord.ReferenceAssemblies
     internal static class ProcessHelpers
     {
 
-        public static int Run(string fileName, string args, string workingDirectory = null)
+        public static int Run(string fileName, string args, string? workingDirectory = null)
         {
             using var proc = Process.Start(new ProcessStartInfo(fileName, args)
             {
@@ -16,7 +16,7 @@ namespace Bannerlord.ReferenceAssemblies
             return proc.ExitCode;
         }
 
-        public static int Run(string fileName, string args, out string stdOut, string workingDirectory = null)
+        public static int Run(string fileName, string args, out string stdOut, string? workingDirectory = null)
         {
             using var proc = Process.Start(new ProcessStartInfo(fileName, args)
             {
@@ -28,7 +28,7 @@ namespace Bannerlord.ReferenceAssemblies
             return proc.ExitCode;
         }
 
-        public static int Run(string fileName, string args, out string stdOut, out string stdErr, string workingDirectory = null)
+        public static int Run(string fileName, string args, out string stdOut, out string stdErr, string? workingDirectory = null)
         {
             using var proc = Process.Start(new ProcessStartInfo(fileName, args)
             {

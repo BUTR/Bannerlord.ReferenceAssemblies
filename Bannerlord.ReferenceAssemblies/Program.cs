@@ -203,10 +203,10 @@ namespace Bannerlord.ReferenceAssemblies
 
         private static async Task DownloadBranchAsync(SteamAppBranch steamAppBranch, CancellationToken ct)
         {
-            var folder = ExecutableFolder
-                .CreateFolder("depots", CreationCollisionOption.OpenIfExists)
-                .CreateFolder(steamDepotId.ToString(), CreationCollisionOption.OpenIfExists)
-                .CreateFolder(steamAppBranch.BuildId.ToString(), CreationCollisionOption.OpenIfExists);
+            var folder = await (await (await ExecutableFolder
+                .CreateFolderAsync("depots", CreationCollisionOption.OpenIfExists, ct))
+                .CreateFolderAsync(steamDepotId.ToString(), CreationCollisionOption.OpenIfExists, ct))
+                .CreateFolderAsync(steamAppBranch.BuildId.ToString(), CreationCollisionOption.OpenIfExists, ct);
 
             ContentDownloader.Config.MaxDownloads = 4;
             ContentDownloader.Config.InstallDirectory = folder.Path;

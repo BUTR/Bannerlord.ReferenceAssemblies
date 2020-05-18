@@ -10,7 +10,7 @@ namespace Bannerlord.ReferenceAssemblies
         public bool Equals(ButrNuGetPackage other)
             => Name == other.Name && PkgVersion == other.PkgVersion;
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
             => obj is ButrNuGetPackage other && Equals(other);
 
         public override int GetHashCode()
@@ -30,9 +30,9 @@ namespace Bannerlord.ReferenceAssemblies
                 : nameComparison;
         }
 
-        public int CompareTo(object obj)
+        public int CompareTo(object? obj)
         {
-            if (ReferenceEquals(null, obj))
+            if (obj is null)
                 return 1;
 
             return obj is ButrNuGetPackage other
