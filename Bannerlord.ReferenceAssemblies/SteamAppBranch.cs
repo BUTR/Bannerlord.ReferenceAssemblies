@@ -4,20 +4,18 @@ using System.Collections.Generic;
 namespace Bannerlord.ReferenceAssemblies
 {
 
-    public enum BranchType
-    {
-
-        Unknown = 105,
-        Alpha = 97,
-        Beta = 98,
-        EarlyAccess = 101,
-        Release = 118,
-        Development = 100
-    }
-
     internal struct SteamAppBranch
     {
-
+        public static readonly IReadOnlyDictionary<BranchType, string?> VersionPrefixToName = new SortedList<BranchType, string?>
+        {
+            {BranchType.Alpha, "Alpha"},
+            {BranchType.Beta, "Beta"},
+            {BranchType.EarlyAccess, "EarlyAccess"},
+            {BranchType.Development, "Development"},
+            {BranchType.Release, null},
+            {BranchType.Unknown, "Invalid"},
+        };
+        
         public BranchType Prefix
         {
             get

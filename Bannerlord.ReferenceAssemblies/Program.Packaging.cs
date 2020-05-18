@@ -12,18 +12,8 @@ namespace Bannerlord.ReferenceAssemblies
     public static partial class Program
     {
 
-        private static SortedList<BranchType, string?> Soth = new SortedList<BranchType, string?>
-        {
-            {BranchType.Alpha, "Alpha"},
-            {BranchType.Beta, "Beta"},
-            {BranchType.EarlyAccess, "EarlyAccess"},
-            {BranchType.Development, "Development"},
-            {BranchType.Release, null},
-            {BranchType.Unknown, "Invalid"},
-        };
-
         private static string? GetSuffix(BranchType branchType) 
-            => branchType == BranchType.Release ? null : Soth[branchType];
+            => branchType == BranchType.Release ? null : SteamAppBranch.VersionPrefixToName[branchType];
 
         private static string GetSuffixEx(BranchType branchType)
             => GetSuffix(branchType) is { } str ? $".{str}" : "";
