@@ -65,7 +65,7 @@ namespace Bannerlord.ReferenceAssemblies
 
             foreach (var package in allPackages)
             {
-                if (!package.Identity.Id.StartsWith("Bannerlord.ReferenceAssemblies."))
+                if (!package.Identity.Id.StartsWith(Program.PackageName))
                     continue;
 
                 var versions = new List<ButrNuGetPackage>();

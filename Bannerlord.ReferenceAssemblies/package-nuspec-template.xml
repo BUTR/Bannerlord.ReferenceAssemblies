@@ -2,7 +2,7 @@
 
 <package>
     <metadata minClientVersion="3.3">
-        <id>{{packageName}}.{{moduleName}}{{versionPrefix}}</id>
+        <id>{{packageName}}.{{moduleName}}{{packageNameSuffix}}</id>
         <version>{{packageVersion}}</version>
         <title>Bannerlord Game Reference Assemblies</title>
         <authors>The Mount &amp; Blade Development Community</authors>
@@ -10,7 +10,7 @@
         <developmentDependency>true</developmentDependency>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <repository type="git" url="https://github.com/Bannerlord-Unofficial-Tools-Resources/Bannerlord.ReferenceAssemblies.git" />
-        <tags>bannerlord game reference assemblies build:{{buildId}} {{appVersion}}</tags>
+        <tags>bannerlord game reference assemblies buildId:{{buildId}} depotId:{{depotId}} appId:{{appId}}</tags>
     </metadata>
     <files>
         <file src="ref\*.exe" target="ref\net472" />

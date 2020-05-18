@@ -10,7 +10,7 @@ namespace Bannerlord.ReferenceAssemblies
         private static readonly Regex RxDoubleBraceVariable = new Regex(@"\{\{([^}]+)\}\}", RegexOptions.CultureInvariant);
 
         public static string ApplyTemplate(string template, IReadOnlyDictionary<string, string> repl)
-            => RxDoubleBraceVariable.Replace(template, match => repl[match.Value]);
+            => RxDoubleBraceVariable.Replace(template, match => repl[match.Value.TrimStart('{').TrimEnd('}')]);
 
     }
 

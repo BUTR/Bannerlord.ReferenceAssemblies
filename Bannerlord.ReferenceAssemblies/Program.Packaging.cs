@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -11,24 +12,46 @@ namespace Bannerlord.ReferenceAssemblies
     public static partial class Program
     {
 
+        private static SortedList<BranchType, string?> Soth = new SortedList<BranchType, string?>
+        {
+            {BranchType.Alpha, "Alpha"},
+            {BranchType.Beta, "Beta"},
+            {BranchType.EarlyAccess, "EarlyAccess"},
+            {BranchType.Development, "Development"},
+            {BranchType.Release, null},
+            {BranchType.Unknown, "Invalid"},
+        };
+
+        private static string? GetSuffix(BranchType branchType) 
+            => branchType == BranchType.Release ? null : Soth[branchType];
+
+        private static string GetSuffixEx(BranchType branchType)
+            => GetSuffix(branchType) is { } str ? $".{str}" : "";
+
+        private static string GetPackageName(string module, BranchType branchType)
+            => $"{PackageName}{(string.IsNullOrEmpty(module) ? "" : $".{module}")}{(GetSuffixEx(branchType))}";
+
         private static void GeneratePackages(IEnumerable<SteamAppBranch> toDownload)
         {
             foreach (var branch in toDownload)
             {
-                var rootFolder = ExecutableFolder
+                var refFolder = ExecutableFolder
                     .GetFolder("ref")
                     .GetFolder(steamDepotId.ToString())
                     .GetFolder(branch.BuildId.ToString());
 
                 var deps = new List<string> {"Core"};
-                GenerateNupkg(branch, "", rootFolder);
-                foreach (var module in rootFolder.GetFolder("Modules").GetFolders())
+                // Core
+                GenerateNupkg(branch, "", refFolder);
+                // Modules
+                foreach (var module in refFolder.GetFolder("Modules").GetFolders())
                 {
                     deps.Add(module.Name);
                     GenerateNupkg(branch, module.Name, module);
                 }
 
-                GenerateMetaNupkg(branch, rootFolder, deps);
+                // Meta
+                GenerateMetaNupkg(branch, refFolder, deps);
             }
         }
 
@@ -39,9 +62,11 @@ namespace Bannerlord.ReferenceAssemblies
                     {"packageName", PackageName},
                     {"moduleName", moduleName},
                     {"appVersion", steamAppBranch.Version},
+                    {"appId", steamAppBranch.BuildId.ToString()},
+                    {"depotId", steamAppBranch.BuildId.ToString()},
                     {"buildId", steamAppBranch.BuildId.ToString()},
-                    {"versionPrefix", steamAppBranch.Prefix == 'v' ? "" : $".{steamAppBranch.SpecialVersionType}"},
-                    {"packageVersion", steamAppBranch.Version.Substring(1)}
+                    {"packageNameSuffix", GetSuffixEx(steamAppBranch.Prefix)},
+                    {"packageVersion", steamAppBranch.Version}
                 });
 
         private static string GenerateCsproj(SteamAppBranch steamAppBranch, string moduleName)
@@ -50,27 +75,29 @@ namespace Bannerlord.ReferenceAssemblies
                 {
                     {"packageName", PackageName},
                     {"moduleName", moduleName},
-                    {"versionPrefix", steamAppBranch.Prefix == 'v' ? "" : $".{steamAppBranch.SpecialVersionType}"},
-                    {"packageVersion", steamAppBranch.Version.Substring(1)}
+                    {"packageNameSuffix", GetSuffixEx(steamAppBranch.Prefix)},
+                    {"packageVersion", steamAppBranch.Version}
                 });
 
         private static string GenerateMetaNuspec(SteamAppBranch steamAppBranch, IEnumerable<string> deps)
         {
-            var versionPrefix = steamAppBranch.Prefix == 'v' ? "" : $".{steamAppBranch.SpecialVersionType}";
-            var packageVersion = steamAppBranch.Version.Substring(1);
+            var versionPrefix = steamAppBranch.Prefix == BranchType.Release ? "" : $".{steamAppBranch.Version}";
+            var packageVersion = steamAppBranch.Version;
             var dependenciesXml = deps.Select(dep
                 => new XElement("dependency",
-                    new XAttribute("id", $"{PackageName}.{dep}{versionPrefix}"),
-                    new XAttribute("version", packageVersion))).ToString();
+                    new XAttribute("id", $"{PackageName}.{dep}"),
+                    new XAttribute("version", packageVersion))).ToList();
             return TemplateHelpers.ApplyTemplate(Resourcer.Resource.AsString("metapackage-nuspec-template.xml"),
                 new Dictionary<string, string>
                 {
                     {"packageName", PackageName},
                     {"appVersion", steamAppBranch.Version},
+                    {"appId", steamAppBranch.BuildId.ToString()},
+                    {"depotId", steamAppBranch.BuildId.ToString()},
                     {"buildId", steamAppBranch.BuildId.ToString()},
                     {"packageVersion", packageVersion},
-                    {"versionPrefix", versionPrefix},
-                    {"dependenciesXml", dependenciesXml}
+                    {"packageNameSuffix", GetSuffixEx(steamAppBranch.Prefix)},
+                    {"dependenciesXml", string.Join(Environment.NewLine, dependenciesXml.Select(x => x.ToString()))}
                 });
         }
 
@@ -79,7 +106,7 @@ namespace Bannerlord.ReferenceAssemblies
                 new Dictionary<string, string>
                 {
                     {"packageName", PackageName},
-                    {"versionPrefix", steamAppBranch.Prefix == 'v' ? "" : $".{steamAppBranch.SpecialVersionType}"}
+                    {"packageNameSuffix", GetSuffixEx(steamAppBranch.Prefix)}
                 });
 
         private static void GenerateNupkg(SteamAppBranch steamAppBranch, string moduleName, IFolder rootFolder)
@@ -87,59 +114,54 @@ namespace Bannerlord.ReferenceAssemblies
             var isCore = string.IsNullOrEmpty(moduleName);
             var name = isCore ? "Core" : moduleName;
 
-            var outputFolder = ExecutableFolder
+            var nugetFolder = ExecutableFolder
                 .CreateFolder("nuget", CreationCollisionOption.OpenIfExists)
                 .CreateFolder(steamDepotId.ToString(), CreationCollisionOption.OpenIfExists)
                 .CreateFolder(steamAppBranch.BuildId.ToString(), CreationCollisionOption.OpenIfExists)
                 .CreateFolder(name, CreationCollisionOption.OpenIfExists);
-            var refFolder = outputFolder.CreateFolder("ref", CreationCollisionOption.OpenIfExists);
+            var nugetRefFolder = nugetFolder.CreateFolder("ref", CreationCollisionOption.OpenIfExists);
 
-            outputFolder
-                .CreateFile($"{PackageName}.{name}.{steamAppBranch.Prefix}.nuspec", CreationCollisionOption.ReplaceExisting)
+            var fileNameBase = GetPackageName(name, steamAppBranch.Prefix);
+
+            nugetFolder
+                .CreateFile($"{fileNameBase}.nuspec", CreationCollisionOption.ReplaceExisting)
                 .WriteAllText(GenerateNuspec(steamAppBranch, name));
 
-            outputFolder
-                .CreateFile($"{PackageName}.{name}.{steamAppBranch.Prefix}.csproj", CreationCollisionOption.ReplaceExisting)
+            nugetFolder
+                .CreateFile($"{fileNameBase}.csproj", CreationCollisionOption.ReplaceExisting)
                 .WriteAllText(GenerateCsproj(steamAppBranch, name));
 
             foreach (var file in rootFolder.GetFolder("bin").GetFolder("Win64_Shipping_Client").GetModuleFiles(isCore))
-                file.Copy(refFolder.CreateFile(file.Name, CreationCollisionOption.ReplaceExisting));
+                file.Copy(nugetRefFolder.CreateFile(file.Name, CreationCollisionOption.ReplaceExisting));
 
             var finalFolder = ExecutableFolder
                 .CreateFolder("final", CreationCollisionOption.OpenIfExists);
 
-            ProcessHelpers.Run("dotnet", $"pack -o \"{finalFolder.Path}\"", outputFolder.Path);
-            Process.Start(new ProcessStartInfo("dotnet", $"pack -o {finalFolder.Path}")
-            {
-                WorkingDirectory = outputFolder.Path
-            })!.WaitForExit();
+            ProcessHelpers.Run("dotnet", $"pack -o \"{finalFolder.Path}\"", nugetFolder.Path);
         }
 
         private static void GenerateMetaNupkg(SteamAppBranch steamAppBranch, IFolder rootFolder, IEnumerable<string> deps)
         {
-            var outputFolder = ExecutableFolder
+            var nugetFolder = ExecutableFolder
                 .CreateFolder("nuget", CreationCollisionOption.OpenIfExists)
                 .CreateFolder(steamDepotId.ToString(), CreationCollisionOption.OpenIfExists)
                 .CreateFolder(steamAppBranch.BuildId.ToString(), CreationCollisionOption.OpenIfExists)
                 .CreateFolder("Meta", CreationCollisionOption.OpenIfExists);
-            var refFolder = outputFolder.CreateFolder("ref", CreationCollisionOption.OpenIfExists);
 
-            outputFolder
-                .CreateFile($"{PackageName}.{steamAppBranch.Prefix}.nuspec", CreationCollisionOption.ReplaceExisting)
+            var fileNameBase = GetPackageName("", steamAppBranch.Prefix);
+
+            nugetFolder
+                .CreateFile($"{fileNameBase}.nuspec", CreationCollisionOption.ReplaceExisting)
                 .WriteAllText(GenerateMetaNuspec(steamAppBranch, deps));
 
-            outputFolder
-                .CreateFile($"{PackageName}.{steamAppBranch.Prefix}.csproj", CreationCollisionOption.ReplaceExisting)
+            nugetFolder
+                .CreateFile($"{fileNameBase}.csproj", CreationCollisionOption.ReplaceExisting)
                 .WriteAllText(GenerateMetaCsproj(steamAppBranch));
 
             var finalFolder = ExecutableFolder
                 .CreateFolder("final", CreationCollisionOption.OpenIfExists);
 
-            ProcessHelpers.Run("dotnet", $"pack -o \"{finalFolder.Path}\"", outputFolder.Path);
-            Process.Start(new ProcessStartInfo("dotnet", $"pack -o {finalFolder.Path}")
-            {
-                WorkingDirectory = outputFolder.Path
-            })!.WaitForExit();
+            ProcessHelpers.Run("dotnet", $"pack -o \"{finalFolder.Path}\"", nugetFolder.Path);
         }
 
     }

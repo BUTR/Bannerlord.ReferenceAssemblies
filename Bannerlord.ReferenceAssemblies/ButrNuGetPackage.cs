@@ -15,15 +15,18 @@ namespace Bannerlord.ReferenceAssemblies
 
         public readonly NuGetVersion PkgVersion;
 
-        public readonly string AppVersion;
+        public readonly uint AppId;
+
+        public readonly uint DepotId;
 
         public readonly uint BuildId;
 
-        private ButrNuGetPackage(string name, NuGetVersion pkgVersion, string appVersion, uint buildId)
+        private ButrNuGetPackage(string name, NuGetVersion pkgVersion, uint appId, uint depotId, uint buildId)
         {
             Name = name;
             PkgVersion = pkgVersion;
-            AppVersion = appVersion;
+            AppId = appId;
+            DepotId = depotId;
             BuildId = buildId;
         }
 
@@ -31,12 +34,16 @@ namespace Bannerlord.ReferenceAssemblies
             : this(
                 name,
                 version.Version,
-                ParseAppVersion(version.PackageSearchMetadata.Tags)
-                ?? throw new NotImplementedException($"Missing App Version Tag for {name}"),
+                ParseAppIdEmbedding(version.PackageSearchMetadata.Tags)
+                ?? throw new NotImplementedException($"Missing Steam App Id Tag for {name}"),
+                ParseDepotIdEmbedding(version.PackageSearchMetadata.Tags)
+                ?? throw new NotImplementedException($"Missing Steam Depot Id Tag for {name}"),
                 ParseBuildIdEmbedding(version.PackageSearchMetadata.Tags)
                 ?? throw new NotImplementedException($"Missing Steam Build Id Tag for {name}")
             ) { }
 
+        public override string ToString()
+            => $"{Name} {PkgVersion} ({AppId}, {DepotId}, {BuildId})";
     }
 
 }

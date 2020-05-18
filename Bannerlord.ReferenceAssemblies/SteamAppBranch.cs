@@ -4,32 +4,39 @@ using System.Collections.Generic;
 namespace Bannerlord.ReferenceAssemblies
 {
 
+    public enum BranchType
+    {
+
+        Unknown = 105,
+        Alpha = 97,
+        Beta = 98,
+        EarlyAccess = 101,
+        Release = 118,
+        Development = 100
+    }
+
     internal struct SteamAppBranch
     {
 
-        public static readonly IReadOnlyDictionary<char, string> VersionPrefixToName
-            = new SortedList<char, string>
+        public BranchType Prefix
+        {
+            get
             {
-                {'a', "Alpha"},
-                {'b', "Beta"},
-                {'e', "EarlyAccess"},
-                {'d', "Development"},
-                {'v', null},
-            };
-
-        public string SpecialVersionType
-            => VersionPrefixToName.TryGetValue(Prefix, out var name)
-                ? name
-                : throw new NotImplementedException("Probably an error.");
-
-        public char Prefix => Version?[0] ?? 'i';
-
-        public string Version { get; set; }
+                if (string.IsNullOrEmpty(Name) || Name.Length < 1 || !char.IsDigit(Name[1]) || !Enum.IsDefined(typeof(BranchType), (int) Name[0]))
+                    return BranchType.Unknown;
+                return (BranchType) Name[0];
+            }
+        }
 
         public string Name { get; set; }
 
-        public uint BuildId { get; set; }
+        public string Version { get; set; }
 
+        public uint AppId { get; set; }
+
+        public uint DepotId { get; set; }
+
+        public uint BuildId { get; set; }
     }
 
 }
