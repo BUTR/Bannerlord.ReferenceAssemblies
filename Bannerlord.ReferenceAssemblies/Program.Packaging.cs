@@ -31,6 +31,9 @@ namespace Bannerlord.ReferenceAssemblies
                     {"packageName", PackageName},
                     {"moduleName", moduleName},
                     {"branchVersion", PackageName},
+                    {"appId", steamAppId.ToString()},
+                    {"depotId", steamDepotId.ToString()},
+                    {"buildId", branch.BuildId.ToString()},
                 });
 
         private static string GenerateCsproj(Branch branch, string moduleName)

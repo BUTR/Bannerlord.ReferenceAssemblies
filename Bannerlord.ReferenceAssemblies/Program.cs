@@ -1,4 +1,4 @@
-﻿using DepotDownloader;
+using DepotDownloader;
 using PCLExt.FileStorage;
 using PCLExt.FileStorage.Folders;
 using SteamKit2;
@@ -34,9 +34,9 @@ namespace Bannerlord.ReferenceAssemblies
 
         private static readonly uint steamAppId = 261550;
 
-        private static readonly string os = "windows";
+        private static readonly string steamOS = "windows";
 
-        private static readonly string osArch = "64";
+        private static readonly string steamOSArch = "64";
 
         private static readonly uint steamDepotId = 261551;
 
@@ -61,8 +61,8 @@ namespace Bannerlord.ReferenceAssemblies
             Console.WriteLine("Checking NuGet...");
             var packages = _butrNuget.GetVersions(OrgName);
 
-            foreach (var pkg in packages)
-                Console.WriteLine($"{pkg.Key}: [{string.Join(", ", pkg.Value)}]");
+            foreach (var (name, packageList) in packages)
+                Console.WriteLine($"{name}: [{string.Join(", ", packageList)}]");
 
             Console.WriteLine("Checking branches...");
             var branches = GetAllBranches();
@@ -71,11 +71,11 @@ namespace Bannerlord.ReferenceAssemblies
             var coreNugetVersions
                 = packages.TryGetValue("Bannerlord.ReferenceAssemblies.Core", out var v)
                     ? v
-                    : Array.Empty<string>();
+                    : Array.Empty<ButrNuGetPackage>();
 
             var toDownload
                 = branches.Where(branch => !string.IsNullOrEmpty(branch.Version)
-                    && !coreNugetVersions.Contains(branch.Version)).ToList();
+                    && coreNugetVersions.All(n => n.Version != branch.Version)).ToList();
 
             if (toDownload.Count == 0)
             {
@@ -131,24 +131,12 @@ namespace Bannerlord.ReferenceAssemblies
             }
         }
 
-        private static Branch ConvertVersion(string version, string buildId)
+        private static Branch ConvertVersion(string version, string buildId) => new Branch()
         {
-            var letter = version[0];
-            if (char.IsDigit(version[1]))
-                return new Branch()
-                {
-                    Name = version,
-                    Version = $"{version[1..]}.{buildId}-{letter}",
-                    BuildId = uint.TryParse(buildId, out var r) ? r : 0
-                };
-            else
-                return new Branch()
-                {
-                    Name = version,
-                    Version = "",
-                    BuildId = uint.TryParse(buildId, out var r) ? r : 0
-                };
-        }
+            Name = version,
+            Version = char.IsDigit(version[1]) ? $"{version[1..]}.{buildId}-{version[0]}" : "",
+            BuildId = uint.TryParse(buildId, out var r) ? r : 0
+        };
 
         private static IEnumerable<Branch> GetAllBranches()
         {
@@ -197,8 +185,8 @@ namespace Bannerlord.ReferenceAssemblies
                 Console.WriteLine($"Warning: Unable to load file filters: {ex}");
             }
 
-            ContentDownloader.DownloadAppAsync(steamAppId, steamDepotId, ContentDownloader.INVALID_MANIFEST_ID, branch.Name, os,
-                osArch, null, false, true).ConfigureAwait(false).GetAwaiter().GetResult();
+            ContentDownloader.DownloadAppAsync(steamAppId, steamDepotId, ContentDownloader.INVALID_MANIFEST_ID, branch.Name, steamOS,
+                steamOSArch, null, false, true).ConfigureAwait(false).GetAwaiter().GetResult();
         }
 
         private static void GenerateReference(Branch branch, string moduleName, IFolder rootFolder)
