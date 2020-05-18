@@ -22,7 +22,7 @@ namespace Bannerlord.ReferenceAssemblies
             get
             {
                 var ticks = _stopwatch.ElapsedTicks;
-                return $"[{ticks / StopwatchFrequencyFp:F10}] ";
+                return $"[{ticks / StopwatchFrequencyFp:F7}] ";
             }
         }
 
