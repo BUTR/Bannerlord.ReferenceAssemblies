@@ -1,3 +1,4 @@
 [submodule "DepotDownloader"]
 	path = DepotDownloader
 	url = https://github.com/Bannerlord-Unofficial-Modding-Community/DepotDownloader
+	branch = async-stuff
