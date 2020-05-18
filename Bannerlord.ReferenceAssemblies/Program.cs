@@ -103,7 +103,7 @@ namespace Bannerlord.ReferenceAssemblies
 
             Trace.WriteLine($"Public Branch Matches: {matchedPublicBranch.Name}");
             var toDownload
-                = branches.Where(branch => branch.Prefix != 'i' && !coreVersions[branch.Prefix].Contains(branch.BuildId)).ToList();
+                = branches.Where(branch => branch.Prefix != BranchType.Unknown && !coreVersions[branch.Prefix].Contains(branch.BuildId)).ToList();
 
             if (toDownload.Count == 0)
             {
