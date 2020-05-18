@@ -67,11 +67,10 @@ namespace Bannerlord.ReferenceAssemblies
 
         private static string GenerateMetaNuspec(SteamAppBranch steamAppBranch, IEnumerable<string> deps)
         {
-            var versionPrefix = steamAppBranch.Prefix == BranchType.Release ? "" : $".{steamAppBranch.Version}";
             var packageVersion = steamAppBranch.Version;
             var dependenciesXml = deps.Select(dep
                 => new XElement("dependency",
-                    new XAttribute("id", $"{PackageName}.{dep}"),
+                    new XAttribute("id", $"{PackageName}.{dep}{GetSuffix(steamAppBranch.Prefix)}"),
                     new XAttribute("version", packageVersion))).ToList();
             return TemplateHelpers.ApplyTemplate(Resourcer.Resource.AsString("metapackage-nuspec-template.xml"),
                 new Dictionary<string, string>
