@@ -11,15 +11,11 @@ namespace Bannerlord.ReferenceAssemblies
 
     public static partial class Program
     {
-
-        private static string? GetSuffix(BranchType branchType) 
-            => branchType == BranchType.Release ? null : SteamAppBranch.VersionPrefixToName[branchType];
-
-        private static string GetSuffixEx(BranchType branchType)
-            => GetSuffix(branchType) is { } str ? $".{str}" : "";
+        private static string GetSuffix(BranchType branchType)
+            => SteamAppBranch.VersionPrefixToName[branchType] is { } str ? $".{str}" : "";
 
         private static string GetPackageName(string module, BranchType branchType)
-            => $"{PackageName}{(string.IsNullOrEmpty(module) ? "" : $".{module}")}{(GetSuffixEx(branchType))}";
+            => $"{PackageName}{(string.IsNullOrEmpty(module) ? "" : $".{module}")}{(GetSuffix(branchType))}";
 
         private static void GeneratePackages(IEnumerable<SteamAppBranch> toDownload)
         {
@@ -55,7 +51,7 @@ namespace Bannerlord.ReferenceAssemblies
                     {"appId", steamAppBranch.BuildId.ToString()},
                     {"depotId", steamAppBranch.BuildId.ToString()},
                     {"buildId", steamAppBranch.BuildId.ToString()},
-                    {"packageNameSuffix", GetSuffixEx(steamAppBranch.Prefix)},
+                    {"packageNameSuffix", GetSuffix(steamAppBranch.Prefix)},
                     {"packageVersion", steamAppBranch.Version}
                 });
 
@@ -65,7 +61,7 @@ namespace Bannerlord.ReferenceAssemblies
                 {
                     {"packageName", PackageName},
                     {"moduleName", moduleName},
-                    {"packageNameSuffix", GetSuffixEx(steamAppBranch.Prefix)},
+                    {"packageNameSuffix", GetSuffix(steamAppBranch.Prefix)},
                     {"packageVersion", steamAppBranch.Version}
                 });
 
@@ -86,7 +82,7 @@ namespace Bannerlord.ReferenceAssemblies
                     {"depotId", steamAppBranch.BuildId.ToString()},
                     {"buildId", steamAppBranch.BuildId.ToString()},
                     {"packageVersion", packageVersion},
-                    {"packageNameSuffix", GetSuffixEx(steamAppBranch.Prefix)},
+                    {"packageNameSuffix", GetSuffix(steamAppBranch.Prefix)},
                     {"dependenciesXml", string.Join(Environment.NewLine, dependenciesXml.Select(x => x.ToString()))}
                 });
         }
@@ -96,7 +92,7 @@ namespace Bannerlord.ReferenceAssemblies
                 new Dictionary<string, string>
                 {
                     {"packageName", PackageName},
-                    {"packageNameSuffix", GetSuffixEx(steamAppBranch.Prefix)}
+                    {"packageNameSuffix", GetSuffix(steamAppBranch.Prefix)}
                 });
 
         private static void GenerateNupkg(SteamAppBranch steamAppBranch, string moduleName, IFolder rootFolder)
