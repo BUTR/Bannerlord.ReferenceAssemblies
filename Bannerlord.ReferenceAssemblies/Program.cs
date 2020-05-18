@@ -3,7 +3,6 @@ using PCLExt.FileStorage;
 using PCLExt.FileStorage.Folders;
 using SteamKit2;
 using System;
-using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -104,6 +103,8 @@ namespace Bannerlord.ReferenceAssemblies
             Trace.WriteLine($"Public Branch Matches: {matchedPublicBranch.Name}");
             var toDownload
                 = branches.Where(branch => branch.Prefix != BranchType.Unknown && !coreVersions[branch.Prefix].Contains(branch.BuildId)).ToList();
+
+            toDownload = toDownload.Take(1).ToList();
 
             if (toDownload.Count == 0)
             {
@@ -248,8 +249,8 @@ namespace Bannerlord.ReferenceAssemblies
 
             foreach (var file in rootFolder.GetFolder("bin").GetFolder("Win64_Shipping_Client").GetModuleFiles(isCore))
             {
-                if (Run("dotnet", $"refgen -f -o \"{Path.Combine(outputFolder.Path, file.Name)}\" \"{file.Path}\"") != 0)
-                    throw new NotImplementedException("Generating reference assemblies failed.");
+                var args = $"-f|-o|{Path.Combine(outputFolder.Path, file.Name)}|{file.Path}".Split('|');
+                ReferenceAssemblyGenerator.Program.Main(args);
             }
         }
 
