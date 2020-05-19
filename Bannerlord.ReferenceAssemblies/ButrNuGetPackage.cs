@@ -11,6 +11,19 @@ namespace Bannerlord.ReferenceAssemblies
     internal readonly partial struct ButrNuGetPackage
     {
 
+        public static ButrNuGetPackage? Get(string name, NuGetVersion version, string tags)
+        {
+            var appId = ParseAppIdEmbedding(tags);
+            var depotId = ParseDepotIdEmbedding(tags);
+            var buildId = ParseBuildIdEmbedding(tags);
+
+            if (appId == null || depotId == null || buildId == null)
+                return null;
+
+            return new ButrNuGetPackage(name, version, appId.Value, depotId.Value, buildId.Value);
+        }
+
+
         public readonly string Name;
 
         public readonly NuGetVersion PkgVersion;

@@ -4,13 +4,16 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using NuGet.Common;
 using NuGet.Configuration;
+using NuGet.Packaging.Core;
 using NuGet.Protocol;
 using NuGet.Protocol.Core.Types;
+using NuGet.Versioning;
 using PCLExt.FileStorage;
 using PCLExt.FileStorage.Folders;
 
@@ -19,6 +22,9 @@ namespace Bannerlord.ReferenceAssemblies
 
     internal class ButrNugetContext
     {
+        private static readonly int MaxConcurrentOperations = 5;
+
+        private static Regex RxPackageName = new Regex($"{Program.PackageName}*", RegexOptions.Compiled);
 
         private static ISettings NugetConfig = Settings.LoadDefaultSettings(Environment.CurrentDirectory);
 
@@ -58,27 +64,97 @@ namespace Bannerlord.ReferenceAssemblies
 
             var sourceRepository = new SourceRepository(packageSource, Repository.Provider.GetCoreV3());
             var packageLister = sourceRepository.GetResource<PackageSearchResource>();
-            var allPackages = await packageLister.SearchAsync("bannerlord",
-                new SearchFilter(true) {SupportedFrameworks = new[] {"net472"}}, 0, 100, NullLogger.Instance, ct);
+            var packages = (await packageLister.SearchAsync("bannerlord",
+                new SearchFilter(true) {SupportedFrameworks = new[] {"net472"}}, 0, 100, NullLogger.Instance, ct))
+                .Where(p => RxPackageName.IsMatch(p.Identity.Id));
 
-            var returnVal = new Dictionary<string, IReadOnlyList<ButrNuGetPackage>>();
+            var sourceCacheContext = new SourceCacheContext();
+            var finderPackageByIdResource = sourceRepository.GetResource<FindPackageByIdResource>();
+            var metadataResource = sourceRepository.GetResource<PackageMetadataResource>();
 
-            foreach (var package in allPackages)
+            return await packages.ToAsyncEnumerable().SelectParallel(MaxConcurrentOperations, async package =>
             {
                 if (!package.Identity.Id.StartsWith(Program.PackageName))
+                    return default;
+
+                var versions = GetVersionsAsync(finderPackageByIdResource.GetAllVersionsAsync(package.Identity.Id, sourceCacheContext, NullLogger.Instance, ct));
+                var metadatas = GetMetadataAsync(versions, version => metadataResource.GetMetadataAsync(new PackageIdentity(package.Identity.Id, version), sourceCacheContext, NullLogger.Instance, ct), ct);
+                return new KeyValuePair<string, IReadOnlyList<ButrNuGetPackage>>(package.Identity.Id, await GetPackageVersionsAsync(metadatas, ct).ToListAsync(ct));
+            }, ct).ToDictionaryAsync(x => x.Key, x => x.Value, ct);
+        }
+
+        private static async IAsyncEnumerable<NuGetVersion> GetVersionsAsync(Task<IEnumerable<NuGetVersion>> versions)
+        {
+            foreach (var version in await versions)
+            {
+                yield return version;
+            }
+        }
+        private static IAsyncEnumerable<IPackageSearchMetadata> GetMetadataAsync(IAsyncEnumerable<NuGetVersion> versions, Func<NuGetVersion, Task<IPackageSearchMetadata>> getMeta, CancellationToken cancellationToken = default)
+            => versions.SelectParallel(MaxConcurrentOperations, getMeta, cancellationToken);
+
+        private static async IAsyncEnumerable<ButrNuGetPackage> GetPackageVersionsAsync(IAsyncEnumerable<IPackageSearchMetadata> metadatas, [EnumeratorCancellation] CancellationToken cancellation = default)
+        {
+            await foreach (var metadata in metadatas.WithCancellation(cancellation))
+            {
+                var package = ButrNuGetPackage.Get(metadata.Identity.Id, metadata.Identity.Version, metadata.Tags);
+                if (package == null)
                     continue;
 
-                var versions = new List<ButrNuGetPackage>();
-                returnVal.Add(package.Identity.Id, versions);
-                var packageVersions = await package.GetVersionsAsync();
-                versions.AddRange(packageVersions
-                    .Where(version => !string.IsNullOrEmpty(version.PackageSearchMetadata?.Tags))
-                    .Select(version => new ButrNuGetPackage(package.Identity.Id, version)));
+                yield return package.Value;
             }
-
-            return returnVal;
         }
 
     }
 
+    internal static class IAsyncEnumerableExtensions
+    {
+
+        public static async IAsyncEnumerable<TResult> SelectParallel<TResult, TSource>(this IAsyncEnumerable<TSource> enumerable, int maxConcurrent, Func<TSource, Task<TResult>> func, [EnumeratorCancellation] CancellationToken cancellation = default)
+        {
+            var semaphore = new SemaphoreSlim(maxConcurrent);
+            var returnVal = new List<TResult>();
+            var tasks = await enumerable.Select(@enum => Task.Run(async () =>
+            {
+                try
+                {
+                    await semaphore.WaitAsync(cancellation).ConfigureAwait(false);
+                    returnVal.Add(await func(@enum));
+                }
+                finally
+                {
+                    semaphore.Release();
+                }
+            }, cancellation))
+                .ToListAsync(cancellationToken: cancellation);
+            await Task.WhenAll(tasks).ConfigureAwait(false);
+
+            foreach (var val in returnVal)
+                yield return val;
+        }
+
+        public static IEnumerable<TResult> SelectParallel<TResult, TSource>(this IEnumerable<TSource> enumerable, int maxConcurrent, Func<TSource, TResult> func)
+        {
+            var semaphore = new SemaphoreSlim(maxConcurrent);
+            var returnVal = new List<TResult>();
+            var tasks = enumerable.Select(@enum => Task.Run(() =>
+            {
+                try
+                {
+                    semaphore.Wait();
+                    returnVal.Add(func(@enum));
+                }
+                finally
+                {
+                    semaphore.Release();
+                }
+            }))
+                .ToList();
+            Task.WhenAll(tasks).ConfigureAwait(false).GetAwaiter().GetResult();
+
+            foreach (var val in returnVal)
+                yield return val;
+        }
+
+    }
 }

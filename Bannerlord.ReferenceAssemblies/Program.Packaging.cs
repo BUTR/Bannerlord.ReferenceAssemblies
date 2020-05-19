@@ -48,8 +48,8 @@ namespace Bannerlord.ReferenceAssemblies
                     {"packageName", PackageName},
                     {"moduleName", moduleName},
                     {"appVersion", steamAppBranch.Version},
-                    {"appId", steamAppBranch.BuildId.ToString()},
-                    {"depotId", steamAppBranch.BuildId.ToString()},
+                    {"appId", steamAppBranch.AppId.ToString()},
+                    {"depotId", steamAppBranch.DepotId.ToString()},
                     {"buildId", steamAppBranch.BuildId.ToString()},
                     {"packageNameSuffix", GetSuffix(steamAppBranch.Prefix)},
                     {"packageVersion", steamAppBranch.Version}
@@ -77,8 +77,8 @@ namespace Bannerlord.ReferenceAssemblies
                 {
                     {"packageName", PackageName},
                     {"appVersion", steamAppBranch.Version},
-                    {"appId", steamAppBranch.BuildId.ToString()},
-                    {"depotId", steamAppBranch.BuildId.ToString()},
+                    {"appId", steamAppBranch.AppId.ToString()},
+                    {"depotId", steamAppBranch.DepotId.ToString()},
                     {"buildId", steamAppBranch.BuildId.ToString()},
                     {"packageVersion", packageVersion},
                     {"packageNameSuffix", GetSuffix(steamAppBranch.Prefix)},
