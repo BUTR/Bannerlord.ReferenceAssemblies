@@ -139,10 +139,10 @@ namespace Bannerlord.ReferenceAssemblies
 
         private static string? GetAssembliesVersion(string path)
         {
-            if (Run("dotnet", $"getblver \"{path}\"", out var versionStr) != 0)
+            if (Run("dotnet", $"getblver {path}", out var versionStr) != 0)
                 return null;
 
-            return versionStr;
+            return versionStr.Replace("\r", "").Replace("\n", "");
         }
 
         private static void GenerateReferences(IEnumerable<SteamAppBranch> toDownload)

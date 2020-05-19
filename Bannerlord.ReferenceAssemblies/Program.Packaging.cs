@@ -32,7 +32,7 @@ namespace Bannerlord.ReferenceAssemblies
                     .GetFolder(branch.BuildId.ToString())
                     .GetFolder("bin")
                     .GetFolder("Win64_Shipping_Client");
-                var version = GetAssembliesVersion(coreBinFolder.Path);
+                var version = GetAssembliesVersion(coreBinFolder.Path)?.Split('.')?.Last();
                 if (version == null)
                 {
                     Trace.WriteLine($"Branch {branch.Name} ({branch.AppId} {branch.DepotId} {branch.BuildId}) does not include a readable App Version, skipping...");

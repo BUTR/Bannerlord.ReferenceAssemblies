@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Bannerlord.ReferenceAssemblies
 {
@@ -34,7 +35,11 @@ namespace Bannerlord.ReferenceAssemblies
 
         public uint BuildId { get; set; }
 
-        public string GetVersion(string appVersion) => char.IsDigit(Name[1]) ? $"{Name[1..]}.{appVersion}-{Name[0]}" : "";
+        public string GetVersion(string appVersion)
+            => char.IsDigit(Name[1]) ? $"{Name[1..]}.{appVersion}-{Name[0]}" : "";
+
+        public override string ToString()
+            => $"{Name} ({AppId} {DepotId} {BuildId})";
 
     }
 
