@@ -114,7 +114,7 @@ namespace Bannerlord.ReferenceAssemblies
             Trace.WriteLine("New versions:");
 
             foreach (var br in toDownload)
-                Trace.WriteLine($"{br.Name} {br.Version}: ({br.BuildId})");
+                Trace.WriteLine($"{br.Name}: ({br.AppId} {br.DepotId} {br.BuildId})");
 
             Trace.WriteLine("Checking downloading...");
             await DownloadBranchesAsync(toDownload, ct);
@@ -183,7 +183,6 @@ namespace Bannerlord.ReferenceAssemblies
             => new SteamAppBranch()
             {
                 Name = version,
-                Version = char.IsDigit(version[1]) ? $"{version[1..]}.{buildId}-{version[0]}" : "",
                 AppId = steamAppId,
                 DepotId = steamDepotId,
                 BuildId = uint.TryParse(buildId, out var r) ? r : 0
