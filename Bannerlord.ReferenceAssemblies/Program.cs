@@ -137,10 +137,10 @@ namespace Bannerlord.ReferenceAssemblies
             ContentDownloader.ShutdownSteam3();
         }
 
-        private static string GetAssembliesVersion(string path)
+        private static string? GetAssembliesVersion(string path)
         {
             if (Run("dotnet", $"getblver \"{path}\"", out var versionStr) != 0)
-                throw new NotImplementedException("Resolving assemblies version failed.");
+                return null;
 
             return versionStr;
         }
