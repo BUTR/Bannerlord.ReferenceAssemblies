@@ -14,21 +14,25 @@ jobs:
     steps:
     - uses: actions/delete-package-versions@v1
       with:
-        package-name: Bannerlord.ReferenceAssemblies.Core
+        package-name: Bannerlord.ReferenceAssemblies.Core.EarlyAccess
         num-old-versions-to-delete: 30
     - uses: actions/delete-package-versions@v1
       with:
-        package-name: Bannerlord.ReferenceAssemblies.StoryMode
+        package-name: Bannerlord.ReferenceAssemblies.StoryMode.EarlyAccess
         num-old-versions-to-delete: 30
     - uses: actions/delete-package-versions@v1
       with:
-        package-name: Bannerlord.ReferenceAssemblies.Native
+        package-name: Bannerlord.ReferenceAssemblies.Native.EarlyAccess
         num-old-versions-to-delete: 30
     - uses: actions/delete-package-versions@v1
       with:
-        package-name: Bannerlord.ReferenceAssemblies.CustomBattle
+        package-name: Bannerlord.ReferenceAssemblies.CustomBattle.EarlyAccess
         num-old-versions-to-delete: 30
     - uses: actions/delete-package-versions@v1
       with:
-        package-name: Bannerlord.ReferenceAssemblies.SandBox
+        package-name: Bannerlord.ReferenceAssemblies.SandBox.EarlyAccess
+        num-old-versions-to-delete: 30
+    - uses: actions/delete-package-versions@v1
+      with:
+        package-name: Bannerlord.ReferenceAssemblies.EarlyAccess
         num-old-versions-to-delete: 30
