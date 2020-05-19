@@ -36,7 +36,7 @@ namespace Bannerlord.ReferenceAssemblies
                 if (version == null)
                 {
                     Trace.WriteLine($"Branch {branch.Name} ({branch.AppId} {branch.DepotId} {branch.BuildId}) does not include a readable App Version, skipping...");
-                    return;
+                    continue;
                 }
 
                 var deps = new List<string> {"Core"};
