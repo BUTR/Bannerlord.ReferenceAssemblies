@@ -49,7 +49,7 @@ namespace Bannerlord.ReferenceAssemblies
 
         private static ButrNugetContext _butrNuget;
 
-        private static readonly string OrgName = "Bannerlord-Unofficial-Tools-Resources";
+        private static readonly string OrgName = "BUTR";
 
         public static async Task<int> Main(string[] args)
         {
