@@ -1,21 +1,18 @@
-using System;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
 
 namespace Bannerlord.ReferenceAssemblies
 {
-
-
-    public class CustomTraceListener : TraceListener {
-
+    public class CustomTraceListener : TraceListener
+    {
         private readonly TextWriter _sink;
 
         private readonly StringBuilder _buffer = new StringBuilder();
-        
+
         private readonly Stopwatch _stopwatch = Stopwatch.StartNew();
 
-        private static readonly double StopwatchFrequencyFp = (double)Stopwatch.Frequency;
+        private static readonly double StopwatchFrequencyFp = (double) Stopwatch.Frequency;
 
         private string LinePrefix
         {
@@ -26,11 +23,13 @@ namespace Bannerlord.ReferenceAssemblies
             }
         }
 
-        private void FlushCompleteLines() {
+        private void FlushCompleteLines()
+        {
             var eol = BufferIndexOfEol();
             if (eol == -1) return;
 
-            do {
+            do
+            {
                 var line = _buffer.ToString(0, eol);
                 _sink.WriteLine(LinePrefix + line);
                 _buffer.Remove(0, eol + 1);
@@ -42,10 +41,12 @@ namespace Bannerlord.ReferenceAssemblies
         public CustomTraceListener(TextWriter sink)
             => _sink = sink;
 
-        public override void Write(string message) {
+        public override void Write(string message)
+        {
             if (message == null) return;
 
-            if (_buffer.Length == 0 && message.EndsWith('\n')) {
+            if (_buffer.Length == 0 && message.EndsWith('\n'))
+            {
                 _sink.WriteLine(LinePrefix + message.Substring(0, message.Length - 1));
                 return;
             }
@@ -54,10 +55,12 @@ namespace Bannerlord.ReferenceAssemblies
             FlushCompleteLines();
         }
 
-        public override void WriteLine(string message) {
+        public override void WriteLine(string message)
+        {
             if (message == null) return;
 
-            if (_buffer.Length == 0) {
+            if (_buffer.Length == 0)
+            {
                 _sink.WriteLine(LinePrefix + message);
                 return;
             }
@@ -66,8 +69,10 @@ namespace Bannerlord.ReferenceAssemblies
             FlushCompleteLines();
         }
 
-        int BufferIndexOfEol() {
-            for (var i = 0; i < _buffer.Length; ++i) {
+        private int BufferIndexOfEol()
+        {
+            for (var i = 0; i < _buffer.Length; ++i)
+            {
                 if (_buffer[i] == '\n')
                     return i;
             }
@@ -75,12 +80,11 @@ namespace Bannerlord.ReferenceAssemblies
             return -1;
         }
 
-        protected override void Dispose(bool disposing) {
+        protected override void Dispose(bool disposing)
+        {
             FlushCompleteLines();
-            _sink.WriteLine(LinePrefix + _buffer.ToString());
+            _sink.WriteLine(LinePrefix + _buffer);
             _buffer.Clear();
         }
-
     }
-
 }

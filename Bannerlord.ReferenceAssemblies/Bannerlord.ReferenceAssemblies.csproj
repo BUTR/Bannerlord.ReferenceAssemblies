@@ -4,6 +4,7 @@
         <OutputType>Exe</OutputType>
         <TargetFramework>netcoreapp3.1</TargetFramework>
         <Nullable>enable</Nullable>
+      <langversion>8.0</langversion>
     </PropertyGroup>
 
     <ItemGroup>
@@ -15,6 +16,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <PackageReference Include="CommandLineParser" Version="2.8.0" />
         <PackageReference Include="JetBrains.Annotations" Version="2020.1.0" PrivateAssets="all" />
         <PackageReference Include="NuGet.Configuration" Version="5.5.1" />
         <PackageReference Include="NuGet.Protocol" Version="5.5.1" />
@@ -30,18 +32,17 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Compile Update="ButrNuGetPackage.Comparison.cs">
-        <DependentUpon>ButrNuGetPackage.cs</DependentUpon>
+      <Compile Update="NuGetPackage.Comparison.cs">
+        <DependentUpon>NuGetPackage.cs</DependentUpon>
       </Compile>
-      <Compile Update="ButrNuGetPackage.Parsing.cs">
-        <DependentUpon>ButrNuGetPackage.cs</DependentUpon>
+      <Compile Update="NuGetPackage.Parsing.cs">
+        <DependentUpon>NuGetPackage.cs</DependentUpon>
       </Compile>
     </ItemGroup>
 
     <ItemGroup>
-        <Compile Update="Program.Packaging.cs">
-            <DependentUpon>Program.cs</DependentUpon>
-        </Compile>
+      <None Include="Tool.Packaging.cs" />
+      <None Include="Tool.Steam.cs" />
     </ItemGroup>
 
 </Project>

@@ -2,10 +2,8 @@ using System.Diagnostics;
 
 namespace Bannerlord.ReferenceAssemblies
 {
-
     internal static class ProcessHelpers
     {
-
         public static int Run(string fileName, string args, string? workingDirectory = null)
         {
             using var proc = Process.Start(new ProcessStartInfo(fileName, args)
@@ -41,7 +39,5 @@ namespace Bannerlord.ReferenceAssemblies
             stdErr = proc.StandardError.ReadToEnd();
             return proc.ExitCode;
         }
-
     }
-
 }

@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 namespace Bannerlord.ReferenceAssemblies
 {
 
-    internal readonly partial struct ButrNuGetPackage
+    internal readonly partial struct NuGetPackage
     {
 
         private static readonly Regex RxSteamAppIdEmbedding

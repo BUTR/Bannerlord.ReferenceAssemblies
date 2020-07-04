@@ -1,38 +1,38 @@
+using PCLExt.FileStorage;
+using PCLExt.FileStorage.Extensions;
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Xml.Linq;
-using PCLExt.FileStorage;
-using PCLExt.FileStorage.Extensions;
 
 namespace Bannerlord.ReferenceAssemblies
 {
-
-    public static partial class Program
+    internal partial class Tool
     {
-        private static string GetSuffix(BranchType branchType)
-            => SteamAppBranch.VersionPrefixToName[branchType] is { } str ? $".{str}" : "";
+        private static string GetSuffix(BranchType branchType) =>
+            SteamAppBranch.VersionPrefixToName[branchType] is { } str ? $".{str}" : "";
 
-        private static string GetPackageName(string module, BranchType branchType)
-            => $"{PackageName}{(string.IsNullOrEmpty(module) ? "" : $".{module}")}{(GetSuffix(branchType))}";
+        private string GetPackageName(string module, BranchType branchType) =>
+            $"{_options.PackageBaseName}{(string.IsNullOrEmpty(module) ? "" : $".{module}")}{GetSuffix(branchType)}";
 
-        private static void GeneratePackages(IEnumerable<SteamAppBranch> toDownload)
+        private void GeneratePackages(IEnumerable<SteamAppBranch> toDownload)
         {
             foreach (var branch in toDownload)
             {
                 var refFolder = ExecutableFolder
                     .GetFolder("ref")
-                    .GetFolder(steamDepotId.ToString())
+                    .GetFolder(_options.SteamDepotId.ToString())
                     .GetFolder(branch.BuildId.ToString());
 
                 var coreBinFolder = ExecutableFolder
                     .GetFolder("depots") // ref?
-                    .GetFolder(steamDepotId.ToString())
+                    .GetFolder(_options.SteamDepotId.ToString())
                     .GetFolder(branch.BuildId.ToString())
                     .GetFolder("bin")
                     .GetFolder("Win64_Shipping_Client");
-                var version = GetAssembliesVersion(coreBinFolder.Path)?.Split('.')?.Last();
+                var version = GetAssembliesVersion(coreBinFolder.Path)?.Split('.').Last();
                 if (version == null)
                 {
                     Trace.WriteLine($"Branch {branch.Name} ({branch.AppId} {branch.DepotId} {branch.BuildId}) does not include a readable App Version, skipping...");
@@ -54,11 +54,11 @@ namespace Bannerlord.ReferenceAssemblies
             }
         }
 
-        private static string GenerateNuspec(SteamAppBranch steamAppBranch, string appVersion, string moduleName)
-            => TemplateHelpers.ApplyTemplate(Resourcer.Resource.AsString("package-nuspec-template.xml"),
+        private string GenerateNuspec(SteamAppBranch steamAppBranch, string appVersion, string moduleName) =>
+            TemplateHelpers.ApplyTemplate(Resourcer.Resource.AsString("package-nuspec-template.xml"),
                 new Dictionary<string, string>
                 {
-                    {"packageName", PackageName},
+                    {"packageName", _options.PackageBaseName},
                     {"moduleName", moduleName},
                     {"appVersion", appVersion},
                     {"appId", steamAppBranch.AppId.ToString()},
@@ -68,28 +68,27 @@ namespace Bannerlord.ReferenceAssemblies
                     {"packageVersion", steamAppBranch.GetVersion(appVersion)}
                 });
 
-        private static string GenerateCsproj(SteamAppBranch steamAppBranch, string appVersion, string moduleName)
-            => TemplateHelpers.ApplyTemplate(Resourcer.Resource.AsString("package-csproj-template.xml"),
+        private string GenerateCsproj(SteamAppBranch steamAppBranch, string appVersion, string moduleName) =>
+            TemplateHelpers.ApplyTemplate(Resourcer.Resource.AsString("package-csproj-template.xml"),
                 new Dictionary<string, string>
                 {
-                    {"packageName", PackageName},
+                    {"packageName", _options.PackageBaseName},
                     {"moduleName", moduleName},
                     {"appVersion", appVersion},
                     {"packageNameSuffix", GetSuffix(steamAppBranch.Prefix)},
                     {"packageVersion", steamAppBranch.GetVersion(appVersion)}
                 });
 
-        private static string GenerateMetaNuspec(SteamAppBranch steamAppBranch, string appVersion, IEnumerable<string> deps)
+        private string GenerateMetaNuspec(SteamAppBranch steamAppBranch, string appVersion, IEnumerable<string> deps)
         {
             var packageVersion = steamAppBranch.GetVersion(appVersion);
-            var dependenciesXml = deps.Select(dep
-                => new XElement("dependency",
-                    new XAttribute("id", $"{PackageName}.{dep}{GetSuffix(steamAppBranch.Prefix)}"),
+            var dependenciesXml = deps.Select(dep =>new XElement("dependency",
+                    new XAttribute("id", $"{_options.PackageBaseName}.{dep}{GetSuffix(steamAppBranch.Prefix)}"),
                     new XAttribute("version", packageVersion))).ToList();
             return TemplateHelpers.ApplyTemplate(Resourcer.Resource.AsString("metapackage-nuspec-template.xml"),
                 new Dictionary<string, string>
                 {
-                    {"packageName", PackageName},
+                    {"packageName", _options.PackageBaseName},
                     {"appVersion", appVersion},
                     {"appId", steamAppBranch.AppId.ToString()},
                     {"depotId", steamAppBranch.DepotId.ToString()},
@@ -100,23 +99,23 @@ namespace Bannerlord.ReferenceAssemblies
                 });
         }
 
-        private static string GenerateMetaCsproj(SteamAppBranch steamAppBranch, string appVersion)
-            => TemplateHelpers.ApplyTemplate(Resourcer.Resource.AsString("metapackage-csproj-template.xml"),
+        private string GenerateMetaCsproj(SteamAppBranch steamAppBranch, string appVersion) =>
+            TemplateHelpers.ApplyTemplate(Resourcer.Resource.AsString("metapackage-csproj-template.xml"),
                 new Dictionary<string, string>
                 {
-                    {"packageName", PackageName},
+                    {"packageName", _options.PackageBaseName},
                     {"packageNameSuffix", GetSuffix(steamAppBranch.Prefix)},
                     {"appVersion", appVersion},
                 });
 
-        private static void GenerateNupkg(SteamAppBranch steamAppBranch, string appVersion, string moduleName, IFolder rootFolder)
+        private void GenerateNupkg(SteamAppBranch steamAppBranch, string appVersion, string moduleName, IFolder rootFolder)
         {
             var isCore = string.IsNullOrEmpty(moduleName);
             var name = isCore ? "Core" : moduleName;
 
             var nugetFolder = ExecutableFolder
                 .CreateFolder("nuget", CreationCollisionOption.OpenIfExists)
-                .CreateFolder(steamDepotId.ToString(), CreationCollisionOption.OpenIfExists)
+                .CreateFolder(_options.SteamDepotId.ToString(), CreationCollisionOption.OpenIfExists)
                 .CreateFolder(steamAppBranch.BuildId.ToString(), CreationCollisionOption.OpenIfExists)
                 .CreateFolder(name, CreationCollisionOption.OpenIfExists);
             var nugetRefFolder = nugetFolder.CreateFolder("ref", CreationCollisionOption.OpenIfExists);
@@ -140,11 +139,11 @@ namespace Bannerlord.ReferenceAssemblies
             ProcessHelpers.Run("dotnet", $"pack -o \"{finalFolder.Path}\"", nugetFolder.Path);
         }
 
-        private static void GenerateMetaNupkg(SteamAppBranch steamAppBranch, string appVersion, IEnumerable<string> deps)
+        private void GenerateMetaNupkg(SteamAppBranch steamAppBranch, string appVersion, IEnumerable<string> deps)
         {
             var nugetFolder = ExecutableFolder
                 .CreateFolder("nuget", CreationCollisionOption.OpenIfExists)
-                .CreateFolder(steamDepotId.ToString(), CreationCollisionOption.OpenIfExists)
+                .CreateFolder(_options.SteamDepotId.ToString(), CreationCollisionOption.OpenIfExists)
                 .CreateFolder(steamAppBranch.BuildId.ToString(), CreationCollisionOption.OpenIfExists)
                 .CreateFolder("Meta", CreationCollisionOption.OpenIfExists);
 
@@ -163,7 +162,5 @@ namespace Bannerlord.ReferenceAssemblies
 
             ProcessHelpers.Run("dotnet", $"pack -o \"{finalFolder.Path}\"", nugetFolder.Path);
         }
-
     }
-
 }

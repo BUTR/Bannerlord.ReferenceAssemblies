@@ -1,9 +1,7 @@
 namespace Bannerlord.ReferenceAssemblies
 {
-
     public enum BranchType
     {
-
         Unknown = 'i',
         Alpha = 'a',
         Beta = 'b',
@@ -11,5 +9,4 @@ namespace Bannerlord.ReferenceAssemblies
         Release = 'v',
         Development = 'd'
     }
-
 }
