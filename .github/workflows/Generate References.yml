@@ -4,9 +4,8 @@ on:
   push:
     branches: 
       - master
-  repository_dispatch:
-    types:
-      - build
+  schedule:
+    - cron: "* */8 * * *"
   
 jobs:
   build:   
