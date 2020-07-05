@@ -90,7 +90,7 @@ namespace Bannerlord.ReferenceAssemblies
 
 
 
-        private static string? GetAssembliesVersion(string path) => ProcessHelpers.Run("getblmeta", $"getchangeset -f {path}", out var versionStr) != 0
+        private static string? GetAssembliesVersion(string path) => ProcessHelpers.Run("dotnet", $"getblmeta getchangeset -f {path}", out var versionStr) != 0
             ? null
             : versionStr.Replace("\r", "").Replace("\n", "");
 
