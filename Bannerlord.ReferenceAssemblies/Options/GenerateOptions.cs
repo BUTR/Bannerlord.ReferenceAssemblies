@@ -2,7 +2,6 @@ using CommandLine;
 
 namespace Bannerlord.ReferenceAssemblies.Options
 {
-    [Verb("generate")]
     internal class GenerateOptions
     {
         [Option("steamLogin", Required = true)]

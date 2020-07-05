@@ -47,7 +47,7 @@ namespace Bannerlord.ReferenceAssemblies
 
             if (_buffer.Length == 0 && message.EndsWith('\n'))
             {
-                _sink.WriteLine(LinePrefix + message.Substring(0, message.Length - 1));
+                _sink.WriteLine(LinePrefix + message[0..^1]);
                 return;
             }
 

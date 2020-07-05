@@ -5,6 +5,7 @@ using CommandLine;
 using System;
 using System.Diagnostics;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Bannerlord.ReferenceAssemblies
 {
@@ -23,7 +24,7 @@ namespace Bannerlord.ReferenceAssemblies
     /// </summary>
     public static class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var ctrlC = new CancellationTokenSource();
             Console.CancelKeyPress += (sender, eventArgs) =>
@@ -38,17 +39,9 @@ namespace Bannerlord.ReferenceAssemblies
             Trace.Listeners.Add(new CustomTraceListener(Console.Out));
 
 
-            Parser
-                .Default
-                .ParseArguments<GenerateOptions>(args)
-                .WithParsed<GenerateOptions>(async o =>
-                {
-                    new Tool(o).ExecuteAsync(ctrlC.Token);
-                })
-                .WithNotParsed(e =>
-                {
-                    ;
-                });
+            var result = Parser.Default.ParseArguments<GenerateOptions>(args);
+            await result.WithParsedAsync<GenerateOptions>(o => new Tool(o).ExecuteAsync(ctrlC.Token));
+            result.WithNotParsed(e => Console.Error.WriteLine(e.ToString()));
         }
     }
 }

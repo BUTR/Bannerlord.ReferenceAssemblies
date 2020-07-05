@@ -11,6 +11,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Bannerlord.ReferenceAssemblies
 {
@@ -25,12 +26,12 @@ namespace Bannerlord.ReferenceAssemblies
             _options = options;
         }
 
-        public void ExecuteAsync(CancellationToken ct)
+        public async Task ExecuteAsync(CancellationToken ct)
         {
             var nugetFeed = new NuGetFeed(_options.FeedUrl, _options.FeedUser, _options.FeedPassword, _options.PackageBaseName);
 
             Trace.WriteLine("Checking NuGet...");
-            var packages = nugetFeed.GetVersionsAsync(ct).GetAwaiter().GetResult();
+            var packages = await nugetFeed.GetVersionsAsync(ct);
 
             foreach (var (key, value) in packages)
                 Trace.WriteLine($"{key}: [{string.Join(", ", value)}]");
@@ -39,8 +40,8 @@ namespace Bannerlord.ReferenceAssemblies
             var branches = GetAllBranches().ToList();
 
             Trace.WriteLine("Getting new versions...");
-            var prefixes = new HashSet<BranchType>(branches.Select(branch => branch.Prefix));
-            prefixes.Remove(BranchType.Unknown);
+            var prefixes =
+                new HashSet<BranchType>(branches.Select(branch => branch.Prefix).Where(b => b != BranchType.Unknown));
 
             var coreVersions = prefixes.ToDictionary(branchType => branchType,
                 branchType => packages.TryGetValue(GetPackageName("Core", branchType), out var pkg)
@@ -76,21 +77,21 @@ namespace Bannerlord.ReferenceAssemblies
                 Trace.WriteLine($"{br.Name}: ({br.AppId} {br.DepotId} {br.BuildId})");
 
             Trace.WriteLine("Checking downloading...");
-            DownloadBranchesAsync(toDownload, ct).GetAwaiter().GetResult();
+            await DownloadBranchesAsync(toDownload, ct);
 
             Trace.WriteLine("Generating references...");
             GenerateReferences(toDownload);
 
             Trace.WriteLine("Generating packages...");
+
             GeneratePackages(toDownload);
 
             Trace.WriteLine("Publishing...");
-            nugetFeed.Publish().GetAwaiter().GetResult();
+            await nugetFeed.PublishAsync();
         }
 
 
-
-        private static string? GetAssembliesVersion(string path) => ProcessHelpers.Run("getblmeta", $"getchangeset -f {path}", out var versionStr) != 0
+        private static string? GetAssembliesVersion(string path) => ProcessHelpers.Run("dotnet", $"getblmeta getchangeset -f {path}", out var versionStr) != 0
             ? null
             : versionStr.Replace("\r", "").Replace("\n", "");
 

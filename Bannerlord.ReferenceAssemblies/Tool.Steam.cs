@@ -37,7 +37,7 @@ namespace Bannerlord.ReferenceAssemblies
         private async Task DownloadBranchesAsync(IEnumerable<SteamAppBranch> toDownload, CancellationToken ct)
         {
             foreach (var branch in toDownload)
-                await DownloadBranchAsync(branch, ct).ConfigureAwait(false);
+                await DownloadBranchAsync(branch, ct);
             ContentDownloader.ShutdownSteam3();
         }
         private async Task DownloadBranchAsync(SteamAppBranch steamAppBranch, CancellationToken ct)

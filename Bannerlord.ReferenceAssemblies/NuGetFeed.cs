@@ -45,7 +45,7 @@ namespace Bannerlord.ReferenceAssemblies
             _sourceRepository = new SourceRepository(packageSource, Repository.Provider.GetCoreV3());
         }
 
-        public async Task Publish()
+        public async Task PublishAsync()
         {
             var uploadResource = await _sourceRepository.GetResourceAsync<PackageUpdateResource>();
 
@@ -63,15 +63,15 @@ namespace Bannerlord.ReferenceAssemblies
             var finderPackageByIdResource = _sourceRepository.GetResource<FindPackageByIdResource>();
             var metadataResource = _sourceRepository.GetResource<PackageMetadataResource>();
 
-            return packages.SelectParallel(MaxConcurrentOperations, package =>
+            return await packages.ToAsyncEnumerable().SelectParallel(MaxConcurrentOperations, async package =>
             {
                 if (!package.Identity.Id.StartsWith(_packageBaseName))
                     return default;
 
                 var versions = finderPackageByIdResource.GetAllVersionsAsync(package.Identity.Id, sourceCacheContext, NullLogger.Instance, ct).GetAwaiter().GetResult().ToList();
                 var metadatas = GetMetadataAsync(versions.ToAsyncEnumerable(), version => metadataResource.GetMetadataAsync(new PackageIdentity(package.Identity.Id, version), sourceCacheContext, NullLogger.Instance, ct), ct);
-                return (package.Identity.Id, GetPackageVersionsAsync(metadatas, ct).ToListAsync().GetAwaiter().GetResult() as IReadOnlyList<NuGetPackage>);
-            }).ToDictionary(x => x.Item1, x => x.Item2);
+                return (package.Identity.Id, (await GetPackageVersionsAsync(metadatas, ct).ToListAsync(ct)) as IReadOnlyList<NuGetPackage>);
+            }, ct).ToDictionaryAsync(x => x.Item1, x => x.Item2, ct);
         }
 
         private static IAsyncEnumerable<IPackageSearchMetadata> GetMetadataAsync(IAsyncEnumerable<NuGetVersion> versions, Func<NuGetVersion, Task<IPackageSearchMetadata>> getMeta, CancellationToken cancellationToken = default) =>
