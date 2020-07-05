@@ -40,8 +40,7 @@ namespace Bannerlord.ReferenceAssemblies
             var branches = GetAllBranches().ToList();
 
             Trace.WriteLine("Getting new versions...");
-            var prefixes =
-                new HashSet<BranchType>(branches.Select(branch => branch.Prefix).Where(b => b != BranchType.Unknown));
+            var prefixes = new HashSet<BranchType>(branches.Select(branch => branch.Prefix).Where(b => b != BranchType.Unknown));
 
             var coreVersions = prefixes.ToDictionary(branchType => branchType,
                 branchType => packages.TryGetValue(GetPackageName("Core", branchType), out var pkg)
@@ -54,7 +53,7 @@ namespace Bannerlord.ReferenceAssemblies
             if (matchedPublicBranch.BuildId == 0)
             {
                 Trace.WriteLine("Public Branch does not match any branch!");
-                Environment.Exit(0);
+                return;
             }
 
             Trace.WriteLine($"Public Branch Matches: {matchedPublicBranch.Name}");
@@ -69,7 +68,7 @@ namespace Bannerlord.ReferenceAssemblies
             {
                 Trace.WriteLine("No new version detected! Exiting...");
                 ContentDownloader.ShutdownSteam3();
-                Environment.Exit(0);
+                return;
             }
 
             Trace.WriteLine("New versions:");

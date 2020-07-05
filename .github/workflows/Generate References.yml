@@ -26,4 +26,4 @@ jobs:
       run: dotnet tool restore
 
     - name: Run Bannerlord.ReferenceAssemblies
-      run: dotnet run --project Bannerlord.ReferenceAssemblies/Bannerlord.ReferenceAssemblies.csproj --configuration Release --login ${{secrets.STEAM_LOGIN}} --pass ${{secrets.STEAM_PASSWORD}} --gtoken ${{secrets.GITHUB_TOKEN}}
+      run: dotnet run --project Bannerlord.ReferenceAssemblies/Bannerlord.ReferenceAssemblies.csproj --configuration Release --steamLogin ${{secrets.STEAM_LOGIN}} --steamPassword ${{secrets.STEAM_PASSWORD}} --steamAppId 261550 --steamOS windows --steamOSArch 64 --steamDepotId 261551 --packageBaseName Bannerlord.ReferenceAssemblies --feedUrl https://nuget.pkg.github.com/BUTR/index.json --feedUser Aragas --feedPassword ${{secrets.GITHUB_TOKEN}}
