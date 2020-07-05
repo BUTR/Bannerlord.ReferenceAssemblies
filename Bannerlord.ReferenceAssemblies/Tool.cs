@@ -27,65 +27,75 @@ namespace Bannerlord.ReferenceAssemblies
 
         public void ExecuteAsync(CancellationToken ct)
         {
-            var nugetFeed = new NuGetFeed(_options.FeedUrl, _options.FeedUser, _options.FeedPassword, _options.PackageBaseName);
-
-            Trace.WriteLine("Checking NuGet...");
-            var packages = nugetFeed.GetVersionsAsync(ct).GetAwaiter().GetResult();
-
-            foreach (var (key, value) in packages)
-                Trace.WriteLine($"{key}: [{string.Join(", ", value)}]");
-
-            Trace.WriteLine("Checking branches...");
-            var branches = GetAllBranches().ToList();
-
-            Trace.WriteLine("Getting new versions...");
-            var prefixes = new HashSet<BranchType>(branches.Select(branch => branch.Prefix));
-            prefixes.Remove(BranchType.Unknown);
-
-            var coreVersions = prefixes.ToDictionary(branchType => branchType,
-                branchType => packages.TryGetValue(GetPackageName("Core", branchType), out var pkg)
-                    ? pkg.Select(x => x.BuildId)
-                    : Array.Empty<uint>());
-
-            var publicBranch = branches.First(branch => branch.Name == "public");
-            var otherBranches = branches.Where(branch => branch.Prefix != BranchType.Unknown);
-            var matchedPublicBranch = otherBranches.FirstOrDefault(branch => branch.BuildId == publicBranch.BuildId);
-            if (matchedPublicBranch.BuildId == 0)
+            try
             {
-                Trace.WriteLine("Public Branch does not match any branch!");
-                Environment.Exit(0);
+                var nugetFeed = new NuGetFeed(_options.FeedUrl, _options.FeedUser, _options.FeedPassword,
+                    _options.PackageBaseName);
+
+                Trace.WriteLine("Checking NuGet...");
+                var packages = nugetFeed.GetVersionsAsync(ct).GetAwaiter().GetResult();
+
+                foreach (var (key, value) in packages)
+                    Trace.WriteLine($"{key}: [{string.Join(", ", value)}]");
+
+                Trace.WriteLine("Checking branches...");
+                var branches = GetAllBranches().ToList();
+
+                Trace.WriteLine("Getting new versions...");
+                var prefixes = new HashSet<BranchType>(branches.Select(branch => branch.Prefix));
+                prefixes.Remove(BranchType.Unknown);
+
+                var coreVersions = prefixes.ToDictionary(branchType => branchType,
+                    branchType => packages.TryGetValue(GetPackageName("Core", branchType), out var pkg)
+                        ? pkg.Select(x => x.BuildId)
+                        : Array.Empty<uint>());
+
+                var publicBranch = branches.First(branch => branch.Name == "public");
+                var otherBranches = branches.Where(branch => branch.Prefix != BranchType.Unknown);
+                var matchedPublicBranch = otherBranches.FirstOrDefault(branch => branch.BuildId == publicBranch.BuildId);
+                if (matchedPublicBranch.BuildId == 0)
+                {
+                    Trace.WriteLine("Public Branch does not match any branch!");
+                    Environment.Exit(0);
+                }
+
+                Trace.WriteLine($"Public Branch Matches: {matchedPublicBranch.Name}");
+                var toDownload = branches.Where(branch =>
+                    branch.Prefix != BranchType.Unknown
+                    && !coreVersions[branch.Prefix].Contains(branch.BuildId)
+                    // TODO: Fix parsing meta from older versions
+                    && Version.TryParse(branch.Name.Remove(0, 1), out var v) && v >= new Version("1.1.0")
+                ).ToList();
+
+                if (toDownload.Count == 0)
+                {
+                    Trace.WriteLine("No new version detected! Exiting...");
+                    ContentDownloader.ShutdownSteam3();
+                    Environment.Exit(0);
+                }
+
+                Trace.WriteLine("New versions:");
+                foreach (var br in toDownload)
+                    Trace.WriteLine($"{br.Name}: ({br.AppId} {br.DepotId} {br.BuildId})");
+
+                Trace.WriteLine("Checking downloading...");
+                DownloadBranchesAsync(toDownload, ct).GetAwaiter().GetResult();
+
+                Trace.WriteLine("Generating references...");
+                GenerateReferences(toDownload);
+
+                Trace.WriteLine("Generating packages...");
+
+                GeneratePackages(toDownload);
+
+                Trace.WriteLine("Publishing...");
+                nugetFeed.Publish().GetAwaiter().GetResult();
             }
-
-            Trace.WriteLine($"Public Branch Matches: {matchedPublicBranch.Name}");
-            var toDownload = branches.Where(branch =>
-                branch.Prefix != BranchType.Unknown
-                && !coreVersions[branch.Prefix].Contains(branch.BuildId)
-                // TODO: Fix parsing meta from older versions
-                && Version.TryParse(branch.Name.Remove(0, 1), out var v) && v >= new Version("1.1.0")
-            ).ToList();
-
-            if (toDownload.Count == 0)
+            catch (Exception e)
             {
-                Trace.WriteLine("No new version detected! Exiting...");
-                ContentDownloader.ShutdownSteam3();
-                Environment.Exit(0);
+                Console.WriteLine(e);
+                throw;
             }
-
-            Trace.WriteLine("New versions:");
-            foreach (var br in toDownload)
-                Trace.WriteLine($"{br.Name}: ({br.AppId} {br.DepotId} {br.BuildId})");
-
-            Trace.WriteLine("Checking downloading...");
-            DownloadBranchesAsync(toDownload, ct).GetAwaiter().GetResult();
-
-            Trace.WriteLine("Generating references...");
-            GenerateReferences(toDownload);
-
-            Trace.WriteLine("Generating packages...");
-            GeneratePackages(toDownload);
-
-            Trace.WriteLine("Publishing...");
-            nugetFeed.Publish().GetAwaiter().GetResult();
         }
 
 
