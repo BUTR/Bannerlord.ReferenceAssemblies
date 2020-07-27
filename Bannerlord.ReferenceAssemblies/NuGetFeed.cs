@@ -50,7 +50,7 @@ namespace Bannerlord.ReferenceAssemblies
             var uploadResource = await _sourceRepository.GetResourceAsync<PackageUpdateResource>();
 
             foreach (var file in await (await ExecutableFolder.GetFolderAsync("final")).GetFilesAsync("*.nupkg"))
-                await uploadResource.Push(file.Path, null, 480, false, param => "", null, false, false, null, NullLogger.Instance);
+                await uploadResource.Push(file.Path, null, 480, false, param => "", null, false, true, null, NullLogger.Instance);
         }
 
         public async Task<IReadOnlyDictionary<string, IReadOnlyList<NuGetPackage>>> GetVersionsAsync(CancellationToken ct)
