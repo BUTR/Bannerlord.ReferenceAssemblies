@@ -52,7 +52,7 @@ namespace Bannerlord.ReferenceAssemblies
             var matchedPublicBranch = otherBranches.FirstOrDefault(branch => branch.BuildId == publicBranch.BuildId);
             if (matchedPublicBranch.BuildId == 0)
             {
-                Trace.WriteLine("Public Branch does not match any branch!");
+                Trace.WriteLine("Public Branch does not match any version branch! Report to TaleWorlds!");
                 return;
             }
 

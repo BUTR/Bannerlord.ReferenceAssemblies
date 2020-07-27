@@ -42,6 +42,7 @@ namespace Bannerlord.ReferenceAssemblies
             var result = Parser.Default.ParseArguments<GenerateOptions>(args);
             await result.WithParsedAsync<GenerateOptions>(o => new Tool(o).ExecuteAsync(ctrlC.Token));
             result.WithNotParsed(e => Console.Error.WriteLine(e.ToString()));
+            Environment.Exit(1);
         }
     }
 }
