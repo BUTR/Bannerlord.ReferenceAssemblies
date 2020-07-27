@@ -79,7 +79,7 @@ namespace Bannerlord.ReferenceAssemblies
             }
 
             await ContentDownloader.DownloadAppAsync(_options.SteamAppId, _options.SteamDepotId, ContentDownloader.INVALID_MANIFEST_ID,
-                steamAppBranch.Name, _options.SteamOS, _options.SteamOSArch, null, false, true);
+                steamAppBranch.Name, _options.SteamOS, _options.SteamOSArch, null, false, true, ct);
         }
     }
 }
