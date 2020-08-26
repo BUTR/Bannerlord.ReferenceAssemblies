@@ -1,6 +1,8 @@
 name: GenerateReferences
 
 on:
+  repository_dispatch:
+    types: [game_version_update]
   push:
     branches: 
       - master
