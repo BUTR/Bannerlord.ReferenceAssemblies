@@ -9,7 +9,9 @@ using PCLExt.FileStorage.Folders;
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -50,7 +52,13 @@ namespace Bannerlord.ReferenceAssemblies
             var uploadResource = await _sourceRepository.GetResourceAsync<PackageUpdateResource>();
 
             foreach (var file in await (await ExecutableFolder.GetFolderAsync("final")).GetFilesAsync("*.nupkg"))
-                await uploadResource.Push(file.Path, null, 480, false, param => "", null, false, true, null, NullLogger.Instance);
+            {
+                try
+                {
+                    await uploadResource.Push(file.Path, null, 480, false, param => "", null, false, true, null, NullLogger.Instance);
+                }
+                catch (Exception e) when (e is HttpRequestException h && h.InnerException is IOException) { }
+            }
         }
 
         public async Task<IReadOnlyDictionary<string, IReadOnlyList<NuGetPackage>>> GetVersionsAsync(CancellationToken ct)
