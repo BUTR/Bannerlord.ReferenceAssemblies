@@ -45,7 +45,7 @@ namespace Bannerlord.ReferenceAssemblies
         private static PropertyInfo FilesToDownloadRegexProperty { get; } = AccessTools.Property(DownloadConfigType, "FilesToDownloadRegex");
 
 
-        static DepotDownloaderExt()
+        public static void Init()
         {
             var harmony = new Harmony("123");
             harmony.Patch(

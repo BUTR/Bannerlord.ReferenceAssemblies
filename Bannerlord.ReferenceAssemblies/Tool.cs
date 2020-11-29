@@ -25,6 +25,8 @@ namespace Bannerlord.ReferenceAssemblies
 
         public Tool(GenerateOptions options)
         {
+            DepotDownloaderExt.Init();
+
             _options = options;
         }
 
