@@ -14,7 +14,7 @@ env:
   DOTNET_NOLOGO: true
   # Disable the .NET first time experience to skip caching NuGet packages and speed up the build.
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
-  # Disable sending .NET CLI telemetry to Microsoft. 123
+  # Disable sending .NET CLI telemetry to Microsoft.
   DOTNET_CLI_TELEMETRY_OPTOUT: true
 
 jobs:
@@ -35,4 +35,4 @@ jobs:
       run: dotnet tool restore
 
     - name: Run Bannerlord.ReferenceAssemblies
-      run: dotnet run --project Bannerlord.ReferenceAssemblies/Bannerlord.ReferenceAssemblies.csproj --configuration Release --steamLogin ${{secrets.STEAM_LOGIN}} --steamPassword ${{secrets.STEAM_PASSWORD}} --steamAppId 261550 --steamOS windows --steamOSArch 64 --steamDepotId 261551 --packageBaseName Bannerlord.ReferenceAssemblies --feedUrl https://nuget.pkg.github.com/BUTR/index.json --feedUser Aragas --feedPassword ${{secrets.GITHUB_TOKEN}}
+      run: dotnet run --project Bannerlord.ReferenceAssemblies/Bannerlord.ReferenceAssemblies.csproj --configuration Debug --steamLogin ${{secrets.STEAM_LOGIN}} --steamPassword ${{secrets.STEAM_PASSWORD}} --steamAppId 261550 --steamOS windows --steamOSArch 64 --steamDepotId 261551 --packageBaseName Bannerlord.ReferenceAssemblies --feedUrl https://nuget.pkg.github.com/BUTR/index.json --feedUser Aragas --feedPassword ${{secrets.GITHUB_TOKEN}}
