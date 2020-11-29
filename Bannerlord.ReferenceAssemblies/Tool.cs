@@ -12,6 +12,8 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using HarmonyLib;
+using SteamKit2;
 
 namespace Bannerlord.ReferenceAssemblies
 {
@@ -67,7 +69,7 @@ namespace Bannerlord.ReferenceAssemblies
             if (toDownload.Count == 0)
             {
                 Trace.WriteLine("No new version detected! Exiting...");
-                ContentDownloader.ShutdownSteam3();
+                DepotDownloaderExt.ContentDownloaderShutdownSteam3();
                 return;
             }
 

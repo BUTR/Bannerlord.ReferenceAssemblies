@@ -1,8 +1,4 @@
-﻿using DepotDownloader;
-
-using PCLExt.FileStorage;
-
-using SteamKit2;
+﻿using PCLExt.FileStorage;
 
 using System;
 using System.Collections.Generic;
@@ -26,10 +22,10 @@ namespace Bannerlord.ReferenceAssemblies
 
         private IEnumerable<SteamAppBranch> GetAllBranches()
         {
-            AccountSettingsStore.LoadFromFile("account.config");
-            DepotDownloader.Program.InitializeSteam(_options.SteamLogin, _options.SteamPassword);
-            ContentDownloader.steam3.RequestAppInfo(_options.SteamAppId);
-            var depots = ContentDownloader.GetSteam3AppSection(_options.SteamAppId, EAppInfoSection.Depots);
+            DepotDownloaderExt.AccountSettingsStoreLoadFromFile("account.config");
+            DepotDownloaderExt.DepotDownloaderProgramInitializeSteam(_options.SteamLogin, _options.SteamPassword);
+            DepotDownloaderExt.ContentDownloadersteam3RequestAppInfo(_options.SteamAppId);
+            var depots = DepotDownloaderExt.ContentDownloaderGetSteam3AppSection(_options.SteamAppId);
             var branches = depots["branches"];
             return branches.Children.Select(c => ConvertVersion(c.Name!, c["buildid"].Value!));
         }
@@ -38,7 +34,7 @@ namespace Bannerlord.ReferenceAssemblies
         {
             foreach (var branch in toDownload)
                 await DownloadBranchAsync(branch, ct);
-            ContentDownloader.ShutdownSteam3();
+            DepotDownloaderExt.ContentDownloaderShutdownSteam3();
         }
         private async Task DownloadBranchAsync(SteamAppBranch steamAppBranch, CancellationToken ct)
         {
@@ -47,27 +43,29 @@ namespace Bannerlord.ReferenceAssemblies
                     .CreateFolderAsync(_options.SteamDepotId.ToString(), CreationCollisionOption.OpenIfExists, ct))
                 .CreateFolderAsync(steamAppBranch.BuildId.ToString(), CreationCollisionOption.OpenIfExists, ct);
 
-            ContentDownloader.Config.MaxDownloads = 4;
-            ContentDownloader.Config.InstallDirectory = folder.Path;
+            DepotDownloaderExt.ContentDownloaderConfigSetMaxDownloads(4);
+            DepotDownloaderExt.ContentDownloaderConfigSetInstallDirectory(folder.Path);
 
             try
             {
-                var fileListData = Resourcer.Resource.AsString("FileFilters.regexp");
+                var fileListData = Resourcer.Resource.AsString("Resources/FileFilters.regexp");
                 var fileRxs = fileListData.Split(new[] {'\n', '\r'}, StringSplitOptions.RemoveEmptyEntries);
 
-                ContentDownloader.Config.UsingFileList = true;
-                ContentDownloader.Config.FilesToDownload = new List<string>();
-                ContentDownloader.Config.FilesToDownloadRegex = new List<Regex>();
+                DepotDownloaderExt.ContentDownloaderConfigSetUsingFileList(true);
+                var filesToDownload = DepotDownloaderExt.ContentDownloaderConfigGetFilesToDownload();
+                filesToDownload.Clear();
+                var filesToDownloadRegex = DepotDownloaderExt.ContentDownloaderConfigGetFilesToDownloadRegex();
+                filesToDownloadRegex.Clear();
 
                 foreach (var fileRx in fileRxs)
                 {
                     // require all expressions to be valid and with proper slashes
                     var rx = new Regex(fileRx, RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
-                    ContentDownloader.Config.FilesToDownloadRegex.Add(rx);
+                    filesToDownloadRegex.Add(rx);
                 }
 
                 Trace.WriteLine("Using file filters:");
-                
+
                 ++Trace.IndentLevel;
                 foreach (var file in fileRxs)
                     Trace.WriteLine(file);
@@ -78,8 +76,7 @@ namespace Bannerlord.ReferenceAssemblies
                 Trace.WriteLine($"Warning: Unable to load file filters: {ex}");
             }
 
-            await ContentDownloader.DownloadAppAsync(_options.SteamAppId, _options.SteamDepotId, ContentDownloader.INVALID_MANIFEST_ID,
-                steamAppBranch.Name, _options.SteamOS, _options.SteamOSArch, null, false, true, ct);
+            await DepotDownloaderExt.ContentDownloaderDownloadAppAsync(_options.SteamAppId, new List<(uint depotId, ulong manifestId)>() { (_options.SteamDepotId, ulong.MaxValue) }, steamAppBranch.Name, _options.SteamOS, _options.SteamOSArch, null, false, true);
         }
     }
 }

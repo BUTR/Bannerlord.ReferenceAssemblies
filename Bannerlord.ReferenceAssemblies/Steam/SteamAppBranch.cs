@@ -14,7 +14,7 @@ namespace Bannerlord.ReferenceAssemblies
             { BranchType.Release, null },
             { BranchType.Unknown, "Invalid" },
         };
-        
+
         public BranchType Prefix
         {
             get
@@ -25,7 +25,7 @@ namespace Bannerlord.ReferenceAssemblies
             }
         }
 
-        public string Name { get; set; } 
+        public string Name { get; set; }
         public uint AppId { get; set; }
         public uint DepotId { get; set; }
         public uint BuildId { get; set; }

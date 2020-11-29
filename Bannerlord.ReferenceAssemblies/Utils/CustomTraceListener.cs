@@ -12,7 +12,7 @@ namespace Bannerlord.ReferenceAssemblies
 
         private readonly Stopwatch _stopwatch = Stopwatch.StartNew();
 
-        private static readonly double StopwatchFrequencyFp = (double) Stopwatch.Frequency;
+        private static readonly double StopwatchFrequencyFp = Stopwatch.Frequency;
 
         private string LinePrefix
         {
@@ -41,7 +41,7 @@ namespace Bannerlord.ReferenceAssemblies
         public CustomTraceListener(TextWriter sink)
             => _sink = sink;
 
-        public override void Write(string message)
+        public override void Write(string? message)
         {
             if (message == null) return;
 
@@ -55,7 +55,7 @@ namespace Bannerlord.ReferenceAssemblies
             FlushCompleteLines();
         }
 
-        public override void WriteLine(string message)
+        public override void WriteLine(string? message)
         {
             if (message == null) return;
 

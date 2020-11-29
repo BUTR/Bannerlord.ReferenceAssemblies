@@ -1,4 +1,5 @@
 bin[\\|/]Win64_Shipping_Client[\\|/](?<=[\\|/])[^\\|^/]*TaleWorlds.+
+bin[\\|/]Win64_Shipping_Client[\\|/](?<=[\\|/])[^\\|^/]*Version.xml
 Modules[\\|/]CustomBattle[\\|/]bin[\\|/]Win64_Shipping_Client[\\|/](?<=[\\|/])[^\\|/]+dll
 Modules[\\|/]SandBox[\\|/]bin[\\|/]Win64_Shipping_Client[\\|/](?<=[\\|/])[^\\|/]+dll
 Modules[\\|/]SandBoxCore[\\|/]bin[\\|/]Win64_Shipping_Client[\\|/](?<=[\\|/])[^\\|/]+dll

@@ -2,10 +2,8 @@ using System.Text.RegularExpressions;
 
 namespace Bannerlord.ReferenceAssemblies
 {
-
     internal readonly partial struct NuGetPackage
     {
-
         private static readonly Regex RxSteamAppIdEmbedding
             = new Regex(@"appId:(\d+)", RegexOptions.CultureInvariant | RegexOptions.Compiled);
 
@@ -52,7 +50,5 @@ namespace Bannerlord.ReferenceAssemblies
                  : 0
             );
         }
-
     }
-
 }

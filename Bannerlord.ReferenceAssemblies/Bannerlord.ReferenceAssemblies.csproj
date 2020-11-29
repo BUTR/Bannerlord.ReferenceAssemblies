@@ -1,48 +1,34 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <OutputType>Exe</OutputType>
-        <TargetFramework>netcoreapp3.1</TargetFramework>
-        <Nullable>enable</Nullable>
-      <langversion>8.0</langversion>
-    </PropertyGroup>
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net5.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <LangVersion>9.0</LangVersion>
+  </PropertyGroup>
 
-    <ItemGroup>
-        <EmbeddedResource Include="FileFilters.regexp" />
-        <EmbeddedResource Include="package-csproj-template.xml" />
-        <EmbeddedResource Include="metapackage-csproj-template.xml" />
-        <EmbeddedResource Include="metapackage-nuspec-template.xml" />
-        <EmbeddedResource Include="package-nuspec-template.xml" />
-    </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\FileFilters.regexp" />
+    <EmbeddedResource Include="Resources\package-csproj-template.xml" />
+    <EmbeddedResource Include="Resources\metapackage-csproj-template.xml" />
+    <EmbeddedResource Include="Resources\metapackage-nuspec-template.xml" />
+    <EmbeddedResource Include="Resources\package-nuspec-template.xml" />
+  </ItemGroup>
 
-    <ItemGroup>
-        <PackageReference Include="CommandLineParser" Version="2.8.0" />
-        <PackageReference Include="JetBrains.Annotations" Version="2020.1.0" PrivateAssets="all" />
-        <PackageReference Include="NuGet.Configuration" Version="5.5.1" />
-        <PackageReference Include="NuGet.Protocol" Version="5.5.1" />
-        <PackageReference Include="PCLExt.FileStorage-devel" Version="1.5.0.294" />
-        <PackageReference Include="Fody" Version="6.1.1" PrivateAssets="all" />
-        <PackageReference Include="ReferenceAssemblyGenerator.Library" Version="2.0.1" />
-        <PackageReference Include="Resourcer.Fody" Version="1.8.0" PrivateAssets="all" />
-        <PackageReference Include="System.Linq.Async" Version="4.1.1" />
-    </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="CommandLineParser" Version="2.8.0" />
+    <PackageReference Include="HarmonyX" Version="2.2.0" />
+    <PackageReference Include="NuGet.Configuration" Version="5.8.0" />
+    <PackageReference Include="NuGet.Protocol" Version="5.8.0" />
+    <PackageReference Include="PCLExt.FileStorage-devel" Version="1.5.0.294" />
+    <PackageReference Include="Fody" Version="6.3.0" PrivateAssets="all" />
+    <PackageReference Include="ReferenceAssemblyGenerator.Library" Version="2.0.1" />
+    <PackageReference Include="Resourcer.Fody" Version="1.8.0" PrivateAssets="all" />
+    <PackageReference Include="System.Linq.Async" Version="5.0.0" />
+  </ItemGroup>
 
-    <ItemGroup>
-        <ProjectReference Include="..\DepotDownloader\DepotDownloader\DepotDownloader.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Compile Update="NuGetPackage.Comparison.cs">
-        <DependentUpon>NuGetPackage.cs</DependentUpon>
-      </Compile>
-      <Compile Update="NuGetPackage.Parsing.cs">
-        <DependentUpon>NuGetPackage.cs</DependentUpon>
-      </Compile>
-    </ItemGroup>
-
-    <ItemGroup>
-      <None Include="Tool.Packaging.cs" />
-      <None Include="Tool.Steam.cs" />
-    </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DepotDownloader\DepotDownloader\DepotDownloader.csproj" />
+  </ItemGroup>
 
 </Project>

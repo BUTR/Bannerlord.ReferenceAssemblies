@@ -55,7 +55,7 @@ namespace Bannerlord.ReferenceAssemblies
         }
 
         private string GenerateNuspec(SteamAppBranch steamAppBranch, string appVersion, string moduleName) =>
-            TemplateHelpers.ApplyTemplate(Resourcer.Resource.AsString("package-nuspec-template.xml"),
+            TemplateHelpers.ApplyTemplate(Resourcer.Resource.AsString("Resources/package-nuspec-template.xml"),
                 new Dictionary<string, string>
                 {
                     {"packageName", _options.PackageBaseName},
@@ -69,7 +69,7 @@ namespace Bannerlord.ReferenceAssemblies
                 });
 
         private string GenerateCsproj(SteamAppBranch steamAppBranch, string appVersion, string moduleName) =>
-            TemplateHelpers.ApplyTemplate(Resourcer.Resource.AsString("package-csproj-template.xml"),
+            TemplateHelpers.ApplyTemplate(Resourcer.Resource.AsString("Resources/package-csproj-template.xml"),
                 new Dictionary<string, string>
                 {
                     {"packageName", _options.PackageBaseName},
@@ -85,7 +85,7 @@ namespace Bannerlord.ReferenceAssemblies
             var dependenciesXml = deps.Select(dep =>new XElement("dependency",
                     new XAttribute("id", $"{_options.PackageBaseName}.{dep}{GetSuffix(steamAppBranch.Prefix)}"),
                     new XAttribute("version", packageVersion))).ToList();
-            return TemplateHelpers.ApplyTemplate(Resourcer.Resource.AsString("metapackage-nuspec-template.xml"),
+            return TemplateHelpers.ApplyTemplate(Resourcer.Resource.AsString("Resources/metapackage-nuspec-template.xml"),
                 new Dictionary<string, string>
                 {
                     {"packageName", _options.PackageBaseName},
@@ -100,7 +100,7 @@ namespace Bannerlord.ReferenceAssemblies
         }
 
         private string GenerateMetaCsproj(SteamAppBranch steamAppBranch, string appVersion) =>
-            TemplateHelpers.ApplyTemplate(Resourcer.Resource.AsString("metapackage-csproj-template.xml"),
+            TemplateHelpers.ApplyTemplate(Resourcer.Resource.AsString("Resources/metapackage-csproj-template.xml"),
                 new Dictionary<string, string>
                 {
                     {"packageName", _options.PackageBaseName},

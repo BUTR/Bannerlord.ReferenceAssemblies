@@ -55,7 +55,7 @@ namespace Bannerlord.ReferenceAssemblies
             {
                 try
                 {
-                    await uploadResource.Push(file.Path, null, 480, false, param => "", null, false, true, null, NullLogger.Instance);
+                    await uploadResource.Push(file.Path, null, 480, false, _ => "", null, false, true, null, NullLogger.Instance);
                 }
                 catch (Exception e) when (e is HttpRequestException h && h.InnerException is IOException) { }
             }
@@ -63,13 +63,13 @@ namespace Bannerlord.ReferenceAssemblies
 
         public async Task<IReadOnlyDictionary<string, IReadOnlyList<NuGetPackage>>> GetVersionsAsync(CancellationToken ct)
         {
-            var packageLister = _sourceRepository.GetResource<PackageSearchResource>();
+            var packageLister = _sourceRepository.GetResource<PackageSearchResource>(ct);
             var packages = (await packageLister.SearchAsync("bannerlord", new SearchFilter(true) { SupportedFrameworks = new[] { "net472" } }, 0, 100, NullLogger.Instance, ct))
                 .Where(p => RxPackageName.IsMatch(p.Identity.Id));
 
             var sourceCacheContext = new SourceCacheContext();
-            var finderPackageByIdResource = _sourceRepository.GetResource<FindPackageByIdResource>();
-            var metadataResource = _sourceRepository.GetResource<PackageMetadataResource>();
+            var finderPackageByIdResource = _sourceRepository.GetResource<FindPackageByIdResource>(ct);
+            var metadataResource = _sourceRepository.GetResource<PackageMetadataResource>(ct);
 
             return await packages.ToAsyncEnumerable().SelectParallel(MaxConcurrentOperations, async package =>
             {
