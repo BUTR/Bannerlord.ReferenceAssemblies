@@ -7,7 +7,6 @@ using System;
 
 namespace Bannerlord.ReferenceAssemblies
 {
-    [PublicAPI]
     internal readonly partial struct NuGetPackage
     {
         public static NuGetPackage? Get(string name, NuGetVersion version, string tags)
