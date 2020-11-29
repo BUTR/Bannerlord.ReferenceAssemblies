@@ -42,6 +42,23 @@ namespace Bannerlord.ReferenceAssemblies
         private static PropertyInfo InstallDirectoryProperty { get; } = AccessTools.Property(DownloadConfigType, "InstallDirectory");
         private static PropertyInfo UsingFileListProperty { get; } = AccessTools.Property(DownloadConfigType, "UsingFileList");
         private static PropertyInfo FilesToDownloadProperty { get; } = AccessTools.Property(DownloadConfigType, "FilesToDownload");
+        private static PropertyInfo FilesToDownloadRegexProperty { get; } = AccessTools.Property(DownloadConfigType, "FilesToDownloadRegex");
+
+
+        static DepotDownloaderExt()
+        {
+            var harmony = new Harmony("123");
+            harmony.Patch(
+                AccessTools.Method(DepotConfigStoreType, "LoadFromFile"),
+                new HarmonyMethod(AccessTools.Method(typeof(DepotDownloaderExt), nameof(LoadFromFilePrefix))));
+        }
+        public static void LoadFromFilePrefix(ref bool __runOriginal)
+        {
+            var isLoaded = (bool) LoadedProperty.GetValue(null)!;
+            if (isLoaded)
+                __runOriginal = false;
+        }
+
 
         public static void ContentDownloaderShutdownSteam3() => ShutdownSteam3Method.Invoke(null, Array.Empty<object>());
         public static void AccountSettingsStoreLoadFromFile(string file)
@@ -62,12 +79,11 @@ namespace Bannerlord.ReferenceAssemblies
         {
             var config = ConfigField.GetValue(null);
 
-            var filesToDownloadProperty = AccessTools.Property(DownloadConfigType, "FilesToDownload");
-            var filesToDownload = filesToDownloadProperty.GetValue(config) as List<string>;
+            var filesToDownload = FilesToDownloadProperty.GetValue(config) as List<string>;
             if (filesToDownload is null)
             {
                 filesToDownload = new List<string>();
-                filesToDownloadProperty.SetValue(config, filesToDownload);
+                FilesToDownloadProperty.SetValue(config, filesToDownload);
             }
 
             return filesToDownload;
@@ -76,11 +92,11 @@ namespace Bannerlord.ReferenceAssemblies
         {
             var config = ConfigField.GetValue(null);
 
-            var filesToDownloadRegex = FilesToDownloadProperty.GetValue(config) as List<Regex>;
+            var filesToDownloadRegex = FilesToDownloadRegexProperty.GetValue(config) as List<Regex>;
             if (filesToDownloadRegex is null)
             {
                 filesToDownloadRegex = new List<Regex>();
-                FilesToDownloadProperty.SetValue(config, filesToDownloadRegex);
+                FilesToDownloadRegexProperty.SetValue(config, filesToDownloadRegex);
             }
 
             return filesToDownloadRegex;
