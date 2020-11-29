@@ -52,11 +52,12 @@ namespace Bannerlord.ReferenceAssemblies
                 AccessTools.Method(DepotConfigStoreType, "LoadFromFile"),
                 new HarmonyMethod(AccessTools.Method(typeof(DepotDownloaderExt), nameof(LoadFromFilePrefix))));
         }
-        public static void LoadFromFilePrefix(ref bool __runOriginal)
+        public static bool LoadFromFilePrefix()
         {
             var isLoaded = (bool) LoadedProperty.GetValue(null)!;
             if (isLoaded)
-                __runOriginal = false;
+                return false;
+            return true;
         }
 
 

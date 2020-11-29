@@ -17,7 +17,7 @@
 
   <ItemGroup>
     <PackageReference Include="CommandLineParser" Version="2.8.0" />
-    <PackageReference Include="HarmonyX" Version="2.2.0" />
+    <PackageReference Include="Lib.Harmony" Version="2.0.4" />
     <PackageReference Include="NuGet.Configuration" Version="5.8.0" />
     <PackageReference Include="NuGet.Protocol" Version="5.8.0" />
     <PackageReference Include="PCLExt.FileStorage-devel" Version="1.5.0.294" />

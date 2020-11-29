@@ -1,5 +1,3 @@
-using JetBrains.Annotations;
-
 using NuGet.Protocol.Core.Types;
 using NuGet.Versioning;
 
