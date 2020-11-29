@@ -14,7 +14,7 @@ env:
   DOTNET_NOLOGO: true
   # Disable the .NET first time experience to skip caching NuGet packages and speed up the build.
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
-  # Disable sending .NET CLI telemetry to Microsoft.
+  # Disable sending .NET CLI telemetry to Microsoft. 123
   DOTNET_CLI_TELEMETRY_OPTOUT: true
 
 jobs:
