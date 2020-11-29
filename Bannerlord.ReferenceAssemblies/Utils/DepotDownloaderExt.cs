@@ -24,6 +24,8 @@ namespace Bannerlord.ReferenceAssemblies
             typeof(ContentDownloaderException).Assembly.GetType("DepotDownloader.Steam3Session")!;
         private static Type DownloadConfigType { get; } =
             typeof(ContentDownloaderException).Assembly.GetType("DepotDownloader.DownloadConfig")!;
+        private static Type DepotConfigStoreType { get; } =
+            typeof(ContentDownloaderException).Assembly.GetType("DepotDownloader.DepotConfigStore")!;
 
         private static MethodInfo ShutdownSteam3Method { get; } = AccessTools.Method(ContentDownloaderType, "ShutdownSteam3");
         private static MethodInfo LoadFromFileMethod { get; } = AccessTools.Method(AccountSettingsStoreType, "LoadFromFile");
@@ -35,27 +37,27 @@ namespace Bannerlord.ReferenceAssemblies
         private static FieldInfo Steam3Field { get; } = AccessTools.Field(ContentDownloaderType, "steam3");
         private static FieldInfo ConfigField { get; } = AccessTools.Field(ContentDownloaderType, "Config");
 
+        private static PropertyInfo LoadedProperty { get; } = AccessTools.Property(DepotConfigStoreType, "Loaded");
+        private static PropertyInfo MaxDownloadsProperty { get; } = AccessTools.Property(DownloadConfigType, "MaxDownloads");
+        private static PropertyInfo InstallDirectoryProperty { get; } = AccessTools.Property(DownloadConfigType, "InstallDirectory");
+        private static PropertyInfo UsingFileListProperty { get; } = AccessTools.Property(DownloadConfigType, "UsingFileList");
+        private static PropertyInfo FilesToDownloadProperty { get; } = AccessTools.Property(DownloadConfigType, "FilesToDownload");
+
         public static void ContentDownloaderShutdownSteam3() => ShutdownSteam3Method.Invoke(null, Array.Empty<object>());
-        public static void AccountSettingsStoreLoadFromFile(string file) => LoadFromFileMethod.Invoke(null, new object?[] { file });
+        public static void AccountSettingsStoreLoadFromFile(string file)
+        {
+            var isLoaded = (bool) LoadedProperty.GetValue(null)!;
+            if(!isLoaded)
+                LoadFromFileMethod.Invoke(null, new object?[] {file});
+        }
+
         public static void DepotDownloaderProgramInitializeSteam(string login, string password) => InitializeSteamMethod.Invoke(null, new object?[] { login, password });
         public static void ContentDownloadersteam3RequestAppInfo(uint appId) => RequestAppInfoMethod.Invoke(Steam3Field.GetValue(null), new object?[] { appId, false });
         public static KeyValue ContentDownloaderGetSteam3AppSection(uint appId) => (KeyValue) GetSteam3AppSectionMethod.Invoke(null, new object?[] { appId, EAppInfoSection.Depots })!;
 
-        public static void ContentDownloaderConfigSetMaxDownloads(int maxDownloads)
-        {
-            var maxDownloadsProperty = AccessTools.Property(DownloadConfigType, "MaxDownloads");
-            maxDownloadsProperty.SetValue(ConfigField.GetValue(null), maxDownloads);
-        }
-        public static void ContentDownloaderConfigSetInstallDirectory(string installDirectory)
-        {
-            var installDirectoryProperty = AccessTools.Property(DownloadConfigType, "InstallDirectory");
-            installDirectoryProperty.SetValue(ConfigField.GetValue(null), installDirectory);
-        }
-        public static void ContentDownloaderConfigSetUsingFileList(bool usingFileList)
-        {
-            var usingFileListProperty = AccessTools.Property(DownloadConfigType, "UsingFileList");
-            usingFileListProperty.SetValue(ConfigField.GetValue(null), usingFileList);
-        }
+        public static void ContentDownloaderConfigSetMaxDownloads(int maxDownloads) => MaxDownloadsProperty.SetValue(ConfigField.GetValue(null), maxDownloads);
+        public static void ContentDownloaderConfigSetInstallDirectory(string installDirectory) =>  InstallDirectoryProperty.SetValue(ConfigField.GetValue(null), installDirectory);
+        public static void ContentDownloaderConfigSetUsingFileList(bool usingFileList) => UsingFileListProperty.SetValue(ConfigField.GetValue(null), usingFileList);
         public static List<string> ContentDownloaderConfigGetFilesToDownload()
         {
             var config = ConfigField.GetValue(null);
@@ -74,12 +76,11 @@ namespace Bannerlord.ReferenceAssemblies
         {
             var config = ConfigField.GetValue(null);
 
-            var filesToDownloadRegexProperty = AccessTools.Property(DownloadConfigType, "FilesToDownloadRegex");
-            var filesToDownloadRegex = filesToDownloadRegexProperty.GetValue(config) as List<Regex>;
+            var filesToDownloadRegex = FilesToDownloadProperty.GetValue(config) as List<Regex>;
             if (filesToDownloadRegex is null)
             {
                 filesToDownloadRegex = new List<Regex>();
-                filesToDownloadRegexProperty.SetValue(config, filesToDownloadRegex);
+                FilesToDownloadProperty.SetValue(config, filesToDownloadRegex);
             }
 
             return filesToDownloadRegex;
