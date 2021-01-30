@@ -1,7 +1,5 @@
 using Bannerlord.ReferenceAssemblies.Options;
 
-using DepotDownloader;
-
 using PCLExt.FileStorage;
 using PCLExt.FileStorage.Folders;
 
@@ -12,8 +10,6 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using HarmonyLib;
-using SteamKit2;
 
 namespace Bannerlord.ReferenceAssemblies
 {
@@ -94,9 +90,10 @@ namespace Bannerlord.ReferenceAssemblies
         }
 
 
-        private static string? GetAssembliesVersion(string path) => ProcessHelpers.Run("dotnet", $"getblmeta getchangeset -f {path}", out var versionStr) != 0
-            ? null
-            : versionStr.Replace("\r", "").Replace("\n", "");
+        private static string? GetAssembliesVersion(string path) =>
+            ProcessHelpers.Run("dotnet", $"getblmeta getchangeset -f {path}", out var versionStr) != 0
+                ? null
+                : versionStr.Replace("\r", "").Replace("\n", "");
 
         private void GenerateReferences(IEnumerable<SteamAppBranch> toDownload)
         {
@@ -137,12 +134,8 @@ namespace Bannerlord.ReferenceAssemblies
 
             foreach (var file in rootFolder.GetFolder("bin").GetFolder("Win64_Shipping_Client").GetModuleFiles(isCore))
             {
-                try
-                {
-                    var args = $"-f|-o|{Path.Combine(outputFolder.Path, file.Name)}|{file.Path}".Split('|');
-                    ReferenceAssemblyGenerator.Program.Main(args);
-                }
-                catch (System.BadImageFormatException) { }
+                var outputFile = Path.Combine(outputFolder.Path, file.Name);
+                ProcessHelpers.Run("dotnet", $"refasmer {file.Path} -o {outputFile} -c");
             }
         }
     }

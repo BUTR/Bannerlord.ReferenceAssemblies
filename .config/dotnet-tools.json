@@ -2,10 +2,10 @@
   "version": 1,
   "isRoot": true,
   "tools": {
-    "referenceassemblygenerator": {
-      "version": "2.0.0",
+    "jetbrains.refasmer.clitool": {
+      "version": "1.0.12",
       "commands": [
-        "refgen"
+        "refasmer"
       ]
     },
     "fetchbannerlordversion": {
