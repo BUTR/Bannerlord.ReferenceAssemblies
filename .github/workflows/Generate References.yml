@@ -19,20 +19,33 @@ env:
 
 jobs:
   build:   
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v2
       with:
         submodules: 'recursive'
       
-    - name: Setup .NET Core (5.0.x)
+    - name: Setup .NET Core 5.0.x
       uses: actions/setup-dotnet@master
       with:
         dotnet-version: 5.0.x
+    - name: Setup .NET Core 3.1.x
+      uses: actions/setup-dotnet@master
+      with:
+        dotnet-version: 3.1.x
+    - name: Setup BUTR GPR
+      uses: actions/setup-dotnet@master
+      with:
+        source-url: https://nuget.pkg.github.com/BUTR/index.json
+      env:
+        NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
-    - name: Restore Tools
-      run: dotnet tool restore
+    - name: Install Tools
+      run: >-
+          dotnet tool install -g JetBrains.Refasmer.CliTool;
+          dotnet tool install -g FetchBannerlordVersion;
+          dotnet tool install -g gpr;
 
     - name: Run Bannerlord.ReferenceAssemblies
       run: dotnet run --project Bannerlord.ReferenceAssemblies/Bannerlord.ReferenceAssemblies.csproj --configuration Debug --steamLogin ${{secrets.STEAM_LOGIN}} --steamPassword ${{secrets.STEAM_PASSWORD}} --steamAppId 261550 --steamOS windows --steamOSArch 64 --steamDepotId 261551 --packageBaseName Bannerlord.ReferenceAssemblies --feedUrl https://nuget.pkg.github.com/BUTR/index.json --feedUser Aragas --feedPassword ${{secrets.GITHUB_TOKEN}}
