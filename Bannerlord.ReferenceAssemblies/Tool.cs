@@ -91,7 +91,7 @@ namespace Bannerlord.ReferenceAssemblies
 
 
         private static string? GetAssembliesVersion(string path) =>
-            ProcessHelpers.Run("dotnet", $"getblmeta getchangeset -f {path}", out var versionStr) != 0
+            ProcessHelpers.Run("getblmeta", $"getchangeset -f {path}", out var versionStr) != 0
                 ? null
                 : versionStr.Replace("\r", "").Replace("\n", "");
 
@@ -135,7 +135,7 @@ namespace Bannerlord.ReferenceAssemblies
             foreach (var file in rootFolder.GetFolder("bin").GetFolder("Win64_Shipping_Client").GetModuleFiles(isCore))
             {
                 var outputFile = Path.Combine(outputFolder.Path, file.Name);
-                ProcessHelpers.Run("dotnet", $"refasmer {file.Path} -o {outputFile} -c");
+                ProcessHelpers.Run("refasmer", $"{file.Path} -o {outputFile} -c");
             }
         }
     }
