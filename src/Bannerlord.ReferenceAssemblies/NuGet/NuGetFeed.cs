@@ -4,14 +4,9 @@ using NuGet.Packaging.Core;
 using NuGet.Protocol.Core.Types;
 using NuGet.Versioning;
 
-using PCLExt.FileStorage;
-using PCLExt.FileStorage.Folders;
-
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Net.Http;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -24,8 +19,6 @@ namespace Bannerlord.ReferenceAssemblies
         private static readonly int MaxConcurrentOperations = 5;
 
         private static Regex RxPackageName;
-
-        private static readonly IFolder ExecutableFolder = new FolderFromPath(AppDomain.CurrentDomain.BaseDirectory);
 
         private readonly string _packageBaseName;
 
@@ -47,24 +40,10 @@ namespace Bannerlord.ReferenceAssemblies
             _sourceRepository = new SourceRepository(packageSource, Repository.Provider.GetCoreV3());
         }
 
-        public async Task PublishAsync()
-        {
-            var uploadResource = await _sourceRepository.GetResourceAsync<PackageUpdateResource>();
-
-            foreach (var file in await (await ExecutableFolder.GetFolderAsync("final")).GetFilesAsync("*.nupkg"))
-            {
-                try
-                {
-                    await uploadResource.Push(file.Path, null, 480, false, _ => "", null, false, true, null, NullLogger.Instance);
-                }
-                catch (Exception e) when (e is HttpRequestException h && h.InnerException is IOException) { }
-            }
-        }
-
         public async Task<IReadOnlyDictionary<string, IReadOnlyList<NuGetPackage>>> GetVersionsAsync(CancellationToken ct)
         {
             var packageLister = _sourceRepository.GetResource<PackageSearchResource>(ct);
-            var packages = (await packageLister.SearchAsync("bannerlord", new SearchFilter(true) { SupportedFrameworks = new[] { "net472" } }, 0, 100, NullLogger.Instance, ct))
+            var packages = (await packageLister.SearchAsync("ReferenceAssemblies", new SearchFilter(true), 0, 100, NullLogger.Instance, ct))
                 .Where(p => RxPackageName.IsMatch(p.Identity.Id));
 
             var sourceCacheContext = new SourceCacheContext();

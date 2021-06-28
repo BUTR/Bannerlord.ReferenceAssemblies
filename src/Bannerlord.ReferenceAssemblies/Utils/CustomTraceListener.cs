@@ -8,7 +8,7 @@ namespace Bannerlord.ReferenceAssemblies
     {
         private readonly TextWriter _sink;
 
-        private readonly StringBuilder _buffer = new StringBuilder();
+        private readonly StringBuilder _buffer = new();
 
         private readonly Stopwatch _stopwatch = Stopwatch.StartNew();
 

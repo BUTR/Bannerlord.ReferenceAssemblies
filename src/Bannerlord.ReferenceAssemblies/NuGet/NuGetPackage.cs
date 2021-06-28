@@ -1,7 +1,4 @@
-using NuGet.Protocol.Core.Types;
 using NuGet.Versioning;
-
-using System;
 
 namespace Bannerlord.ReferenceAssemblies
 {
@@ -34,17 +31,6 @@ namespace Bannerlord.ReferenceAssemblies
             DepotId = depotId;
             BuildId = buildId;
         }
-
-        public NuGetPackage(string name, VersionInfo version) : this(
-            name,
-            version.Version,
-            ParseAppIdEmbedding(version.PackageSearchMetadata.Tags)
-            ?? throw new NotImplementedException($"Missing Steam App Id Tag for {name}"),
-            ParseDepotIdEmbedding(version.PackageSearchMetadata.Tags)
-            ?? throw new NotImplementedException($"Missing Steam Depot Id Tag for {name}"),
-            ParseBuildIdEmbedding(version.PackageSearchMetadata.Tags)
-            ?? throw new NotImplementedException($"Missing Steam Build Id Tag for {name}")
-            ) { }
 
         public override string ToString() => $"{Name} {PkgVersion} ({AppId}, {DepotId}, {BuildId})";
     }

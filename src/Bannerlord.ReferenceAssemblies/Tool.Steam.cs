@@ -12,7 +12,7 @@ namespace Bannerlord.ReferenceAssemblies
 {
     internal partial class Tool
     {
-        private SteamAppBranch ConvertVersion(string version, string buildId) => new SteamAppBranch
+        private SteamAppBranch ConvertVersion(string version, string buildId) => new()
         {
             Name = version,
             AppId = _options.SteamAppId,
@@ -76,7 +76,15 @@ namespace Bannerlord.ReferenceAssemblies
                 Trace.WriteLine($"Warning: Unable to load file filters: {ex}");
             }
 
-            await DepotDownloaderExt.ContentDownloaderDownloadAppAsync(_options.SteamAppId, new List<(uint depotId, ulong manifestId)>() { (_options.SteamDepotId, ulong.MaxValue) }, steamAppBranch.Name, _options.SteamOS, _options.SteamOSArch, null, false, false);
+            await DepotDownloaderExt.ContentDownloaderDownloadAppAsync(
+                _options.SteamAppId,
+                new List<(uint depotId, ulong manifestId)> { (_options.SteamDepotId, ulong.MaxValue) },
+                steamAppBranch.Name,
+                _options.SteamOS,
+                _options.SteamOSArch,
+                null!,
+                false,
+                false).ConfigureAwait(false);
         }
     }
 }

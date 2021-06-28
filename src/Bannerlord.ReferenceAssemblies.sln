@@ -5,7 +5,14 @@ VisualStudioVersion = 16.0.30104.148
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bannerlord.ReferenceAssemblies", "Bannerlord.ReferenceAssemblies\Bannerlord.ReferenceAssemblies.csproj", "{9710A0A4-ED84-4E6E-A875-A965F6D410AE}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DepotDownloader", "DepotDownloader\DepotDownloader\DepotDownloader.csproj", "{65D4728B-DD9A-4D1B-8E92-0EA322D4ECB4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DepotDownloader", "DepotDownloader\DepotDownloader\DepotDownloader.csproj", "{CD128590-34BD-4CCB-B6E8-8ACAB9289B22}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{EC4C35C5-968A-4E15-BE7B-010AF6E95928}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{E05A0443-54C2-4EE6-A809-6198DAB7A37D}"
+	ProjectSection(SolutionItems) = preProject
+		..\.github\workflows\Generate References.yml = ..\.github\workflows\Generate References.yml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,13 +24,17 @@ Global
 		{9710A0A4-ED84-4E6E-A875-A965F6D410AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9710A0A4-ED84-4E6E-A875-A965F6D410AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9710A0A4-ED84-4E6E-A875-A965F6D410AE}.Release|Any CPU.Build.0 = Release|Any CPU
-		{65D4728B-DD9A-4D1B-8E92-0EA322D4ECB4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{65D4728B-DD9A-4D1B-8E92-0EA322D4ECB4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{65D4728B-DD9A-4D1B-8E92-0EA322D4ECB4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{65D4728B-DD9A-4D1B-8E92-0EA322D4ECB4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CD128590-34BD-4CCB-B6E8-8ACAB9289B22}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CD128590-34BD-4CCB-B6E8-8ACAB9289B22}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CD128590-34BD-4CCB-B6E8-8ACAB9289B22}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CD128590-34BD-4CCB-B6E8-8ACAB9289B22}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{9710A0A4-ED84-4E6E-A875-A965F6D410AE} = {EC4C35C5-968A-4E15-BE7B-010AF6E95928}
+		{CD128590-34BD-4CCB-B6E8-8ACAB9289B22} = {EC4C35C5-968A-4E15-BE7B-010AF6E95928}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {221C9F13-CDF8-4910-AC85-E2C94B835B46}
