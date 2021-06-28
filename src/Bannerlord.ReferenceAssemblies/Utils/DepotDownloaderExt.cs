@@ -76,14 +76,14 @@ namespace Bannerlord.ReferenceAssemblies
         public static void ContentDownloaderConfigSetMaxDownloads(int maxDownloads) => MaxDownloadsProperty.SetValue(ConfigField.GetValue(null), maxDownloads);
         public static void ContentDownloaderConfigSetInstallDirectory(string installDirectory) =>  InstallDirectoryProperty.SetValue(ConfigField.GetValue(null), installDirectory);
         public static void ContentDownloaderConfigSetUsingFileList(bool usingFileList) => UsingFileListProperty.SetValue(ConfigField.GetValue(null), usingFileList);
-        public static List<string> ContentDownloaderConfigGetFilesToDownload()
+        public static HashSet<string> ContentDownloaderConfigGetFilesToDownload()
         {
             var config = ConfigField.GetValue(null);
 
-            var filesToDownload = FilesToDownloadProperty.GetValue(config) as List<string>;
+            var filesToDownload = FilesToDownloadProperty.GetValue(config) as HashSet<string>;
             if (filesToDownload is null)
             {
-                filesToDownload = new List<string>();
+                filesToDownload = new HashSet<string>();
                 FilesToDownloadProperty.SetValue(config, filesToDownload);
             }
 

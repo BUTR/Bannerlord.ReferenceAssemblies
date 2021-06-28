@@ -4,7 +4,7 @@ on:
   repository_dispatch:
     types: [game_version_update]
   push:
-    branches: 
+    branches:
       - master
   schedule:
     - cron: "0 */8 * * *"
@@ -18,14 +18,14 @@ env:
   DOTNET_CLI_TELEMETRY_OPTOUT: true
 
 jobs:
-  build:   
+  build:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v2
       with:
         submodules: 'recursive'
-      
+
     - name: Setup .NET Core 5.0.x
       uses: actions/setup-dotnet@master
       with:
@@ -45,7 +45,18 @@ jobs:
       run: >-
           dotnet tool install -g JetBrains.Refasmer.CliTool;
           dotnet tool install -g FetchBannerlordVersion;
-          dotnet tool install -g gpr;
 
     - name: Run Bannerlord.ReferenceAssemblies
       run: dotnet run --project Bannerlord.ReferenceAssemblies/Bannerlord.ReferenceAssemblies.csproj --configuration Debug --steamLogin ${{secrets.STEAM_LOGIN}} --steamPassword ${{secrets.STEAM_PASSWORD}} --steamAppId 261550 --steamOS windows --steamOSArch 64 --steamDepotId 261551 --packageBaseName Bannerlord.ReferenceAssemblies --feedUrl https://nuget.pkg.github.com/BUTR/index.json --feedUser Aragas --feedPassword ${{secrets.GITHUB_TOKEN}}
+
+    - name: Push to NuGet
+      run: dotnet nuget push "./src/Bannerlord.ReferenceAssemblies/bin/Debug/net5.0/final/*.nupkg" -k ${{secrets.NUGET_API_KEY}} -s https://www.nuget.org
+      shell: pwsh
+
+    - name: Push to GPR
+      run: |
+           for f in ./src/Bannerlord.ReferenceAssemblies/bin/Debug/net5.0/final/*.nupkg
+           do
+             curl -vX PUT -u "vslee:${{secrets.GITHUB_TOKEN}}" -F package=@$f https://nuget.pkg.github.com/BUTR/
+           done
+      shell: bash

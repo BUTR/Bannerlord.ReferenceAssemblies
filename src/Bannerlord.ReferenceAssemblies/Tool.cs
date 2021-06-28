@@ -85,8 +85,7 @@ namespace Bannerlord.ReferenceAssemblies
 
             GeneratePackages(toDownload);
 
-            Trace.WriteLine("Publishing...");
-            await nugetFeed.PublishAsync();
+            Trace.WriteLine("Done!");
         }
 
 

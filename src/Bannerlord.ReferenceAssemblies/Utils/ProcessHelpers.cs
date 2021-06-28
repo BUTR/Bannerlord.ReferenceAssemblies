@@ -25,19 +25,5 @@ namespace Bannerlord.ReferenceAssemblies
             stdOut = proc.StandardOutput.ReadToEnd();
             return proc.ExitCode;
         }
-
-        public static int Run(string fileName, string args, out string stdOut, out string stdErr, string? workingDirectory = null)
-        {
-            using var proc = Process.Start(new ProcessStartInfo(fileName, args)
-            {
-                WorkingDirectory = workingDirectory ?? "",
-                RedirectStandardOutput = true,
-                RedirectStandardError = true
-            });
-            proc!.WaitForExit();
-            stdOut = proc.StandardOutput.ReadToEnd();
-            stdErr = proc.StandardError.ReadToEnd();
-            return proc.ExitCode;
-        }
     }
 }
