@@ -53,7 +53,7 @@ jobs:
       id: check_files
       uses: andstor/file-existence-action@v1
       with:
-        files: "src/Bannerlord.ReferenceAssemblies/bin/Debug/net5.0/final/*.nupkg"
+        files: "./src/Bannerlord.ReferenceAssemblies/bin/Debug/net5.0/final/*.nupkg"
 
     - name: Push to NuGet
       if: steps.check_files.outputs.files_exists == 'true'
