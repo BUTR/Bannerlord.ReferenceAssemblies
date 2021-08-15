@@ -54,12 +54,16 @@ jobs:
       run: echo "::set-output name=files_exists::$([[ "$(ls -A ./src/Bannerlord.ReferenceAssemblies/bin/Debug/net5.0/final)" ]] && echo "true" || echo "false")"
       shell: bash
     
+    - name: Show check result
+      run: echo "${{ steps.check_files.outputs.files_exists }}"
+    
     - name: Push to NuGet
       if: steps.check_files.outputs.files_exists == 'true'
       run: dotnet nuget push "./src/Bannerlord.ReferenceAssemblies/bin/Debug/net5.0/final/*.nupkg" -k ${{secrets.NUGET_API_KEY}} -s https://www.nuget.org
       shell: pwsh
 
     - name: Push to GPR
+      if: steps.check_files.outputs.files_exists == 'true'
       run: |
            for f in ./src/Bannerlord.ReferenceAssemblies/bin/Debug/net5.0/final/*.nupkg
            do
