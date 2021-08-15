@@ -49,7 +49,13 @@ jobs:
     - name: Run Bannerlord.ReferenceAssemblies
       run: dotnet run --project src/Bannerlord.ReferenceAssemblies/Bannerlord.ReferenceAssemblies.csproj --configuration Debug --steamLogin ${{secrets.STEAM_LOGIN}} --steamPassword ${{secrets.STEAM_PASSWORD}} --steamAppId 261550 --steamOS windows --steamOSArch 64 --steamDepotId 261551 --packageBaseName Bannerlord.ReferenceAssemblies --feedUrl https://nuget.pkg.github.com/BUTR/index.json --feedUser Aragas --feedPassword ${{secrets.GITHUB_TOKEN}}
 
+    - name: Check files
+      id: check_files
+      run: echo "::set-output name=files_exists::$([[ "$(ls -A ./src/Bannerlord.ReferenceAssemblies/bin/Debug/net5.0/final)" ]] && echo "true" || echo "false")"
+      shell: bash
+    
     - name: Push to NuGet
+      if: steps.check_files.outputs.files_exists == 'true'
       run: dotnet nuget push "./src/Bannerlord.ReferenceAssemblies/bin/Debug/net5.0/final/*.nupkg" -k ${{secrets.NUGET_API_KEY}} -s https://www.nuget.org
       shell: pwsh
 
