@@ -22,7 +22,7 @@
     <PackageReference Include="NuGet.Configuration" Version="5.10.0" />
     <PackageReference Include="NuGet.Protocol" Version="5.10.0" />
     <PackageReference Include="PCLExt.FileStorage-devel" Version="1.5.0.301" />
-    <PackageReference Include="Fody" Version="6.5.1" PrivateAssets="all" />
+    <PackageReference Include="Fody" Version="6.5.2" PrivateAssets="all" />
     <PackageReference Include="Resourcer.Fody" Version="1.8.0" PrivateAssets="all" />
     <PackageReference Include="System.Linq.Async" Version="5.0.0" />
   </ItemGroup>
