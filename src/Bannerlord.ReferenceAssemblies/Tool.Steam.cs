@@ -49,7 +49,7 @@ namespace Bannerlord.ReferenceAssemblies
             try
             {
                 var fileListData = Resourcer.Resource.AsString("Resources/FileFilters.regexp");
-                var fileRxs = fileListData.Split(new[] {'\n', '\r'}, StringSplitOptions.RemoveEmptyEntries);
+                var files = fileListData.Split(new[] {'\n', '\r'}, StringSplitOptions.RemoveEmptyEntries);
 
                 DepotDownloaderExt.ContentDownloaderConfigSetUsingFileList(true);
                 var filesToDownload = DepotDownloaderExt.ContentDownloaderConfigGetFilesToDownload();
@@ -57,17 +57,24 @@ namespace Bannerlord.ReferenceAssemblies
                 var filesToDownloadRegex = DepotDownloaderExt.ContentDownloaderConfigGetFilesToDownloadRegex();
                 filesToDownloadRegex.Clear();
 
-                foreach (var fileRx in fileRxs)
+                foreach (var fileEntry in files)
                 {
+                    if (fileEntry.StartsWith("regex:"))
+                    {
+                        var rgx = new Regex(fileEntry.Substring(6), RegexOptions.Compiled | RegexOptions.IgnoreCase);
+                        filesToDownloadRegex.Add(rgx);
+                    }
+                    else
+                    {
+                        filesToDownload.Add(fileEntry);
+                    }
                     // require all expressions to be valid and with proper slashes
-                    var rx = new Regex(fileRx, RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
-                    filesToDownloadRegex.Add(rx);
                 }
 
                 Trace.WriteLine("Using file filters:");
 
                 ++Trace.IndentLevel;
-                foreach (var file in fileRxs)
+                foreach (var file in files)
                     Trace.WriteLine(file);
                 --Trace.IndentLevel;
             }
