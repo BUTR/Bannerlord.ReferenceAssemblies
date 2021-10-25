@@ -8,6 +8,7 @@ on:
       - master
   schedule:
     - cron: "0 */8 * * *"
+  workflow_dispatch:
 
 env:
   # Disable the .NET logo in the console output.
