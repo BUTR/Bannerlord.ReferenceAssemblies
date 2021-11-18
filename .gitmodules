@@ -2,3 +2,4 @@
 	path = src/DepotDownloader
 	url = https://github.com/SteamRE/DepotDownloader
 	branch = master
+	ignore = dirty
