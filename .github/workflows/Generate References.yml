@@ -50,3 +50,20 @@ jobs:
              curl -vX PUT -u "vslee:${{secrets.GITHUB_TOKEN}}" -F package=@$f https://nuget.pkg.github.com/BUTR/
            done
       shell: bash
+      
+    - name: Dispatch
+      uses: guilouro/multiple-repositories-dispatch@master
+      if: steps.check_files.outputs.files_exists == 'true'
+      with:
+        repo_token: ${{secrets.REPO_ACCESS_TOKEN}}
+        repositories: |
+          BUTR/Bannerlord.ReferenceAssemblies.Documentation
+          BUTR/Bannerlord.UIExtenderEx
+          BUTR/Bannerlord.ButterLib
+          Aragas/Bannerlord.MBOptionScreen
+          BUTR/Bannerlord.BUTRLoader
+          BUTR/Bannerlord.BUTR.Shared
+          BUTR/Bannerlord.ReferenceAssemblies.Diff
+          BUTR/AssemblyDiffer
+        event_type: game_version_update_patch
+        client_payload: '{"github": ${{ toJson(github) }}}'
