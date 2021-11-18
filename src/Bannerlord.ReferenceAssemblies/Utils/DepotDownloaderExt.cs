@@ -65,8 +65,8 @@ namespace Bannerlord.ReferenceAssemblies
         public static void AccountSettingsStoreLoadFromFile(string file)
         {
             var isLoaded = (bool) LoadedProperty.GetValue(null)!;
-            if(!isLoaded)
-                LoadFromFileMethod.Invoke(null, new object?[] {file});
+            if (!isLoaded)
+                LoadFromFileMethod.Invoke(null, new object?[] { file });
         }
 
         public static void DepotDownloaderProgramInitializeSteam(string login, string password) => InitializeSteamMethod.Invoke(null, new object?[] { login, password });
@@ -74,7 +74,7 @@ namespace Bannerlord.ReferenceAssemblies
         public static KeyValue ContentDownloaderGetSteam3AppSection(uint appId) => (KeyValue) GetSteam3AppSectionMethod.Invoke(null, new object?[] { appId, EAppInfoSection.Depots })!;
 
         public static void ContentDownloaderConfigSetMaxDownloads(int maxDownloads) => MaxDownloadsProperty.SetValue(ConfigField.GetValue(null), maxDownloads);
-        public static void ContentDownloaderConfigSetInstallDirectory(string installDirectory) =>  InstallDirectoryProperty.SetValue(ConfigField.GetValue(null), installDirectory);
+        public static void ContentDownloaderConfigSetInstallDirectory(string installDirectory) => InstallDirectoryProperty.SetValue(ConfigField.GetValue(null), installDirectory);
         public static void ContentDownloaderConfigSetUsingFileList(bool usingFileList) => UsingFileListProperty.SetValue(ConfigField.GetValue(null), usingFileList);
         public static HashSet<string> ContentDownloaderConfigGetFilesToDownload()
         {
@@ -103,7 +103,7 @@ namespace Bannerlord.ReferenceAssemblies
             return filesToDownloadRegex;
         }
 
-        public static Task ContentDownloaderDownloadAppAsync(uint appId, List<(uint depotId, ulong manifestId)> depotManifestIds, string branch, string os, string arch, string language, bool lv, bool isUgc )
+        public static Task ContentDownloaderDownloadAppAsync(uint appId, List<(uint depotId, ulong manifestId)> depotManifestIds, string branch, string os, string arch, string language, bool lv, bool isUgc)
         {
             return (Task) DownloadAppAsyncMethod.Invoke(null, new object?[] { appId, depotManifestIds, branch, os, arch, language, lv, isUgc })!;
         }

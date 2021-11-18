@@ -1,4 +1,4 @@
-using PCLExt.FileStorage;
+﻿using PCLExt.FileStorage;
 using PCLExt.FileStorage.Extensions;
 
 using System;
@@ -39,7 +39,7 @@ namespace Bannerlord.ReferenceAssemblies
                     continue;
                 }
 
-                var deps = new List<string> {"Core"};
+                var deps = new List<string> { "Core" };
                 // Core
                 GenerateNupkg(branch, version, "", refFolder);
                 // Modules
@@ -82,7 +82,7 @@ namespace Bannerlord.ReferenceAssemblies
         private string GenerateMetaNuspec(SteamAppBranch steamAppBranch, string appVersion, IEnumerable<string> deps)
         {
             var packageVersion = steamAppBranch.GetVersion(appVersion);
-            var dependenciesXml = deps.Select(dep =>new XElement("dependency",
+            var dependenciesXml = deps.Select(dep => new XElement("dependency",
                     new XAttribute("id", $"{_options.PackageBaseName}.{dep}{GetSuffix(steamAppBranch.Prefix)}"),
                     new XAttribute("version", packageVersion))).ToList();
             return TemplateHelpers.ApplyTemplate(Resourcer.Resource.AsString("Resources/metapackage-nuspec-template.xml"),

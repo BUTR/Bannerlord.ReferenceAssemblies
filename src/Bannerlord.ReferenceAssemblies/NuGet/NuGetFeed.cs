@@ -1,4 +1,4 @@
-using NuGet.Common;
+﻿using NuGet.Common;
 using NuGet.Configuration;
 using NuGet.Packaging.Core;
 using NuGet.Protocol.Core.Types;
@@ -32,7 +32,7 @@ namespace Bannerlord.ReferenceAssemblies
 
             var packageSource = new PackageSource(feedUrl, "Feed1", true, false, false)
             {
-                Credentials = new PackageSourceCredential(feedUrl, feedUser ?? "", feedPassword?? "", true, "basic"),
+                Credentials = new PackageSourceCredential(feedUrl, feedUser ?? "", feedPassword ?? "", true, "basic"),
                 ProtocolVersion = 3,
                 MaxHttpRequestsPerSource = 8
             };
