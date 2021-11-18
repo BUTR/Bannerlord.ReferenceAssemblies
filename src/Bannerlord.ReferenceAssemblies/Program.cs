@@ -1,4 +1,4 @@
-using Bannerlord.ReferenceAssemblies.Options;
+﻿using Bannerlord.ReferenceAssemblies.Options;
 
 using CommandLine;
 

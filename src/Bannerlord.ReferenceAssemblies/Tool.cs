@@ -1,4 +1,4 @@
-using Bannerlord.ReferenceAssemblies.Options;
+﻿using Bannerlord.ReferenceAssemblies.Options;
 
 using PCLExt.FileStorage;
 using PCLExt.FileStorage.Folders;

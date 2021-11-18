@@ -1,4 +1,4 @@
-namespace Bannerlord.ReferenceAssemblies
+﻿namespace Bannerlord.ReferenceAssemblies
 {
     public enum BranchType
     {

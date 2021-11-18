@@ -49,7 +49,7 @@ namespace Bannerlord.ReferenceAssemblies
             try
             {
                 var fileListData = Resourcer.Resource.AsString("Resources/FileFilters.regexp");
-                var files = fileListData.Split(new[] {'\n', '\r'}, StringSplitOptions.RemoveEmptyEntries);
+                var files = fileListData.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
 
                 DepotDownloaderExt.ContentDownloaderConfigSetUsingFileList(true);
                 var filesToDownload = DepotDownloaderExt.ContentDownloaderConfigGetFilesToDownload();
