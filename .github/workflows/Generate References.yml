@@ -3,9 +3,6 @@ name: GenerateReferences
 on:
   repository_dispatch:
     types: [game_version_update]
-  push:
-    branches:
-      - master
   schedule:
     - cron: "0 */8 * * *"
   workflow_dispatch:
