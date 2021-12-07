@@ -134,7 +134,7 @@ namespace Bannerlord.ReferenceAssemblies
             foreach (var file in rootFolder.GetFolder("bin").GetFolder("Win64_Shipping_Client").GetModuleFiles(isCore))
             {
                 var outputFile = Path.Combine(outputFolder.Path, file.Name);
-                ProcessHelpers.Run("refasmer", $"{file.Path} -o {outputFile} -c -all");
+                ProcessHelpers.Run("refasmer", $"{file.Path} -o {outputFile} -c");
             }
         }
     }
