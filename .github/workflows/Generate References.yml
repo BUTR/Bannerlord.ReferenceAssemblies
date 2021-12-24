@@ -23,6 +23,11 @@ jobs:
       uses: butr/actions-common-setup@v2.0
       with:
         github-token: ${{secrets.GITHUB_TOKEN}}
+        
+    - name: Setup .NET 5
+      uses: actions/setup-dotnet@master
+      with:
+        dotnet-version: 5.0.x
 
     - name: Install Tools
       run: >-
