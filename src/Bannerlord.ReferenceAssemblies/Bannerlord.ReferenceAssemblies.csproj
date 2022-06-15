@@ -20,7 +20,7 @@
     <PackageReference Include="CommandLineParser" Version="2.9.1" />
     <PackageReference Include="Lib.Harmony" Version="2.2.1" />
     <PackageReference Include="NuGet.Configuration" Version="6.2.0" />
-    <PackageReference Include="NuGet.Protocol" Version="6.2.0" />
+    <PackageReference Include="NuGet.Protocol" Version="6.2.1" />
     <PackageReference Include="PCLExt.FileStorage-devel" Version="1.5.0.319" />
     <PackageReference Include="Fody" Version="6.6.2" PrivateAssets="all" />
     <PackageReference Include="Resourcer.Fody" Version="1.8.0" PrivateAssets="all" />
