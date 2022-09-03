@@ -37,7 +37,7 @@ jobs:
     - name: Install Tools
       run: >-
           dotnet tool install -g JetBrains.Refasmer.CliTool;
-          dotnet tool install -g FetchBannerlordVersion;
+          dotnet tool install -g FetchBannerlordVersion.Tool;
 
     - name: Run Bannerlord.ReferenceAssemblies
       run: dotnet run --project src/Bannerlord.ReferenceAssemblies/Bannerlord.ReferenceAssemblies.csproj --configuration Debug --steamLogin ${{secrets.STEAM_LOGIN}} --steamPassword ${{secrets.STEAM_PASSWORD}} --steamAppId 261550 --steamOS windows --steamOSArch 64 --steamDepotId 261551 --packageBaseName Bannerlord.ReferenceAssemblies --feedUrl https://nuget.pkg.github.com/BUTR/index.json --feedUser Aragas --feedPassword ${{secrets.GITHUB_TOKEN}}
