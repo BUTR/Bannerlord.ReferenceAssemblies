@@ -1,5 +1,7 @@
 ﻿using CommandLine;
 
+using System.Collections.Generic;
+
 namespace Bannerlord.ReferenceAssemblies.Options
 {
     internal class GenerateOptions
@@ -20,7 +22,7 @@ namespace Bannerlord.ReferenceAssemblies.Options
         public string SteamOSArch { get; set; } = default!;
 
         [Option("steamDepotId", Required = true)]
-        public uint SteamDepotId { get; set; } = default!;
+        public IEnumerable<uint> SteamDepotId { get; set; } = default!;
 
 
 

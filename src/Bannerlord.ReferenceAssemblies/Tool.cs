@@ -73,7 +73,7 @@ namespace Bannerlord.ReferenceAssemblies
 
             Trace.WriteLine("New versions:");
             foreach (var br in toDownload)
-                Trace.WriteLine($"{br.Name}: ({br.AppId} {br.DepotId} {br.BuildId})");
+                Trace.WriteLine($"{br.Name}: ({br.AppId} {br.BuildId})");
 
             Trace.WriteLine("Checking downloading...");
             await DownloadBranchesAsync(toDownload, ct);
@@ -100,12 +100,10 @@ namespace Bannerlord.ReferenceAssemblies
             {
                 var depotsFolder = ExecutableFolder
                     .GetFolder("depots")
-                    .GetFolder(_options.SteamDepotId.ToString())
                     .GetFolder(branch.BuildId.ToString());
 
                 var refFolder = ExecutableFolder
                     .CreateFolder("ref", CreationCollisionOption.OpenIfExists)
-                    .CreateFolder(_options.SteamDepotId.ToString(), CreationCollisionOption.OpenIfExists)
                     .CreateFolder(branch.BuildId.ToString(), CreationCollisionOption.OpenIfExists);
 
                 // core

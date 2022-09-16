@@ -16,7 +16,6 @@ namespace Bannerlord.ReferenceAssemblies
         {
             Name = version,
             AppId = _options.SteamAppId,
-            DepotId = _options.SteamDepotId,
             BuildId = uint.TryParse(buildId, out var r) ? r : 0
         };
 
@@ -38,9 +37,8 @@ namespace Bannerlord.ReferenceAssemblies
         }
         private async Task DownloadBranchAsync(SteamAppBranch steamAppBranch, CancellationToken ct)
         {
-            var folder = await (await (await ExecutableFolder
+            var folder = await (await ExecutableFolder
                         .CreateFolderAsync("depots", CreationCollisionOption.OpenIfExists, ct))
-                    .CreateFolderAsync(_options.SteamDepotId.ToString(), CreationCollisionOption.OpenIfExists, ct))
                 .CreateFolderAsync(steamAppBranch.BuildId.ToString(), CreationCollisionOption.OpenIfExists, ct);
 
             DepotDownloaderExt.ContentDownloaderConfigSetMaxDownloads(4);
@@ -85,7 +83,7 @@ namespace Bannerlord.ReferenceAssemblies
 
             await DepotDownloaderExt.ContentDownloaderDownloadAppAsync(
                 _options.SteamAppId,
-                new List<(uint depotId, ulong manifestId)> { (_options.SteamDepotId, ulong.MaxValue) },
+                _options.SteamDepotId.Select(x => (x, ulong.MaxValue)).ToList(),
                 steamAppBranch.Name,
                 _options.SteamOS,
                 _options.SteamOSArch,

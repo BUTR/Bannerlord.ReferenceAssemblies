@@ -1,6 +1,7 @@
 ﻿using DepotDownloader;
 
 using HarmonyLib;
+using HarmonyLib.BUTR.Extensions;
 
 using SteamKit2;
 
@@ -14,25 +15,41 @@ namespace Bannerlord.ReferenceAssemblies
 {
     public static class DepotDownloaderExt
     {
+        private delegate void ShutdownSteam3Delegate();
+
+        private delegate void LoadFromFileDelegate(string filename);
+
+        private delegate bool InitializeSteamDelegate(string username, string password);
+
+        private delegate void RequestAppInfoDelegate(object instance, uint appId, bool bForce = false);
+
+        private delegate KeyValue GetSteam3AppSectionDelegate(uint appId, EAppInfoSection section);
+
+        private delegate Task DownloadAppAsyncDelegate(uint appId, List<(uint depotId, ulong manifestId)> depotManifestIds,
+            string branch, string os, string arch, string language, bool lv, bool isUgc);
+
+
+
+
         private static Type ContentDownloaderType { get; } =
             typeof(ContentDownloaderException).Assembly.GetType("DepotDownloader.ContentDownloader")!;
-        private static Type AccountSettingsStoreType { get; } =
-            typeof(ContentDownloaderException).Assembly.GetType("DepotDownloader.AccountSettingsStore")!;
-        private static Type ProgramType { get; } =
-            typeof(ContentDownloaderException).Assembly.GetType("DepotDownloader.Program")!;
-        private static Type Steam3SessionType { get; } =
-            typeof(ContentDownloaderException).Assembly.GetType("DepotDownloader.Steam3Session")!;
         private static Type DownloadConfigType { get; } =
             typeof(ContentDownloaderException).Assembly.GetType("DepotDownloader.DownloadConfig")!;
         private static Type DepotConfigStoreType { get; } =
             typeof(ContentDownloaderException).Assembly.GetType("DepotDownloader.DepotConfigStore")!;
 
-        private static MethodInfo ShutdownSteam3Method { get; } = AccessTools.Method(ContentDownloaderType, "ShutdownSteam3");
-        private static MethodInfo LoadFromFileMethod { get; } = AccessTools.Method(AccountSettingsStoreType, "LoadFromFile");
-        private static MethodInfo InitializeSteamMethod { get; } = AccessTools.Method(ProgramType, "InitializeSteam");
-        private static MethodInfo RequestAppInfoMethod { get; } = AccessTools.Method(Steam3SessionType, "RequestAppInfo");
-        private static MethodInfo GetSteam3AppSectionMethod { get; } = AccessTools.Method(ContentDownloaderType, "GetSteam3AppSection");
-        private static MethodInfo DownloadAppAsyncMethod { get; } = AccessTools.Method(ContentDownloaderType, "DownloadAppAsync");
+        private static ShutdownSteam3Delegate? ShutdownSteam3Method { get; } =
+            AccessTools2.GetDelegate<ShutdownSteam3Delegate>("DepotDownloader.ContentDownloader:ShutdownSteam3");
+        private static LoadFromFileDelegate? LoadFromFileMethod { get; } =
+            AccessTools2.GetDelegate<LoadFromFileDelegate>("DepotDownloader.AccountSettingsStore:LoadFromFile");
+        private static InitializeSteamDelegate? InitializeSteamMethod { get; } =
+            AccessTools2.GetDelegate<InitializeSteamDelegate>("DepotDownloader.Program:InitializeSteam");
+        private static RequestAppInfoDelegate? RequestAppInfoMethod { get; } =
+            AccessTools2.GetDelegate<RequestAppInfoDelegate>("DepotDownloader.Steam3Session:RequestAppInfo");
+        private static GetSteam3AppSectionDelegate? GetSteam3AppSectionMethod { get; } =
+            AccessTools2.GetDelegate<GetSteam3AppSectionDelegate>("DepotDownloader.ContentDownloader:GetSteam3AppSection");
+        private static DownloadAppAsyncDelegate? DownloadAppAsyncMethod { get; } =
+            AccessTools2.GetDelegate<DownloadAppAsyncDelegate>("DepotDownloader.ContentDownloader:DownloadAppAsync");
 
         private static FieldInfo Steam3Field { get; } = AccessTools.Field(ContentDownloaderType, "steam3");
         private static FieldInfo ConfigField { get; } = AccessTools.Field(ContentDownloaderType, "Config");
@@ -61,17 +78,17 @@ namespace Bannerlord.ReferenceAssemblies
         }
 
 
-        public static void ContentDownloaderShutdownSteam3() => ShutdownSteam3Method.Invoke(null, Array.Empty<object>());
+        public static void ContentDownloaderShutdownSteam3() => ShutdownSteam3Method();
         public static void AccountSettingsStoreLoadFromFile(string file)
         {
             var isLoaded = (bool) LoadedProperty.GetValue(null)!;
             if (!isLoaded)
-                LoadFromFileMethod.Invoke(null, new object?[] { file });
+                LoadFromFileMethod(file);
         }
 
-        public static void DepotDownloaderProgramInitializeSteam(string login, string password) => InitializeSteamMethod.Invoke(null, new object?[] { login, password });
-        public static void ContentDownloadersteam3RequestAppInfo(uint appId) => RequestAppInfoMethod.Invoke(Steam3Field.GetValue(null), new object?[] { appId, false });
-        public static KeyValue ContentDownloaderGetSteam3AppSection(uint appId) => (KeyValue) GetSteam3AppSectionMethod.Invoke(null, new object?[] { appId, EAppInfoSection.Depots })!;
+        public static void DepotDownloaderProgramInitializeSteam(string login, string password) => InitializeSteamMethod(login, password);
+        public static void ContentDownloadersteam3RequestAppInfo(uint appId) => RequestAppInfoMethod(Steam3Field.GetValue(null), appId, false);
+        public static KeyValue ContentDownloaderGetSteam3AppSection(uint appId) => GetSteam3AppSectionMethod(appId, EAppInfoSection.Depots);
 
         public static void ContentDownloaderConfigSetMaxDownloads(int maxDownloads) => MaxDownloadsProperty.SetValue(ConfigField.GetValue(null), maxDownloads);
         public static void ContentDownloaderConfigSetInstallDirectory(string installDirectory) => InstallDirectoryProperty.SetValue(ConfigField.GetValue(null), installDirectory);
@@ -105,7 +122,7 @@ namespace Bannerlord.ReferenceAssemblies
 
         public static Task ContentDownloaderDownloadAppAsync(uint appId, List<(uint depotId, ulong manifestId)> depotManifestIds, string branch, string os, string arch, string language, bool lv, bool isUgc)
         {
-            return (Task) DownloadAppAsyncMethod.Invoke(null, new object?[] { appId, depotManifestIds, branch, os, arch, language, lv, isUgc })!;
+            return DownloadAppAsyncMethod(appId, depotManifestIds, branch, os, arch, language, lv, isUgc)!;
         }
     }
 }

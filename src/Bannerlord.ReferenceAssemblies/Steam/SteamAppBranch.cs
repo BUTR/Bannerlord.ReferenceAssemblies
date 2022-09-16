@@ -27,11 +27,10 @@ namespace Bannerlord.ReferenceAssemblies
 
         public string Name { get; set; }
         public uint AppId { get; set; }
-        public uint DepotId { get; set; }
         public uint BuildId { get; set; }
 
         public string GetVersion(string appVersion) => char.IsDigit(Name[1]) ? $"{Name[1..]}.{appVersion}" : "";
 
-        public override string ToString() => $"{Name} ({AppId} {DepotId} {BuildId})";
+        public override string ToString() => $"{Name} ({AppId} {BuildId})";
     }
 }

@@ -23,19 +23,17 @@ namespace Bannerlord.ReferenceAssemblies
             {
                 var refFolder = ExecutableFolder
                     .GetFolder("ref")
-                    .GetFolder(_options.SteamDepotId.ToString())
                     .GetFolder(branch.BuildId.ToString());
 
                 var coreBinFolder = ExecutableFolder
-                    .GetFolder("depots") // ref?
-                    .GetFolder(_options.SteamDepotId.ToString())
+                    .GetFolder("ref")
                     .GetFolder(branch.BuildId.ToString())
                     .GetFolder("bin")
                     .GetFolder("Win64_Shipping_Client");
                 var version = GetAssembliesVersion(coreBinFolder.Path)?.Split('.').Last();
                 if (version == null)
                 {
-                    Trace.WriteLine($"Branch {branch.Name} ({branch.AppId} {branch.DepotId} {branch.BuildId}) does not include a readable App Version, skipping...");
+                    Trace.WriteLine($"Branch {branch.Name} ({branch.AppId} {branch.BuildId}) does not include a readable App Version, skipping...");
                     continue;
                 }
 
@@ -62,7 +60,6 @@ namespace Bannerlord.ReferenceAssemblies
                     {"moduleName", moduleName},
                     {"appVersion", appVersion},
                     {"appId", steamAppBranch.AppId.ToString()},
-                    {"depotId", steamAppBranch.DepotId.ToString()},
                     {"buildId", steamAppBranch.BuildId.ToString()},
                     {"packageNameSuffix", GetSuffix(steamAppBranch.Prefix)},
                     {"packageVersion", steamAppBranch.GetVersion(appVersion)}
@@ -91,7 +88,6 @@ namespace Bannerlord.ReferenceAssemblies
                     {"packageName", _options.PackageBaseName},
                     {"appVersion", appVersion},
                     {"appId", steamAppBranch.AppId.ToString()},
-                    {"depotId", steamAppBranch.DepotId.ToString()},
                     {"buildId", steamAppBranch.BuildId.ToString()},
                     {"packageVersion", packageVersion},
                     {"packageNameSuffix", GetSuffix(steamAppBranch.Prefix)},
@@ -115,7 +111,6 @@ namespace Bannerlord.ReferenceAssemblies
 
             var nugetFolder = ExecutableFolder
                 .CreateFolder("nuget", CreationCollisionOption.OpenIfExists)
-                .CreateFolder(_options.SteamDepotId.ToString(), CreationCollisionOption.OpenIfExists)
                 .CreateFolder(steamAppBranch.BuildId.ToString(), CreationCollisionOption.OpenIfExists)
                 .CreateFolder(name, CreationCollisionOption.OpenIfExists);
             var nugetRefFolder = nugetFolder.CreateFolder("ref", CreationCollisionOption.OpenIfExists);
@@ -143,7 +138,6 @@ namespace Bannerlord.ReferenceAssemblies
         {
             var nugetFolder = ExecutableFolder
                 .CreateFolder("nuget", CreationCollisionOption.OpenIfExists)
-                .CreateFolder(_options.SteamDepotId.ToString(), CreationCollisionOption.OpenIfExists)
                 .CreateFolder(steamAppBranch.BuildId.ToString(), CreationCollisionOption.OpenIfExists)
                 .CreateFolder("Meta", CreationCollisionOption.OpenIfExists);
 
