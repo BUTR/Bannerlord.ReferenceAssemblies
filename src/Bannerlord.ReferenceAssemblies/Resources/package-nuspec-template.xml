@@ -11,7 +11,7 @@
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <license type="expression">MIT</license>
         <repository type="git" url="https://github.com/BUTR/Bannerlord.ReferenceAssemblies.git" />
-        <tags>bannerlord game reference assemblies buildId:{{buildId}} depotId:{{depotId}} appId:{{appId}}</tags>
+        <tags>bannerlord game reference assemblies buildId:{{buildId}} appId:{{appId}}</tags>
     </metadata>
     <files>
         <file src="ref\*.exe" target="ref\net472" />
