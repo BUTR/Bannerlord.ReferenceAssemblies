@@ -38,6 +38,7 @@ jobs:
       uses: actions/setup-dotnet@master
       with:
         dotnet-version: 7.x.x
+        include-prerelease: true
 
     - name: Install Tools
       run: >-
