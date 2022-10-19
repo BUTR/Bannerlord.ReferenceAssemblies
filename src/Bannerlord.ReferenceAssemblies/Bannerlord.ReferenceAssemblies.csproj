@@ -18,7 +18,7 @@
 
   <ItemGroup>
     <PackageReference Include="CommandLineParser" Version="2.9.1" />
-    <PackageReference Include="Harmony.Extensions" Version="3.1.0.61" />
+    <PackageReference Include="Harmony.Extensions" Version="3.1.0.67" />
     <PackageReference Include="Lib.Harmony" Version="2.2.2" />
     <PackageReference Include="NuGet.Configuration" Version="6.3.0" />
     <PackageReference Include="NuGet.Protocol" Version="6.3.1" />
