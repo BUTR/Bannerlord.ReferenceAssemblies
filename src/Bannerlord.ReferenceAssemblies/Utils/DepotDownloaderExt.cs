@@ -80,6 +80,7 @@ namespace Bannerlord.ReferenceAssemblies
         [MethodImpl(MethodImplOptions.NoInlining)]
         public static bool LoadFromFilePrefix()
         {
+            Console.WriteLine("Test123");
             var isLoaded = (bool) LoadedProperty.GetValue(null)!;
             return !isLoaded;
         }
