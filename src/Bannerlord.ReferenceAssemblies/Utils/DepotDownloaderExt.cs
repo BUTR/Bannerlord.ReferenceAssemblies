@@ -8,6 +8,7 @@ using SteamKit2;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -66,14 +67,22 @@ namespace Bannerlord.ReferenceAssemblies
         {
             var harmony = new Harmony("123");
             harmony.Patch(
-                AccessTools.Method(DepotConfigStoreType, "LoadFromFile"),
-                new HarmonyMethod(AccessTools.Method(typeof(DepotDownloaderExt), nameof(LoadFromFilePrefix))));
+                AccessTools2.Method("DepotDownloader.ContentDownloader:DownloadAppAsync"),
+                transpiler: new HarmonyMethod(AccessTools2.Method(typeof(DepotDownloaderExt), nameof(BlankTranspiler))));
+
+            harmony.Patch(
+                AccessTools2.Method(DepotConfigStoreType, "LoadFromFile"),
+                prefix: new HarmonyMethod(AccessTools2.Method(typeof(DepotDownloaderExt), nameof(LoadFromFilePrefix))));
         }
+        [MethodImpl(MethodImplOptions.NoInlining)]
         public static bool LoadFromFilePrefix()
         {
             var isLoaded = (bool) LoadedProperty.GetValue(null)!;
             return !isLoaded;
         }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private static IEnumerable<CodeInstruction> BlankTranspiler(IEnumerable<CodeInstruction> instructions) => instructions;
 
 
         public static void ContentDownloaderShutdownSteam3() => ShutdownSteam3Method();
