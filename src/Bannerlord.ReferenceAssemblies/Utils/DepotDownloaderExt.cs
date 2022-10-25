@@ -66,6 +66,9 @@ namespace Bannerlord.ReferenceAssemblies
         public static void Init()
         {
             var harmony = new Harmony("123");
+
+            Assembly.Load("DepotDownloader");
+
             harmony.Patch(
                 AccessTools2.Method("DepotDownloader.ContentDownloader:DownloadAppAsync"),
                 transpiler: new HarmonyMethod(AccessTools2.Method(typeof(DepotDownloaderExt), nameof(BlankTranspiler))));
