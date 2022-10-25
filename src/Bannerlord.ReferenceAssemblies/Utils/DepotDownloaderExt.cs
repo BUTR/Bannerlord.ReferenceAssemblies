@@ -72,9 +72,7 @@ namespace Bannerlord.ReferenceAssemblies
         public static bool LoadFromFilePrefix()
         {
             var isLoaded = (bool) LoadedProperty.GetValue(null)!;
-            if (isLoaded)
-                return false;
-            return true;
+            return !isLoaded;
         }
 
 
