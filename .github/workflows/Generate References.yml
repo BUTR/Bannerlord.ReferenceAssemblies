@@ -74,6 +74,5 @@ jobs:
           BUTR/Bannerlord.BUTRLoader
           BUTR/Bannerlord.BUTR.Shared
           BUTR/Bannerlord.ReferenceAssemblies.Diff
-          BUTR/AssemblyDiffer
         event_type: game_version_update_patch
         client_payload: '{"github": ${{ toJson(github) }}}'
