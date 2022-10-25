@@ -16,9 +16,7 @@ namespace Bannerlord.ReferenceAssemblies
 {
     internal class NuGetFeed
     {
-        private static readonly int MaxConcurrentOperations = 5;
-
-        private static Regex RxPackageName;
+        private static Regex? RxPackageName;
 
         private readonly string _packageBaseName;
 
@@ -28,12 +26,11 @@ namespace Bannerlord.ReferenceAssemblies
         {
             _packageBaseName = packageBaseName;
 
-            RxPackageName = new Regex($"{_packageBaseName}*", RegexOptions.Compiled);
+            RxPackageName ??= new Regex($"{_packageBaseName}*", RegexOptions.Compiled);
 
             var packageSource = new PackageSource(feedUrl, "Feed1", true, false, false)
             {
-                Credentials = new PackageSourceCredential(feedUrl, feedUser ?? "", feedPassword ?? "", true, "basic"),
-                ProtocolVersion = 3,
+                Credentials = new PackageSourceCredential(feedUrl, feedUser ?? "", feedPassword ?? "", true, string.Empty),
                 MaxHttpRequestsPerSource = 8
             };
 
@@ -43,26 +40,45 @@ namespace Bannerlord.ReferenceAssemblies
         public async Task<IReadOnlyDictionary<string, IReadOnlyList<NuGetPackage>>> GetVersionsAsync(CancellationToken ct)
         {
             var packageLister = _sourceRepository.GetResource<PackageSearchResource>(ct);
-            var packages = (await packageLister.SearchAsync("ReferenceAssemblies", new SearchFilter(true), 0, 100, NullLogger.Instance, ct))
-                .Where(p => RxPackageName.IsMatch(p.Identity.Id));
+            var packages = (await packageLister.SearchAsync(_packageBaseName, new SearchFilter(true), 0, 10, NullLogger.Instance, ct))
+                .Where(p => RxPackageName.IsMatch(p.Identity.Id)).ToList();
 
             var sourceCacheContext = new SourceCacheContext();
             var finderPackageByIdResource = _sourceRepository.GetResource<FindPackageByIdResource>(ct);
             var metadataResource = _sourceRepository.GetResource<PackageMetadataResource>(ct);
 
-            return await packages.ToAsyncEnumerable().SelectParallel(MaxConcurrentOperations, async package =>
+            return await packages.ToAsyncEnumerable().SelectAwait(async package =>
             {
                 if (!package.Identity.Id.StartsWith(_packageBaseName))
                     return default;
 
-                var versions = finderPackageByIdResource.GetAllVersionsAsync(package.Identity.Id, sourceCacheContext, NullLogger.Instance, ct).GetAwaiter().GetResult().ToList();
-                var metadatas = GetMetadataAsync(versions.ToAsyncEnumerable(), version => metadataResource.GetMetadataAsync(new PackageIdentity(package.Identity.Id, version), sourceCacheContext, NullLogger.Instance, ct), ct);
-                return (package.Identity.Id, (await GetPackageVersionsAsync(metadatas, ct).ToListAsync(ct)) as IReadOnlyList<NuGetPackage>);
-            }, ct).ToDictionaryAsync(x => x.Item1, x => x.Item2, ct);
+                var versions = MaxVersions(finderPackageByIdResource.GetAllVersionsAsync(package.Identity.Id, sourceCacheContext, NullLogger.Instance, ct));
+                var metadatas = GetMetadataAsync(versions, version => metadataResource.GetMetadataAsync(new PackageIdentity(package.Identity.Id, version), sourceCacheContext, NullLogger.Instance, ct), ct);
+                return (package.Identity.Id, (IReadOnlyList<NuGetPackage>) await GetPackageVersionsAsync(metadatas, ct).ToListAsync(ct));
+            }).ToDictionaryAsync(x => x.Item1, x => x.Item2, ct);
         }
 
-        private static IAsyncEnumerable<IPackageSearchMetadata> GetMetadataAsync(IAsyncEnumerable<NuGetVersion> versions, Func<NuGetVersion, Task<IPackageSearchMetadata>> getMeta, CancellationToken cancellationToken = default) =>
-            versions.SelectParallel(MaxConcurrentOperations, getMeta, cancellationToken);
+        private static async IAsyncEnumerable<NuGetVersion> MaxVersions(Task<IEnumerable<NuGetVersion>> source)
+        {
+            var dict = new Dictionary<string, NuGetVersion>();
+            foreach (var version in await source)
+            {
+                var v = version.Version.ToString(3);
+                var currentMax = dict.TryGetValue(v, out var c) ? c : null;
+                if (currentMax is null) dict[v] = version;
+                else if (currentMax.Version < version.Version) dict[v] = version;
+            }
+            foreach (var value in dict.Values)
+                yield return value;
+        }
+
+        private static async IAsyncEnumerable<IPackageSearchMetadata> GetMetadataAsync(IAsyncEnumerable<NuGetVersion> versions, Func<NuGetVersion, Task<IPackageSearchMetadata>> getMeta, CancellationToken cancellationToken = default)
+        {
+            await foreach (var version in versions.WithCancellation(cancellationToken))
+            {
+                yield return await getMeta(version);
+            }
+        }
 
         private static async IAsyncEnumerable<NuGetPackage> GetPackageVersionsAsync(IAsyncEnumerable<IPackageSearchMetadata> metadatas, [EnumeratorCancellation] CancellationToken cancellation = default)
         {

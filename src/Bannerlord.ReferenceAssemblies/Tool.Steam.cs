@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -12,9 +13,9 @@ namespace Bannerlord.ReferenceAssemblies
 {
     internal partial class Tool
     {
-        private SteamAppBranch ConvertVersion(string version, string buildId) => new()
+        private SteamAppBranch ConvertVersion(string name, string buildId) => new()
         {
-            Name = version,
+            Name = name,
             AppId = _options.SteamAppId,
             BuildId = uint.TryParse(buildId, out var r) ? r : 0
         };
@@ -26,7 +27,7 @@ namespace Bannerlord.ReferenceAssemblies
             DepotDownloaderExt.ContentDownloadersteam3RequestAppInfo(_options.SteamAppId);
             var depots = DepotDownloaderExt.ContentDownloaderGetSteam3AppSection(_options.SteamAppId);
             var branches = depots["branches"];
-            return branches.Children.Select(c => ConvertVersion(c.Name!, c["buildid"].Value!));
+            return branches.Children.Where(x => x["pwdrequired"].Value != "1" && x["lcsrequired"].Value != "1").Select(c => ConvertVersion(c.Name!, c["buildid"].Value!));
         }
 
         private async Task DownloadBranchesAsync(IEnumerable<SteamAppBranch> toDownload, CancellationToken ct)

@@ -1,5 +1,7 @@
 ﻿using Bannerlord.ReferenceAssemblies.Options;
 
+using NuGet.Packaging;
+
 using PCLExt.FileStorage;
 using PCLExt.FileStorage.Folders;
 
@@ -15,6 +17,11 @@ namespace Bannerlord.ReferenceAssemblies
 {
     internal partial class Tool
     {
+        private static readonly Dictionary<string, string> SupportMatrix = new()
+        {
+            {"Bannerlord.ReferenceAssemblies.BirthAndDeath.EarlyAccess", "e1.8.0"}
+        };
+
         private static readonly IFolder ExecutableFolder = new FolderFromPath(AppDomain.CurrentDomain.BaseDirectory);
 
         private readonly GenerateOptions _options;
@@ -37,32 +44,19 @@ namespace Bannerlord.ReferenceAssemblies
                 Trace.WriteLine($"{key}: [{string.Join(", ", value)}]");
 
             Trace.WriteLine("Checking branches...");
-            var branches = GetAllBranches().ToList();
+            var branches = GetAllBranches().Where(x => !x.Name.Contains("perf_test")).ToList();
 
-            Trace.WriteLine("Getting new versions...");
-            var prefixes = new HashSet<BranchType>(branches.Select(branch => branch.Prefix).Where(b => b != BranchType.Unknown));
+            var packageNameWithBuildIds = new Dictionary<string, IEnumerable<uint>>();
+            foreach (var (packageId, package) in packages)
+                packageNameWithBuildIds[packageId] = package.Select(x => x.BuildId).ToArray();
 
-            var coreVersions = prefixes.ToDictionary(branchType => branchType,
-                branchType => packages.TryGetValue(GetPackageName("Core", branchType), out var pkg)
-                    ? pkg.Select(x => x.BuildId)
-                    : Array.Empty<uint>());
-
-            var publicBranch = branches.First(branch => branch.Name == "public");
-            var otherBranches = branches.Where(branch => branch.Prefix != BranchType.Unknown);
-            var matchedPublicBranch = otherBranches.FirstOrDefault(branch => branch.BuildId == publicBranch.BuildId);
-            if (matchedPublicBranch.BuildId == 0)
+            var toDownload = new HashSet<SteamAppBranch>();
+            foreach (var (packageId, buildIds) in packageNameWithBuildIds)
             {
-                Trace.WriteLine("Public Branch does not match any version branch! Report to TaleWorlds!");
-                return;
+                toDownload.AddRange(branches.Where(branch =>
+                    (!SupportMatrix.TryGetValue(packageId, out var val) || new AlphanumComparatorFast().Compare(val, branch.Name) <= 0) &&
+                    !buildIds.Contains(branch.BuildId)));
             }
-
-            Trace.WriteLine($"Public Branch Matches: {matchedPublicBranch.Name}");
-            var toDownload = branches.Where(branch =>
-                branch.Prefix != BranchType.Unknown
-                && !coreVersions[branch.Prefix].Contains(branch.BuildId)
-                // TODO: Fix parsing meta from older versions
-                && Version.TryParse(branch.Name.Remove(0, 1), out var v) && v >= new Version("1.1.0")
-            ).ToList();
 
             if (toDownload.Count == 0)
             {
@@ -78,23 +72,49 @@ namespace Bannerlord.ReferenceAssemblies
             Trace.WriteLine("Checking downloading...");
             await DownloadBranchesAsync(toDownload, ct);
 
+            var toDownloadWithVersion = toDownload.Select(branch =>
+            {
+                var depotsBinFolder = ExecutableFolder
+                    .GetFolder("depots")
+                    .GetFolder(branch.BuildId.ToString());
+
+                var version = GetAssembliesVersion(depotsBinFolder.Path);
+                var changeSet = GetAssembliesAppVersion(depotsBinFolder.Path);
+                if (version == null)
+                {
+                    Trace.WriteLine($"Branch {branch.Name} ({branch.AppId} {branch.BuildId}) does not include a readable Version, skipping...");
+                    return null;
+                }
+                if (changeSet == null)
+                {
+                    Trace.WriteLine($"Branch {branch.Name} ({branch.AppId} {branch.BuildId}) does not include a readable ChangeSet, skipping...");
+                    return null;
+                }
+                return new SteamAppBranchWithVersion(version, changeSet, branch);
+            }).OfType<SteamAppBranchWithVersion>().ToArray();
+
             Trace.WriteLine("Generating references...");
-            GenerateReferences(toDownload);
+            GenerateReferences(toDownloadWithVersion);
 
             Trace.WriteLine("Generating packages...");
 
-            GeneratePackages(toDownload);
+            GeneratePackages(toDownloadWithVersion);
 
             Trace.WriteLine("Done!");
         }
 
 
-        private static string? GetAssembliesVersion(string path) =>
+        private static string? GetAssembliesAppVersion(string path) =>
             ProcessHelpers.Run("getblmeta", $"getchangeset -f {path}", out var versionStr) != 0
                 ? null
                 : versionStr.Replace("\r", "").Replace("\n", "");
 
-        private void GenerateReferences(IEnumerable<SteamAppBranch> toDownload)
+       private static string? GetAssembliesVersion(string path) =>
+            ProcessHelpers.Run("getblmeta", $"getversion -f {path}", out var versionStr) != 0
+                ? null
+                : versionStr.Replace("\r", "").Replace("\n", "");
+
+        private void GenerateReferences(IEnumerable<SteamAppBranchWithVersion> toDownload)
         {
             foreach (var branch in toDownload)
             {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Bannerlord.ReferenceAssemblies
 {
-    internal struct SteamAppBranch
+    internal record SteamAppBranch
     {
         public static readonly IReadOnlyDictionary<BranchType, string?> VersionPrefixToName = new SortedList<BranchType, string?>
         {
@@ -15,22 +15,34 @@ namespace Bannerlord.ReferenceAssemblies
             { BranchType.Unknown, "Invalid" },
         };
 
+        public string Name { get; init; }
+        public uint AppId { get; init; }
+        public uint BuildId { get; init; }
+
+        public override string ToString() => $"{Name} ({AppId} {BuildId})";
+    }
+
+    internal record SteamAppBranchWithVersion : SteamAppBranch
+    {
         public BranchType Prefix
         {
             get
             {
-                if (string.IsNullOrEmpty(Name) || Name.Length < 1 || !char.IsDigit(Name[1]) || !Enum.IsDefined(typeof(BranchType), (int) Name[0]))
+                if (string.IsNullOrEmpty(Version) || Version.Length < 1 || !char.IsDigit(Version[1]) || !Enum.IsDefined(typeof(BranchType), (int) Version[0]))
                     return BranchType.Unknown;
-                return (BranchType) Name[0];
+                return (BranchType) Version[0];
             }
         }
 
-        public string Name { get; set; }
-        public uint AppId { get; set; }
-        public uint BuildId { get; set; }
+        public string Version { get; init; }
+        public string ChangeSet { get; init; }
 
-        public string GetVersion(string appVersion) => char.IsDigit(Name[1]) ? $"{Name[1..]}.{appVersion}" : "";
+        public SteamAppBranchWithVersion(string version, string changeSet, SteamAppBranch branch) : base(branch)
+        {
+            Version = version;
+            ChangeSet = changeSet;
+        }
 
-        public override string ToString() => $"{Name} ({AppId} {BuildId})";
+        public override string ToString() => $"{Name} {Version}.{ChangeSet} ({AppId} {BuildId})";
     }
 }

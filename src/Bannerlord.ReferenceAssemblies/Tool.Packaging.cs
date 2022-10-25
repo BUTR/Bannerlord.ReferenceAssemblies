@@ -3,7 +3,6 @@ using PCLExt.FileStorage.Extensions;
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Xml.Linq;
 
@@ -17,7 +16,7 @@ namespace Bannerlord.ReferenceAssemblies
         private string GetPackageName(string module, BranchType branchType) =>
             $"{_options.PackageBaseName}{(string.IsNullOrEmpty(module) ? "" : $".{module}")}{GetSuffix(branchType)}";
 
-        private void GeneratePackages(IEnumerable<SteamAppBranch> toDownload)
+        private void GeneratePackages(IEnumerable<SteamAppBranchWithVersion> toDownload)
         {
             foreach (var branch in toDownload)
             {
@@ -25,14 +24,8 @@ namespace Bannerlord.ReferenceAssemblies
                     .GetFolder("ref")
                     .GetFolder(branch.BuildId.ToString());
 
-                var version = GetAssembliesVersion(refFolder.Path)?.Split('.').Last();
-                if (version == null)
-                {
-                    Trace.WriteLine($"Branch {branch.Name} ({branch.AppId} {branch.BuildId}) does not include a readable App Version, skipping...");
-                    continue;
-                }
-
                 var deps = new List<string> { "Core" };
+                var version = $"{branch.Version.Substring(1)}.{branch.ChangeSet}";
                 // Core
                 GenerateNupkg(branch, version, "", refFolder);
                 // Modules
@@ -47,59 +40,53 @@ namespace Bannerlord.ReferenceAssemblies
             }
         }
 
-        private string GenerateNuspec(SteamAppBranch steamAppBranch, string appVersion, string moduleName) =>
+        private string GenerateNuspec(SteamAppBranchWithVersion steamAppBranch, string version, string moduleName) =>
             TemplateHelpers.ApplyTemplate(Resourcer.Resource.AsString("Resources/package-nuspec-template.xml"),
                 new Dictionary<string, string>
                 {
                     {"packageName", _options.PackageBaseName},
                     {"moduleName", moduleName},
-                    {"appVersion", appVersion},
                     {"appId", steamAppBranch.AppId.ToString()},
                     {"buildId", steamAppBranch.BuildId.ToString()},
                     {"packageNameSuffix", GetSuffix(steamAppBranch.Prefix)},
-                    {"packageVersion", steamAppBranch.GetVersion(appVersion)}
+                    {"packageVersion", version}
                 });
 
-        private string GenerateCsproj(SteamAppBranch steamAppBranch, string appVersion, string moduleName) =>
+        private string GenerateCsproj(SteamAppBranchWithVersion steamAppBranch, string moduleName) =>
             TemplateHelpers.ApplyTemplate(Resourcer.Resource.AsString("Resources/package-csproj-template.xml"),
                 new Dictionary<string, string>
                 {
                     {"packageName", _options.PackageBaseName},
                     {"moduleName", moduleName},
-                    {"appVersion", appVersion},
                     {"packageNameSuffix", GetSuffix(steamAppBranch.Prefix)},
-                    {"packageVersion", steamAppBranch.GetVersion(appVersion)}
                 });
 
-        private string GenerateMetaNuspec(SteamAppBranch steamAppBranch, string appVersion, IEnumerable<string> deps)
+        private string GenerateMetaNuspec(SteamAppBranchWithVersion steamAppBranch, string version, IEnumerable<string> deps)
         {
-            var packageVersion = steamAppBranch.GetVersion(appVersion);
             var dependenciesXml = deps.Select(dep => new XElement("dependency",
                     new XAttribute("id", $"{_options.PackageBaseName}.{dep}{GetSuffix(steamAppBranch.Prefix)}"),
-                    new XAttribute("version", packageVersion))).ToList();
+                    new XAttribute("version", version))).ToList();
             return TemplateHelpers.ApplyTemplate(Resourcer.Resource.AsString("Resources/metapackage-nuspec-template.xml"),
                 new Dictionary<string, string>
                 {
                     {"packageName", _options.PackageBaseName},
-                    {"appVersion", appVersion},
                     {"appId", steamAppBranch.AppId.ToString()},
                     {"buildId", steamAppBranch.BuildId.ToString()},
-                    {"packageVersion", packageVersion},
+                    {"packageVersion", version},
                     {"packageNameSuffix", GetSuffix(steamAppBranch.Prefix)},
                     {"dependenciesXml", string.Join(Environment.NewLine, dependenciesXml.Select(x => x.ToString()))}
                 });
         }
 
-        private string GenerateMetaCsproj(SteamAppBranch steamAppBranch, string appVersion) =>
+        private string GenerateMetaCsproj(SteamAppBranchWithVersion steamAppBranch) =>
             TemplateHelpers.ApplyTemplate(Resourcer.Resource.AsString("Resources/metapackage-csproj-template.xml"),
                 new Dictionary<string, string>
                 {
                     {"packageName", _options.PackageBaseName},
                     {"packageNameSuffix", GetSuffix(steamAppBranch.Prefix)},
-                    {"appVersion", appVersion},
                 });
 
-        private void GenerateNupkg(SteamAppBranch steamAppBranch, string appVersion, string moduleName, IFolder rootFolder)
+        private void GenerateNupkg(SteamAppBranchWithVersion steamAppBranch, string version, string moduleName, IFolder rootFolder)
         {
             var isCore = string.IsNullOrEmpty(moduleName);
             var name = isCore ? "Core" : moduleName;
@@ -114,11 +101,11 @@ namespace Bannerlord.ReferenceAssemblies
 
             nugetFolder
                 .CreateFile($"{fileNameBase}.nuspec", CreationCollisionOption.ReplaceExisting)
-                .WriteAllText(GenerateNuspec(steamAppBranch, appVersion, name));
+                .WriteAllText(GenerateNuspec(steamAppBranch, version, name));
 
             nugetFolder
                 .CreateFile($"{fileNameBase}.csproj", CreationCollisionOption.ReplaceExisting)
-                .WriteAllText(GenerateCsproj(steamAppBranch, appVersion, name));
+                .WriteAllText(GenerateCsproj(steamAppBranch, name));
 
             foreach (var file in rootFolder.GetFolder("bin").GetFolder("Win64_Shipping_Client").GetModuleFiles(isCore))
                 file.Copy(nugetRefFolder.CreateFile(file.Name, CreationCollisionOption.ReplaceExisting));
@@ -129,7 +116,7 @@ namespace Bannerlord.ReferenceAssemblies
             ProcessHelpers.Run("dotnet", $"pack -o \"{finalFolder.Path}\"", nugetFolder.Path);
         }
 
-        private void GenerateMetaNupkg(SteamAppBranch steamAppBranch, string appVersion, IEnumerable<string> deps)
+        private void GenerateMetaNupkg(SteamAppBranchWithVersion steamAppBranch, string version, IEnumerable<string> deps)
         {
             var nugetFolder = ExecutableFolder
                 .CreateFolder("nuget", CreationCollisionOption.OpenIfExists)
@@ -140,11 +127,11 @@ namespace Bannerlord.ReferenceAssemblies
 
             nugetFolder
                 .CreateFile($"{fileNameBase}.nuspec", CreationCollisionOption.ReplaceExisting)
-                .WriteAllText(GenerateMetaNuspec(steamAppBranch, appVersion, deps));
+                .WriteAllText(GenerateMetaNuspec(steamAppBranch, version, deps));
 
             nugetFolder
                 .CreateFile($"{fileNameBase}.csproj", CreationCollisionOption.ReplaceExisting)
-                .WriteAllText(GenerateMetaCsproj(steamAppBranch, appVersion));
+                .WriteAllText(GenerateMetaCsproj(steamAppBranch));
 
             var finalFolder = ExecutableFolder
                 .CreateFolder("final", CreationCollisionOption.OpenIfExists);
