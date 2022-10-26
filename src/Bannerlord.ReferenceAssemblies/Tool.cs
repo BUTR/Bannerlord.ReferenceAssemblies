@@ -109,10 +109,10 @@ namespace Bannerlord.ReferenceAssemblies
                 ? null
                 : versionStr.Replace("\r", "").Replace("\n", "");
 
-       private static string? GetAssembliesVersion(string path) =>
-            ProcessHelpers.Run("getblmeta", $"getversion -f {path}", out var versionStr) != 0
-                ? null
-                : versionStr.Replace("\r", "").Replace("\n", "");
+        private static string? GetAssembliesVersion(string path) =>
+             ProcessHelpers.Run("getblmeta", $"getversion -f {path}", out var versionStr) != 0
+                 ? null
+                 : versionStr.Replace("\r", "").Replace("\n", "");
 
         private void GenerateReferences(IEnumerable<SteamAppBranchWithVersion> toDownload)
         {

@@ -15,7 +15,7 @@ namespace Bannerlord.ReferenceAssemblies
             { BranchType.Unknown, "Invalid" },
         };
 
-        public string Name { get; init; }
+        public string? Name { get; init; }
         public uint AppId { get; init; }
         public uint BuildId { get; init; }
 
