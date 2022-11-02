@@ -34,12 +34,6 @@ jobs:
       with:
         dotnet-version: 6.x.x
 
-    - name: Setup .NET 7
-      uses: actions/setup-dotnet@master
-      with:
-        dotnet-version: 7.x.x
-        include-prerelease: true
-
     - name: Install Tools
       run: >-
           dotnet tool install -g JetBrains.Refasmer.CliTool;
@@ -50,18 +44,18 @@ jobs:
 
     - name: Check files
       id: check_files
-      run: echo "::set-output name=files_exists::$([[ "$(ls -A ./src/Bannerlord.ReferenceAssemblies/bin/Debug/net7.0/final)" ]] && echo "true" || echo "false")"
+      run: echo "::set-output name=files_exists::$([[ "$(ls -A ./src/Bannerlord.ReferenceAssemblies/bin/Debug/net6.0/final)" ]] && echo "true" || echo "false")"
       shell: bash
     
     - name: Push to NuGet
       if: steps.check_files.outputs.files_exists == 'true'
-      run: dotnet nuget push "./src/Bannerlord.ReferenceAssemblies/bin/Debug/net7.0/final/*.nupkg" --skip-duplicate -k ${{secrets.NUGET_API_KEY}} -s https://www.nuget.org
+      run: dotnet nuget push "./src/Bannerlord.ReferenceAssemblies/bin/Debug/net6.0/final/*.nupkg" --skip-duplicate -k ${{secrets.NUGET_API_KEY}} -s https://www.nuget.org
       shell: pwsh
 
     - name: Push to GPR
       if: steps.check_files.outputs.files_exists == 'true'
       run: |
-           for f in ./src/Bannerlord.ReferenceAssemblies/bin/Debug/net7.0/final/*.nupkg
+           for f in ./src/Bannerlord.ReferenceAssemblies/bin/Debug/net6.0/final/*.nupkg
            do
              curl -vX PUT -u "vslee:${{secrets.GITHUB_TOKEN}}" -F package=@$f https://nuget.pkg.github.com/BUTR/
            done
@@ -80,6 +74,5 @@ jobs:
           BUTR/Bannerlord.BUTRLoader
           BUTR/Bannerlord.BUTR.Shared
           BUTR/Bannerlord.ReferenceAssemblies.Diff
-          BUTR/AssemblyDiffer
         event_type: game_version_update_patch
         client_payload: '{"github": ${{ toJson(github) }}}'
