@@ -26,10 +26,6 @@ namespace Bannerlord.ReferenceAssemblies.Options
 
 
 
-        [Option("packageBaseName", Required = true)]
-        public string PackageBaseName { get; set; } = default!;
-
-
         [Option("feedUrl", Required = true)]
         public string FeedUrl { get; set; } = default!;
 

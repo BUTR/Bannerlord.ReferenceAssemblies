@@ -1,6 +1,7 @@
 ﻿using NuGet.Common;
 using NuGet.Configuration;
 using NuGet.Packaging.Core;
+using NuGet.Protocol;
 using NuGet.Protocol.Core.Types;
 using NuGet.Versioning;
 
@@ -18,15 +19,11 @@ namespace Bannerlord.ReferenceAssemblies
     {
         private readonly Regex RxPackageName;
 
-        private readonly string _packageBaseName;
-
         private readonly SourceRepository _sourceRepository;
 
-        public NuGetFeed(string feedUrl, string? feedUser, string? feedPassword, string packageBaseName)
+        public NuGetFeed(string feedUrl, string? feedUser, string? feedPassword)
         {
-            _packageBaseName = packageBaseName;
-
-            RxPackageName = new Regex($"{_packageBaseName}*", RegexOptions.Compiled);
+            RxPackageName = new Regex("Bannerlord.ReferenceAssemblies*", RegexOptions.Compiled);
 
             var packageSource = new PackageSource(feedUrl, "Feed1", true, false, false)
             {
@@ -40,7 +37,7 @@ namespace Bannerlord.ReferenceAssemblies
         public async Task<IReadOnlyDictionary<string, IReadOnlyList<NuGetPackage>>> GetVersionsAsync(CancellationToken ct)
         {
             var packageLister = await _sourceRepository.GetResourceAsync<PackageSearchResource>(ct);
-            var foundPackages = await packageLister.SearchAsync(_packageBaseName, new SearchFilter(true), 0, 10, NullLogger.Instance, ct);
+            var foundPackages = await packageLister.SearchAsync("Bannerlord.ReferenceAssemblies", new SearchFilter(true), 0, 50, NullLogger.Instance, ct);
 
             var sourceCacheContext = new SourceCacheContext();
             var finderPackageByIdResource = await _sourceRepository.GetResourceAsync<FindPackageByIdResource>(ct);
@@ -48,7 +45,7 @@ namespace Bannerlord.ReferenceAssemblies
 
             return await foundPackages.Where(p => RxPackageName.IsMatch(p.Identity.Id)).ToAsyncEnumerable().SelectAwait(async package =>
             {
-                if (!package.Identity.Id.StartsWith(_packageBaseName))
+                if (!package.Identity.Id.StartsWith("Bannerlord.ReferenceAssemblies"))
                     return default;
 
                 var versions = MaxVersions(finderPackageByIdResource.GetAllVersionsAsync(package.Identity.Id, sourceCacheContext, NullLogger.Instance, ct));

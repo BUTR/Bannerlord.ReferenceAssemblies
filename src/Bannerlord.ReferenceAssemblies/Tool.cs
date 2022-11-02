@@ -33,9 +33,18 @@ namespace Bannerlord.ReferenceAssemblies
             _options = options;
         }
 
+        private static string StripEnding(string packageId)
+        {
+            foreach (var (_, value) in SteamAppBranch.VersionPrefixToName)
+            {
+                packageId = packageId.Replace($".{value}", string.Empty);
+            }
+            return packageId;
+        }
+
         public async Task ExecuteAsync(CancellationToken ct)
         {
-            var nugetFeed = new NuGetFeed(_options.FeedUrl, _options.FeedUser, _options.FeedPassword, _options.PackageBaseName);
+            var nugetFeed = new NuGetFeed(_options.FeedUrl, _options.FeedUser, _options.FeedPassword);
 
             Trace.WriteLine("Checking NuGet...");
             var packages = await nugetFeed.GetVersionsAsync(ct);
@@ -44,11 +53,22 @@ namespace Bannerlord.ReferenceAssemblies
                 Trace.WriteLine($"{key}: [{string.Join(", ", value)}]");
 
             Trace.WriteLine("Checking branches...");
-            var branches = GetAllBranches().Where(x => !x.Name.Contains("perf_test")).ToList();
+            var branches = GetAllBranches()
+                .Where(x => string.Equals(x.Name, "public", StringComparison.Ordinal))
+                //.Where(x => !x.Name.Contains("perf_test"))
+                .ToList();
 
-            var packageNameWithBuildIds = new Dictionary<string, IEnumerable<uint>>();
+            var packageNameWithBuildIds = new Dictionary<string, List<uint>>();
             foreach (var (packageId, package) in packages)
-                packageNameWithBuildIds[packageId] = package.Select(x => x.BuildId).ToArray();
+            {
+                var strippedPackageId = StripEnding(packageId);
+                if (!packageNameWithBuildIds.TryGetValue(strippedPackageId, out var buildIds))
+                {
+                    buildIds = new List<uint>();
+                    packageNameWithBuildIds[strippedPackageId] = buildIds;
+                }
+                buildIds.AddRange(package.Select(x => x.BuildId));
+            }
 
             var toDownload = new HashSet<SteamAppBranch>();
             foreach (var (packageId, buildIds) in packageNameWithBuildIds)

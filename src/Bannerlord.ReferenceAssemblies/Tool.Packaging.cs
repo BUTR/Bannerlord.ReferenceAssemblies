@@ -14,7 +14,7 @@ namespace Bannerlord.ReferenceAssemblies
             SteamAppBranch.VersionPrefixToName[branchType] is { } str ? $".{str}" : "";
 
         private string GetPackageName(string module, BranchType branchType) =>
-            $"{_options.PackageBaseName}{(string.IsNullOrEmpty(module) ? "" : $".{module}")}{GetSuffix(branchType)}";
+            $"Bannerlord.ReferenceAssemblies{(string.IsNullOrEmpty(module) ? "" : $".{module}")}{GetSuffix(branchType)}";
 
         private void GeneratePackages(IEnumerable<SteamAppBranchWithVersion> toDownload)
         {
@@ -44,7 +44,7 @@ namespace Bannerlord.ReferenceAssemblies
             TemplateHelpers.ApplyTemplate(Resourcer.Resource.AsString("Resources/package-nuspec-template.xml"),
                 new Dictionary<string, string>
                 {
-                    {"packageName", _options.PackageBaseName},
+                    {"packageName", "Bannerlord.ReferenceAssemblies"},
                     {"moduleName", moduleName},
                     {"appId", steamAppBranch.AppId.ToString()},
                     {"buildId", steamAppBranch.BuildId.ToString()},
@@ -56,7 +56,7 @@ namespace Bannerlord.ReferenceAssemblies
             TemplateHelpers.ApplyTemplate(Resourcer.Resource.AsString("Resources/package-csproj-template.xml"),
                 new Dictionary<string, string>
                 {
-                    {"packageName", _options.PackageBaseName},
+                    {"packageName", "Bannerlord.ReferenceAssemblies"},
                     {"moduleName", moduleName},
                     {"packageNameSuffix", GetSuffix(steamAppBranch.Prefix)},
                 });
@@ -64,12 +64,12 @@ namespace Bannerlord.ReferenceAssemblies
         private string GenerateMetaNuspec(SteamAppBranchWithVersion steamAppBranch, string version, IEnumerable<string> deps)
         {
             var dependenciesXml = deps.Select(dep => new XElement("dependency",
-                    new XAttribute("id", $"{_options.PackageBaseName}.{dep}{GetSuffix(steamAppBranch.Prefix)}"),
+                    new XAttribute("id", $"Bannerlord.ReferenceAssemblies.{dep}{GetSuffix(steamAppBranch.Prefix)}"),
                     new XAttribute("version", version))).ToList();
             return TemplateHelpers.ApplyTemplate(Resourcer.Resource.AsString("Resources/metapackage-nuspec-template.xml"),
                 new Dictionary<string, string>
                 {
-                    {"packageName", _options.PackageBaseName},
+                    {"packageName", "Bannerlord.ReferenceAssemblies"},
                     {"appId", steamAppBranch.AppId.ToString()},
                     {"buildId", steamAppBranch.BuildId.ToString()},
                     {"packageVersion", version},
@@ -82,7 +82,7 @@ namespace Bannerlord.ReferenceAssemblies
             TemplateHelpers.ApplyTemplate(Resourcer.Resource.AsString("Resources/metapackage-csproj-template.xml"),
                 new Dictionary<string, string>
                 {
-                    {"packageName", _options.PackageBaseName},
+                    {"packageName", "Bannerlord.ReferenceAssemblies"},
                     {"packageNameSuffix", GetSuffix(steamAppBranch.Prefix)},
                 });
 
