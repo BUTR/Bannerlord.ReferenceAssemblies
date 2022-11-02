@@ -16,7 +16,7 @@ namespace Bannerlord.ReferenceAssemblies
 {
     internal class NuGetFeed
     {
-        private static Regex? RxPackageName;
+        private readonly Regex RxPackageName;
 
         private readonly string _packageBaseName;
 
@@ -26,12 +26,12 @@ namespace Bannerlord.ReferenceAssemblies
         {
             _packageBaseName = packageBaseName;
 
-            RxPackageName ??= new Regex($"{_packageBaseName}*", RegexOptions.Compiled);
+            RxPackageName = new Regex($"{_packageBaseName}*", RegexOptions.Compiled);
 
             var packageSource = new PackageSource(feedUrl, "Feed1", true, false, false)
             {
                 Credentials = new PackageSourceCredential(feedUrl, feedUser ?? "", feedPassword ?? "", true, string.Empty),
-                MaxHttpRequestsPerSource = 8
+                MaxHttpRequestsPerSource = 8,
             };
 
             _sourceRepository = new SourceRepository(packageSource, Repository.Provider.GetCoreV3());
@@ -39,15 +39,14 @@ namespace Bannerlord.ReferenceAssemblies
 
         public async Task<IReadOnlyDictionary<string, IReadOnlyList<NuGetPackage>>> GetVersionsAsync(CancellationToken ct)
         {
-            var packageLister = _sourceRepository.GetResource<PackageSearchResource>(ct);
-            var packages = (await packageLister.SearchAsync(_packageBaseName, new SearchFilter(true), 0, 10, NullLogger.Instance, ct))
-                .Where(p => RxPackageName.IsMatch(p.Identity.Id)).ToList();
+            var packageLister = await _sourceRepository.GetResourceAsync<PackageSearchResource>(ct);
+            var foundPackages = await packageLister.SearchAsync(_packageBaseName, new SearchFilter(true), 0, 10, NullLogger.Instance, ct);
 
             var sourceCacheContext = new SourceCacheContext();
-            var finderPackageByIdResource = _sourceRepository.GetResource<FindPackageByIdResource>(ct);
-            var metadataResource = _sourceRepository.GetResource<PackageMetadataResource>(ct);
+            var finderPackageByIdResource = await _sourceRepository.GetResourceAsync<FindPackageByIdResource>(ct);
+            var metadataResource = await _sourceRepository.GetResourceAsync<PackageMetadataResource>(ct);
 
-            return await packages.ToAsyncEnumerable().SelectAwait(async package =>
+            return await foundPackages.Where(p => RxPackageName.IsMatch(p.Identity.Id)).ToAsyncEnumerable().SelectAwait(async package =>
             {
                 if (!package.Identity.Id.StartsWith(_packageBaseName))
                     return default;
@@ -66,6 +65,9 @@ namespace Bannerlord.ReferenceAssemblies
                 var v = version.Version.ToString(3);
                 var currentMax = dict.TryGetValue(v, out var c) ? c : null;
                 if (currentMax is null) dict[v] = version;
+                // Release reset their build index. For now everything that is higher than 200000 is considered EA
+                // TODO: better fix?
+                else if (version.Version.Build < 100000 && currentMax.Version < version.Version) dict[v] = version;
                 else if (currentMax.Version < version.Version) dict[v] = version;
             }
             foreach (var value in dict.Values)
