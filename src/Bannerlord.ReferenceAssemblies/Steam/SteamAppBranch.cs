@@ -18,8 +18,9 @@ namespace Bannerlord.ReferenceAssemblies
         public string? Name { get; init; }
         public uint AppId { get; init; }
         public uint BuildId { get; init; }
+        public bool IsBeta { get; init; }
 
-        public override string ToString() => $"{Name} ({AppId} {BuildId})";
+        public override string ToString() => $"{Name} {(IsBeta ? "(beta)" : "")} ({AppId} {BuildId})";
     }
 
     internal record SteamAppBranchWithVersion : SteamAppBranch

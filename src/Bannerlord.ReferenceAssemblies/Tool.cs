@@ -53,10 +53,7 @@ namespace Bannerlord.ReferenceAssemblies
                 Trace.WriteLine($"{key}: [{string.Join(", ", value)}]");
 
             Trace.WriteLine("Checking branches...");
-            var branches = GetAllBranches()
-                .Where(x => string.Equals(x.Name, "public", StringComparison.Ordinal))
-                //.Where(x => !x.Name.Contains("perf_test"))
-                .ToList();
+            var branches = GetAllBranches().ToList();
 
             var packageNameWithBuildIds = new Dictionary<string, List<uint>>();
             foreach (var (packageId, package) in packages)

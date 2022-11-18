@@ -1,4 +1,6 @@
-﻿using PCLExt.FileStorage;
+﻿using Bannerlord.ModuleManager;
+
+using PCLExt.FileStorage;
 
 using System;
 using System.Collections.Generic;
@@ -13,11 +15,12 @@ namespace Bannerlord.ReferenceAssemblies
 {
     internal partial class Tool
     {
-        private SteamAppBranch ConvertVersion(string name, string buildId) => new()
+        private SteamAppBranch ConvertVersion(string name, string buildId, bool isBeta) => new()
         {
             Name = name,
             AppId = _options.SteamAppId,
-            BuildId = uint.TryParse(buildId, out var r) ? r : 0
+            BuildId = uint.TryParse(buildId, out var r) ? r : 0,
+            IsBeta = isBeta,
         };
 
         private IEnumerable<SteamAppBranch> GetAllBranches()
@@ -27,7 +30,10 @@ namespace Bannerlord.ReferenceAssemblies
             DepotDownloaderExt.ContentDownloadersteam3RequestAppInfo(_options.SteamAppId);
             var depots = DepotDownloaderExt.ContentDownloaderGetSteam3AppSection(_options.SteamAppId);
             var branches = depots["branches"];
-            return branches.Children.Where(x => x["pwdrequired"].Value != "1" && x["lcsrequired"].Value != "1").Select(c => ConvertVersion(c.Name!, c["buildid"].Value!));
+            return branches.Children
+                .Where(x => x["pwdrequired"].Value != "1" && x["lcsrequired"].Value != "1")
+                .Where(x => (ApplicationVersion.TryParse(x.Name, out var version) && version.ApplicationVersionType == ApplicationVersionType.Release) || x.Name == "public")
+                .Select(c => ConvertVersion(c.Name!, c["buildid"].Value!, c["description"].Value == "beta"));
         }
 
         private async Task DownloadBranchesAsync(IEnumerable<SteamAppBranch> toDownload, CancellationToken ct)

@@ -25,7 +25,7 @@ namespace Bannerlord.ReferenceAssemblies
                     .GetFolder(branch.BuildId.ToString());
 
                 var deps = new List<string> { "Core" };
-                var version = $"{branch.Version.Substring(1)}.{branch.ChangeSet}";
+                var version = $"{branch.Version.Substring(1)}.{branch.ChangeSet}{(branch.IsBeta ? "-beta" : "")}";
                 // Core
                 GenerateNupkg(branch, version, "", refFolder);
                 // Modules

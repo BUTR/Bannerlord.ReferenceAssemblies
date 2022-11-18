@@ -17,14 +17,10 @@ namespace Bannerlord.ReferenceAssemblies
 {
     internal class NuGetFeed
     {
-        private readonly Regex RxPackageName;
-
         private readonly SourceRepository _sourceRepository;
 
         public NuGetFeed(string feedUrl, string? feedUser, string? feedPassword)
         {
-            RxPackageName = new Regex("Bannerlord.ReferenceAssemblies*", RegexOptions.Compiled);
-
             var packageSource = new PackageSource(feedUrl, "Feed1", true, false, false)
             {
                 Credentials = new PackageSourceCredential(feedUrl, feedUser ?? "", feedPassword ?? "", true, string.Empty),
@@ -43,11 +39,8 @@ namespace Bannerlord.ReferenceAssemblies
             var finderPackageByIdResource = await _sourceRepository.GetResourceAsync<FindPackageByIdResource>(ct);
             var metadataResource = await _sourceRepository.GetResourceAsync<PackageMetadataResource>(ct);
 
-            return await foundPackages.Where(p => RxPackageName.IsMatch(p.Identity.Id)).ToAsyncEnumerable().SelectAwait(async package =>
+            return await foundPackages.ToAsyncEnumerable().SelectAwait(async package =>
             {
-                if (!package.Identity.Id.StartsWith("Bannerlord.ReferenceAssemblies"))
-                    return default;
-
                 var versions = MaxVersions(finderPackageByIdResource.GetAllVersionsAsync(package.Identity.Id, sourceCacheContext, NullLogger.Instance, ct));
                 var metadatas = GetMetadataAsync(versions, version => metadataResource.GetMetadataAsync(new PackageIdentity(package.Identity.Id, version), sourceCacheContext, NullLogger.Instance, ct), ct);
                 return (package.Identity.Id, (IReadOnlyList<NuGetPackage>) await GetPackageVersionsAsync(metadatas, ct).ToListAsync(ct));
