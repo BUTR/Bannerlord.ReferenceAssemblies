@@ -18,7 +18,7 @@
   <ItemGroup>
     <PackageReference Include="Bannerlord.ModuleManager" Version="4.0.150" />
     <PackageReference Include="CommandLineParser" Version="2.9.1" />
-    <PackageReference Include="Harmony.Extensions" Version="3.1.0.67" />
+    <PackageReference Include="Harmony.Extensions" Version="3.1.0.69" />
     <PackageReference Include="Krafs.Publicizer" Version="2.1.0" />
     <PackageReference Include="Lib.Harmony" Version="2.2.2" />
     <PackageReference Include="NuGet.Configuration" Version="6.4.0" />
