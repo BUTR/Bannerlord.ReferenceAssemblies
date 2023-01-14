@@ -5,7 +5,6 @@ using HarmonyLib.BUTR.Extensions;
 
 using SteamKit2;
 
-using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -16,53 +15,6 @@ namespace Bannerlord.ReferenceAssemblies
 {
     public static class DepotDownloaderExt
     {
-        private delegate void ShutdownSteam3Delegate();
-
-        private delegate void LoadFromFileDelegate(string filename);
-
-        private delegate bool InitializeSteamDelegate(string username, string password);
-
-        private delegate void RequestAppInfoDelegate(object instance, uint appId, bool bForce = false);
-
-        private delegate KeyValue GetSteam3AppSectionDelegate(uint appId, EAppInfoSection section);
-
-        private delegate Task DownloadAppAsyncDelegate(uint appId, List<(uint depotId, ulong manifestId)> depotManifestIds,
-            string branch, string os, string arch, string language, bool lv, bool isUgc);
-
-
-
-
-        private static Type ContentDownloaderType { get; } =
-            typeof(ContentDownloaderException).Assembly.GetType("DepotDownloader.ContentDownloader")!;
-        private static Type DownloadConfigType { get; } =
-            typeof(ContentDownloaderException).Assembly.GetType("DepotDownloader.DownloadConfig")!;
-        private static Type DepotConfigStoreType { get; } =
-            typeof(ContentDownloaderException).Assembly.GetType("DepotDownloader.DepotConfigStore")!;
-
-        private static ShutdownSteam3Delegate? ShutdownSteam3Method { get; } =
-            AccessTools2.GetDelegate<ShutdownSteam3Delegate>("DepotDownloader.ContentDownloader:ShutdownSteam3");
-        private static LoadFromFileDelegate? LoadFromFileMethod { get; } =
-            AccessTools2.GetDelegate<LoadFromFileDelegate>("DepotDownloader.AccountSettingsStore:LoadFromFile");
-        private static InitializeSteamDelegate? InitializeSteamMethod { get; } =
-            AccessTools2.GetDelegate<InitializeSteamDelegate>("DepotDownloader.Program:InitializeSteam");
-        private static RequestAppInfoDelegate? RequestAppInfoMethod { get; } =
-            AccessTools2.GetDelegate<RequestAppInfoDelegate>("DepotDownloader.Steam3Session:RequestAppInfo");
-        private static GetSteam3AppSectionDelegate? GetSteam3AppSectionMethod { get; } =
-            AccessTools2.GetDelegate<GetSteam3AppSectionDelegate>("DepotDownloader.ContentDownloader:GetSteam3AppSection");
-        private static DownloadAppAsyncDelegate? DownloadAppAsyncMethod { get; } =
-            AccessTools2.GetDelegate<DownloadAppAsyncDelegate>("DepotDownloader.ContentDownloader:DownloadAppAsync");
-
-        private static FieldInfo Steam3Field { get; } = AccessTools.Field(ContentDownloaderType, "steam3");
-        private static FieldInfo ConfigField { get; } = AccessTools.Field(ContentDownloaderType, "Config");
-
-        private static PropertyInfo LoadedProperty { get; } = AccessTools.Property(DepotConfigStoreType, "Loaded");
-        private static PropertyInfo MaxDownloadsProperty { get; } = AccessTools.Property(DownloadConfigType, "MaxDownloads");
-        private static PropertyInfo InstallDirectoryProperty { get; } = AccessTools.Property(DownloadConfigType, "InstallDirectory");
-        private static PropertyInfo UsingFileListProperty { get; } = AccessTools.Property(DownloadConfigType, "UsingFileList");
-        private static PropertyInfo FilesToDownloadProperty { get; } = AccessTools.Property(DownloadConfigType, "FilesToDownload");
-        private static PropertyInfo FilesToDownloadRegexProperty { get; } = AccessTools.Property(DownloadConfigType, "FilesToDownloadRegex");
-
-
         public static void Init()
         {
             var harmony = new Harmony("123");
@@ -74,14 +26,13 @@ namespace Bannerlord.ReferenceAssemblies
                 transpiler: new HarmonyMethod(AccessTools2.Method(typeof(DepotDownloaderExt), nameof(BlankTranspiler))));
 
             harmony.Patch(
-                AccessTools2.Method(DepotConfigStoreType, "LoadFromFile"),
+                AccessTools2.Method("DepotDownloader.DepotConfigStore:LoadFromFile"),
                 prefix: new HarmonyMethod(AccessTools2.Method(typeof(DepotDownloaderExt), nameof(LoadFromFilePrefix))));
         }
         [MethodImpl(MethodImplOptions.NoInlining)]
         public static bool LoadFromFilePrefix()
         {
-            Console.WriteLine("Test123");
-            var isLoaded = (bool) LoadedProperty.GetValue(null)!;
+            var isLoaded = DepotConfigStore.Loaded;
             return !isLoaded;
         }
 
@@ -89,51 +40,45 @@ namespace Bannerlord.ReferenceAssemblies
         private static IEnumerable<CodeInstruction> BlankTranspiler(IEnumerable<CodeInstruction> instructions) => instructions;
 
 
-        public static void ContentDownloaderShutdownSteam3() => ShutdownSteam3Method();
+        public static void ContentDownloaderShutdownSteam3() => ContentDownloader.ShutdownSteam3();
         public static void AccountSettingsStoreLoadFromFile(string file)
         {
-            var isLoaded = (bool) LoadedProperty.GetValue(null)!;
+            var isLoaded = DepotConfigStore.Loaded;
             if (!isLoaded)
-                LoadFromFileMethod(file);
+                AccountSettingsStore.LoadFromFile(file);
         }
 
-        public static void DepotDownloaderProgramInitializeSteam(string login, string password) => InitializeSteamMethod(login, password);
-        public static void ContentDownloadersteam3RequestAppInfo(uint appId) => RequestAppInfoMethod(Steam3Field.GetValue(null), appId, false);
-        public static KeyValue ContentDownloaderGetSteam3AppSection(uint appId) => GetSteam3AppSectionMethod(appId, EAppInfoSection.Depots);
+        public static void DepotDownloaderProgramInitializeSteam(string login, string password) => DepotDownloader.Program.InitializeSteam(login, password);
+        public static void ContentDownloadersteam3RequestAppInfo(uint appId) => ContentDownloader.steam3.RequestAppInfo(appId, false);
+        public static KeyValue ContentDownloaderGetSteam3AppSection(uint appId) => ContentDownloader.GetSteam3AppSection(appId, EAppInfoSection.Depots);
 
-        public static void ContentDownloaderConfigSetMaxDownloads(int maxDownloads) => MaxDownloadsProperty.SetValue(ConfigField.GetValue(null), maxDownloads);
-        public static void ContentDownloaderConfigSetInstallDirectory(string installDirectory) => InstallDirectoryProperty.SetValue(ConfigField.GetValue(null), installDirectory);
-        public static void ContentDownloaderConfigSetUsingFileList(bool usingFileList) => UsingFileListProperty.SetValue(ConfigField.GetValue(null), usingFileList);
+        public static void ContentDownloaderConfigSetMaxDownloads(int maxDownloads) => ContentDownloader.Config.MaxDownloads = maxDownloads;
+        public static void ContentDownloaderConfigSetInstallDirectory(string installDirectory) => ContentDownloader.Config.InstallDirectory = installDirectory;
+        public static void ContentDownloaderConfigSetUsingFileList(bool usingFileList) => ContentDownloader.Config.UsingFileList = usingFileList;
         public static HashSet<string> ContentDownloaderConfigGetFilesToDownload()
         {
-            var config = ConfigField.GetValue(null);
-
-            var filesToDownload = FilesToDownloadProperty.GetValue(config) as HashSet<string>;
+            var filesToDownload = ContentDownloader.Config.FilesToDownload;
             if (filesToDownload is null)
             {
                 filesToDownload = new HashSet<string>();
-                FilesToDownloadProperty.SetValue(config, filesToDownload);
+                ContentDownloader.Config.FilesToDownload = filesToDownload;
             }
 
             return filesToDownload;
         }
         public static List<Regex> ContentDownloaderConfigGetFilesToDownloadRegex()
         {
-            var config = ConfigField.GetValue(null);
-
-            var filesToDownloadRegex = FilesToDownloadRegexProperty.GetValue(config) as List<Regex>;
+            var filesToDownloadRegex = ContentDownloader.Config.FilesToDownloadRegex;
             if (filesToDownloadRegex is null)
             {
                 filesToDownloadRegex = new List<Regex>();
-                FilesToDownloadRegexProperty.SetValue(config, filesToDownloadRegex);
+                ContentDownloader.Config.FilesToDownloadRegex = filesToDownloadRegex;
             }
 
             return filesToDownloadRegex;
         }
 
-        public static Task ContentDownloaderDownloadAppAsync(uint appId, List<(uint depotId, ulong manifestId)> depotManifestIds, string branch, string os, string arch, string language, bool lv, bool isUgc)
-        {
-            return DownloadAppAsyncMethod(appId, depotManifestIds, branch, os, arch, language, lv, isUgc)!;
-        }
+        public static Task ContentDownloaderDownloadAppAsync(uint appId, List<(uint depotId, ulong manifestId)> depotManifestIds, string branch, string os, string arch, string language, bool lv, bool isUgc) =>
+            ContentDownloader.DownloadAppAsync(appId, depotManifestIds, branch, os, arch, language, lv, isUgc)!;
     }
 }

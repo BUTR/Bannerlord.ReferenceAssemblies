@@ -40,7 +40,9 @@ jobs:
           dotnet tool install -g FetchBannerlordVersion.Tool;
 
     - name: Run Bannerlord.ReferenceAssemblies
-      run: dotnet run --project src/Bannerlord.ReferenceAssemblies/Bannerlord.ReferenceAssemblies.csproj --configuration Debug --steamLogin ${{secrets.STEAM_LOGIN}} --steamPassword ${{secrets.STEAM_PASSWORD}} --steamAppId 261550 --steamOS windows --steamOSArch 64 --steamDepotId 261551 261552 --feedUrl https://api.nuget.org/v3/index.json
+      run: >-
+          dotnet build --project src/DepotDownloader/DepotDownloader/DepotDownloader.csproj --configuration Release;
+          dotnet run --project src/Bannerlord.ReferenceAssemblies/Bannerlord.ReferenceAssemblies.csproj --configuration Release --steamLogin ${{secrets.STEAM_LOGIN}} --steamPassword ${{secrets.STEAM_PASSWORD}} --steamAppId 261550 --steamOS windows --steamOSArch 64 --steamDepotId 261551 261552 --feedUrl https://api.nuget.org/v3/index.json;
 
     - name: Check files
       id: check_files
