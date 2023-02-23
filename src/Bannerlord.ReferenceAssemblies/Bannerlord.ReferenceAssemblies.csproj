@@ -21,7 +21,7 @@
     <PackageReference Include="Harmony.Extensions" Version="3.2.0.72" />
     <PackageReference Include="Krafs.Publicizer" Version="2.1.0" />
     <PackageReference Include="Lib.Harmony" Version="2.2.2" />
-    <PackageReference Include="NuGet.Configuration" Version="6.4.0" />
+    <PackageReference Include="NuGet.Configuration" Version="6.5.0" />
     <PackageReference Include="NuGet.Protocol" Version="6.4.0" />
     <PackageReference Include="PCLExt.FileStorage-devel" Version="1.5.0.319" />
     <PackageReference Include="Fody" Version="6.6.4" PrivateAssets="all" />
