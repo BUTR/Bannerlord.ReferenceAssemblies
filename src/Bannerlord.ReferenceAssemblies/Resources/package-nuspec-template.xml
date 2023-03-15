@@ -15,6 +15,7 @@
     </metadata>
     <files>
         <file src="ref\*.exe" target="ref\net472" />
+        <file src="ref\*.dll" target="ref\net472" />
         <file src="ref\*.dll" target="ref\netstandard2.0" />
     </files>
 </package>
