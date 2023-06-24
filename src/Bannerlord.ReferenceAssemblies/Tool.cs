@@ -19,7 +19,11 @@ namespace Bannerlord.ReferenceAssemblies
     {
         private static readonly Dictionary<string, string> SupportMatrix = new()
         {
-            {"Bannerlord.ReferenceAssemblies.BirthAndDeath.EarlyAccess", "e1.8.0"}
+            {"BannerlordReferenceAssembliesMultiplayer", "v1.2.0" },
+        };
+        private static readonly Dictionary<string, string> ExcludeMatrix = new()
+        {
+            {"BannerlordReferenceAssembliesDedicatedCustomServerHelper", "v1.2.0" },
         };
 
         private static readonly IFolder ExecutableFolder = new FolderFromPath(AppDomain.CurrentDomain.BaseDirectory);
@@ -70,9 +74,9 @@ namespace Bannerlord.ReferenceAssemblies
             var toDownload = new HashSet<SteamAppBranch>();
             foreach (var (packageId, buildIds) in packageNameWithBuildIds)
             {
-                toDownload.AddRange(branches.Where(branch =>
-                    (!SupportMatrix.TryGetValue(packageId, out var val) || new AlphanumComparatorFast().Compare(val, branch.Name) <= 0) &&
-                    !buildIds.Contains(branch.BuildId)));
+                toDownload.AddRange(branches.Where(x => (!SupportMatrix.TryGetValue(packageId, out var val) || new AlphanumComparatorFast().Compare(val, x.Name) <= 0) &&
+                                                        (!ExcludeMatrix.TryGetValue(packageId, out var val2) || new AlphanumComparatorFast().Compare(val2, x.Name) > 0) &&
+                                                        !buildIds.Contains(x.BuildId)).ToArray());
             }
 
             if (toDownload.Count == 0)

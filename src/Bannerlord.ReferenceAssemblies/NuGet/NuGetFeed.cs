@@ -33,7 +33,8 @@ namespace Bannerlord.ReferenceAssemblies
         public async Task<IReadOnlyDictionary<string, IReadOnlyList<NuGetPackage>>> GetVersionsAsync(CancellationToken ct)
         {
             var packageLister = await _sourceRepository.GetResourceAsync<PackageSearchResource>(ct);
-            var foundPackages = await packageLister.SearchAsync("Bannerlord.ReferenceAssemblies", new SearchFilter(true), 0, 50, NullLogger.Instance, ct);
+            var foundPackages = (await packageLister.SearchAsync("Bannerlord.ReferenceAssemblies", new SearchFilter(true), 0, 50, NullLogger.Instance, ct))
+                .Where(x => !x.Identity.Id.Contains("EarlyAccess", StringComparison.OrdinalIgnoreCase));
 
             var sourceCacheContext = new SourceCacheContext();
             var finderPackageByIdResource = await _sourceRepository.GetResourceAsync<FindPackageByIdResource>(ct);
@@ -49,8 +50,10 @@ namespace Bannerlord.ReferenceAssemblies
 
         private static async IAsyncEnumerable<NuGetVersion> MaxVersions(Task<IEnumerable<NuGetVersion>> source)
         {
+            var data = (await source).ToList();
             var dict = new Dictionary<string, NuGetVersion>();
-            foreach (var version in await source)
+            var dictBeta = new Dictionary<string, NuGetVersion>();
+            foreach (var version in data.Where(x => !x.IsPrerelease))
             {
                 var v = version.Version.ToString(3);
                 var currentMax = dict.TryGetValue(v, out var c) ? c : null;
@@ -60,7 +63,19 @@ namespace Bannerlord.ReferenceAssemblies
                 else if (version.Version.Build < 100000 && currentMax.Version < version.Version) dict[v] = version;
                 else if (currentMax.Version < version.Version) dict[v] = version;
             }
+            foreach (var version in data.Where(x => x.IsPrerelease))
+            {
+                var v = version.Version.ToString(3);
+                var currentMax = dictBeta.TryGetValue(v, out var c) ? c : null;
+                if (currentMax is null) dictBeta[v] = version;
+                // Release reset their build index. For now everything that is higher than 200000 is considered EA
+                // TODO: better fix?
+                else if (version.Version.Build < 100000 && currentMax.Version < version.Version) dictBeta[v] = version;
+                else if (currentMax.Version < version.Version) dictBeta[v] = version;
+            }
             foreach (var value in dict.Values)
+                yield return value;
+            foreach (var value in dictBeta.Values)
                 yield return value;
         }
 
