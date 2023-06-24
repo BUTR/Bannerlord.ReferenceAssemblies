@@ -13,12 +13,18 @@ jobs:
           repo_token: ${{secrets.REPO_ACCESS_TOKEN}}
           repositories: |
             BUTR/Bannerlord.ReferenceAssemblies.Documentation
+            BUTR/Bannerlord.Harmony
             BUTR/Bannerlord.UIExtenderEx
             BUTR/Bannerlord.ButterLib
             Aragas/Bannerlord.MBOptionScreen
+            BUTR/Bannerlord.BLSE
             BUTR/Bannerlord.BUTRLoader
             BUTR/Bannerlord.BUTR.Shared
+            BUTR/Bannerlord.Python
+            BUTR/Bannerlord.PHP
+            BUTR/Bannerlord.DiscordRichPresence
+            BUTR/Bannerlord.PlayerSwitcher
+            BUTR/Bannerlord.YellToInspire
             BUTR/Bannerlord.ReferenceAssemblies.Diff
-            BUTR/AssemblyDiffer
           event_type: game_version_update_patch
           client_payload: '{"github": ${{ toJson(github) }}}'
