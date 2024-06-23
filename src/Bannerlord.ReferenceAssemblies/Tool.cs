@@ -13,168 +13,167 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Bannerlord.ReferenceAssemblies
+namespace Bannerlord.ReferenceAssemblies;
+
+internal partial class Tool
 {
-    internal partial class Tool
+    private static readonly Dictionary<string, string> SupportMatrix = new()
     {
-        private static readonly Dictionary<string, string> SupportMatrix = new()
+        {"BannerlordReferenceAssembliesMultiplayer", "v1.2.0" },
+    };
+    private static readonly Dictionary<string, string> ExcludeMatrix = new()
+    {
+        {"BannerlordReferenceAssembliesDedicatedCustomServerHelper", "v1.2.0" },
+    };
+
+    private static readonly IFolder ExecutableFolder = new FolderFromPath(AppDomain.CurrentDomain.BaseDirectory);
+
+    private readonly GenerateOptions _options;
+
+    public Tool(GenerateOptions options)
+    {
+        DepotDownloaderExt.Init();
+
+        _options = options;
+    }
+
+    private static string StripEnding(string packageId)
+    {
+        foreach (var (_, value) in SteamAppBranch.VersionPrefixToName)
         {
-            {"BannerlordReferenceAssembliesMultiplayer", "v1.2.0" },
-        };
-        private static readonly Dictionary<string, string> ExcludeMatrix = new()
+            packageId = packageId.Replace($".{value}", string.Empty);
+        }
+        return packageId;
+    }
+
+    public async Task ExecuteAsync(CancellationToken ct)
+    {
+        var nugetFeed = new NuGetFeed(_options.FeedUrl, _options.FeedUser, _options.FeedPassword);
+
+        Trace.WriteLine("Checking NuGet...");
+        var packages = await nugetFeed.GetVersionsAsync(ct);
+
+        foreach (var (key, value) in packages)
+            Trace.WriteLine($"{key}: [{string.Join(", ", value)}]");
+
+        Trace.WriteLine("Checking branches...");
+        var branches = GetAllBranches().ToList();
+
+        var packageNameWithBuildIds = new Dictionary<string, List<uint>>();
+        foreach (var (packageId, package) in packages)
         {
-            {"BannerlordReferenceAssembliesDedicatedCustomServerHelper", "v1.2.0" },
-        };
-
-        private static readonly IFolder ExecutableFolder = new FolderFromPath(AppDomain.CurrentDomain.BaseDirectory);
-
-        private readonly GenerateOptions _options;
-
-        public Tool(GenerateOptions options)
-        {
-            DepotDownloaderExt.Init();
-
-            _options = options;
+            var strippedPackageId = StripEnding(packageId);
+            if (!packageNameWithBuildIds.TryGetValue(strippedPackageId, out var buildIds))
+            {
+                buildIds = new List<uint>();
+                packageNameWithBuildIds[strippedPackageId] = buildIds;
+            }
+            buildIds.AddRange(package.Select(x => x.BuildId));
         }
 
-        private static string StripEnding(string packageId)
+        var toDownload = new HashSet<SteamAppBranch>();
+        foreach (var (packageId, buildIds) in packageNameWithBuildIds)
         {
-            foreach (var (_, value) in SteamAppBranch.VersionPrefixToName)
-            {
-                packageId = packageId.Replace($".{value}", string.Empty);
-            }
-            return packageId;
+            toDownload.AddRange(branches.Where(x => (!SupportMatrix.TryGetValue(packageId, out var val) || new AlphanumComparatorFast().Compare(val, x.Name) <= 0) &&
+                                                    (!ExcludeMatrix.TryGetValue(packageId, out var val2) || new AlphanumComparatorFast().Compare(val2, x.Name) > 0) &&
+                                                    !buildIds.Contains(x.BuildId)).ToArray());
         }
 
-        public async Task ExecuteAsync(CancellationToken ct)
+        if (toDownload.Count == 0)
         {
-            var nugetFeed = new NuGetFeed(_options.FeedUrl, _options.FeedUser, _options.FeedPassword);
-
-            Trace.WriteLine("Checking NuGet...");
-            var packages = await nugetFeed.GetVersionsAsync(ct);
-
-            foreach (var (key, value) in packages)
-                Trace.WriteLine($"{key}: [{string.Join(", ", value)}]");
-
-            Trace.WriteLine("Checking branches...");
-            var branches = GetAllBranches().ToList();
-
-            var packageNameWithBuildIds = new Dictionary<string, List<uint>>();
-            foreach (var (packageId, package) in packages)
-            {
-                var strippedPackageId = StripEnding(packageId);
-                if (!packageNameWithBuildIds.TryGetValue(strippedPackageId, out var buildIds))
-                {
-                    buildIds = new List<uint>();
-                    packageNameWithBuildIds[strippedPackageId] = buildIds;
-                }
-                buildIds.AddRange(package.Select(x => x.BuildId));
-            }
-
-            var toDownload = new HashSet<SteamAppBranch>();
-            foreach (var (packageId, buildIds) in packageNameWithBuildIds)
-            {
-                toDownload.AddRange(branches.Where(x => (!SupportMatrix.TryGetValue(packageId, out var val) || new AlphanumComparatorFast().Compare(val, x.Name) <= 0) &&
-                                                        (!ExcludeMatrix.TryGetValue(packageId, out var val2) || new AlphanumComparatorFast().Compare(val2, x.Name) > 0) &&
-                                                        !buildIds.Contains(x.BuildId)).ToArray());
-            }
-
-            if (toDownload.Count == 0)
-            {
-                Trace.WriteLine("No new version detected! Exiting...");
-                DepotDownloaderExt.ContentDownloaderShutdownSteam3();
-                return;
-            }
-
-            Trace.WriteLine("New versions:");
-            foreach (var br in toDownload)
-                Trace.WriteLine($"{br.Name}: ({br.AppId} {br.BuildId})");
-
-            Trace.WriteLine("Checking downloading...");
-            await DownloadBranchesAsync(toDownload, ct);
-
-            var toDownloadWithVersion = toDownload.Select(branch =>
-            {
-                var depotsBinFolder = ExecutableFolder
-                    .GetFolder("depots")
-                    .GetFolder(branch.BuildId.ToString());
-
-                var version = GetAssembliesVersion(depotsBinFolder.Path);
-                var changeSet = GetAssembliesAppVersion(depotsBinFolder.Path);
-                if (version == null)
-                {
-                    Trace.WriteLine($"Branch {branch.Name} ({branch.AppId} {branch.BuildId}) does not include a readable Version, skipping...");
-                    return null;
-                }
-                if (changeSet == null)
-                {
-                    Trace.WriteLine($"Branch {branch.Name} ({branch.AppId} {branch.BuildId}) does not include a readable ChangeSet, skipping...");
-                    return null;
-                }
-                return new SteamAppBranchWithVersion(version, changeSet, branch);
-            }).OfType<SteamAppBranchWithVersion>().ToArray();
-
-            Trace.WriteLine("Generating references...");
-            GenerateReferences(toDownloadWithVersion);
-
-            Trace.WriteLine("Generating packages...");
-
-            GeneratePackages(toDownloadWithVersion);
-
-            Trace.WriteLine("Done!");
+            Trace.WriteLine("No new version detected! Exiting...");
+            DepotDownloaderExt.ContentDownloaderShutdownSteam3();
+            return;
         }
 
+        Trace.WriteLine("New versions:");
+        foreach (var br in toDownload)
+            Trace.WriteLine($"{br.Name}: ({br.AppId} {br.BuildId})");
 
-        private static string? GetAssembliesAppVersion(string path) =>
-            ProcessHelpers.Run("getblmeta", $"getchangeset -f {path}", out var versionStr) != 0
-                ? null
-                : versionStr.Replace("\r", "").Replace("\n", "");
+        Trace.WriteLine("Checking downloading...");
+        await DownloadBranchesAsync(toDownload, ct);
 
-        private static string? GetAssembliesVersion(string path) =>
-             ProcessHelpers.Run("getblmeta", $"getversion -f {path}", out var versionStr) != 0
-                 ? null
-                 : versionStr.Replace("\r", "").Replace("\n", "");
-
-        private void GenerateReferences(IEnumerable<SteamAppBranchWithVersion> toDownload)
+        var toDownloadWithVersion = toDownload.Select(branch =>
         {
-            foreach (var branch in toDownload)
+            var depotsBinFolder = ExecutableFolder
+                .GetFolder("depots")
+                .GetFolder(branch.BuildId.ToString());
+
+            var version = GetAssembliesVersion(depotsBinFolder.Path);
+            var changeSet = GetAssembliesAppVersion(depotsBinFolder.Path);
+            if (version == null)
             {
-                var depotsFolder = ExecutableFolder
-                    .GetFolder("depots")
-                    .GetFolder(branch.BuildId.ToString());
+                Trace.WriteLine($"Branch {branch.Name} ({branch.AppId} {branch.BuildId}) does not include a readable Version, skipping...");
+                return null;
+            }
+            if (changeSet == null)
+            {
+                Trace.WriteLine($"Branch {branch.Name} ({branch.AppId} {branch.BuildId}) does not include a readable ChangeSet, skipping...");
+                return null;
+            }
+            return new SteamAppBranchWithVersion(version, changeSet, branch);
+        }).OfType<SteamAppBranchWithVersion>().ToArray();
 
-                var refFolder = ExecutableFolder
-                    .CreateFolder("ref", CreationCollisionOption.OpenIfExists)
-                    .CreateFolder(branch.BuildId.ToString(), CreationCollisionOption.OpenIfExists);
+        Trace.WriteLine("Generating references...");
+        GenerateReferences(toDownloadWithVersion);
 
-                // core
-                var coreRefFolder = refFolder
-                    .GetModuleFolder("")
+        Trace.WriteLine("Generating packages...");
+
+        GeneratePackages(toDownloadWithVersion);
+
+        Trace.WriteLine("Done!");
+    }
+
+
+    private static string? GetAssembliesAppVersion(string path) =>
+        ProcessHelpers.Run("getblmeta", $"getchangeset -f {path}", out var versionStr) != 0
+            ? null
+            : versionStr.Replace("\r", "").Replace("\n", "");
+
+    private static string? GetAssembliesVersion(string path) =>
+        ProcessHelpers.Run("getblmeta", $"getversion -f {path}", out var versionStr) != 0
+            ? null
+            : versionStr.Replace("\r", "").Replace("\n", "");
+
+    private void GenerateReferences(IEnumerable<SteamAppBranchWithVersion> toDownload)
+    {
+        foreach (var branch in toDownload)
+        {
+            var depotsFolder = ExecutableFolder
+                .GetFolder("depots")
+                .GetFolder(branch.BuildId.ToString());
+
+            var refFolder = ExecutableFolder
+                .CreateFolder("ref", CreationCollisionOption.OpenIfExists)
+                .CreateFolder(branch.BuildId.ToString(), CreationCollisionOption.OpenIfExists);
+
+            // core
+            var coreRefFolder = refFolder
+                .GetModuleFolder("")
+                .CreateFolder("bin", CreationCollisionOption.OpenIfExists)
+                .CreateFolder("Win64_Shipping_Client", CreationCollisionOption.OpenIfExists);
+            GenerateReference("", depotsFolder, coreRefFolder);
+
+            // official modules
+            foreach (var module in depotsFolder.GetFolder("Modules").GetFolders())
+            {
+                var name = module.Name;
+                var moduleOutputFolder = refFolder
+                    .GetModuleFolder(name, false)
                     .CreateFolder("bin", CreationCollisionOption.OpenIfExists)
                     .CreateFolder("Win64_Shipping_Client", CreationCollisionOption.OpenIfExists);
-                GenerateReference("", depotsFolder, coreRefFolder);
-
-                // official modules
-                foreach (var module in depotsFolder.GetFolder("Modules").GetFolders())
-                {
-                    var name = module.Name;
-                    var moduleOutputFolder = refFolder
-                        .GetModuleFolder(name, false)
-                        .CreateFolder("bin", CreationCollisionOption.OpenIfExists)
-                        .CreateFolder("Win64_Shipping_Client", CreationCollisionOption.OpenIfExists);
-                    GenerateReference(name, module, moduleOutputFolder);
-                }
+                GenerateReference(name, module, moduleOutputFolder);
             }
         }
-        private static void GenerateReference(string moduleName, IFolder rootFolder, IFolder outputFolder)
-        {
-            var isCore = string.IsNullOrEmpty(moduleName);
+    }
+    private static void GenerateReference(string moduleName, IFolder rootFolder, IFolder outputFolder)
+    {
+        var isCore = string.IsNullOrEmpty(moduleName);
 
-            foreach (var file in rootFolder.GetFolder("bin").GetFolder("Win64_Shipping_Client").GetModuleFiles(isCore))
-            {
-                var outputFile = Path.Combine(outputFolder.Path, file.Name);
-                ProcessHelpers.Run("refasmer", $"{file.Path} -o {outputFile} -c");
-            }
+        foreach (var file in rootFolder.GetFolder("bin").GetFolder("Win64_Shipping_Client").GetModuleFiles(isCore))
+        {
+            var outputFile = Path.Combine(outputFolder.Path, file.Name);
+            ProcessHelpers.Run("refasmer", $"{file.Path} -o {outputFile} -c");
         }
     }
 }
