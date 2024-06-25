@@ -46,7 +46,7 @@ jobs:
 
     - name: Check files
       id: check_files
-      run: echo "::set-output name=files_exists::$([[ "$(ls -A ./src/Bannerlord.ReferenceAssemblies/bin/Release/net6.0/final)" ]] && echo "true" || echo "false")"
+      run: echo "files_exists=$([[ "$(ls -A ./src/Bannerlord.ReferenceAssemblies/bin/Release/net6.0/final)" ]] && echo "true" || echo "false")" >> "$GITHUB_OUTPUT"
       shell: bash
     
     - name: Push to NuGet
