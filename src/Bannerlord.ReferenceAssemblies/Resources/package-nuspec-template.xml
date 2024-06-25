@@ -7,15 +7,13 @@
         <title>Bannerlord Game Reference Assemblies</title>
         <owners>BUTR</owners>
         <authors>BUTR</authors>
-        <description>Contains stripped metadata-only libraries for building against Mount &amp;amp; Blade II: Bannerlord.</description>
+        <description>Contains stripped metadata-only libraries for building against Mount &amp; Blade II: Bannerlord.</description>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <license type="expression">MIT</license>
         <repository type="git" url="https://github.com/BUTR/Bannerlord.ReferenceAssemblies.git" />
         <tags>bannerlord game reference assemblies buildId:{{buildId}} appId:{{appId}}</tags>
     </metadata>
     <files>
-        <file src="ref\*.exe" target="ref\net472" />
-        <file src="ref\*.dll" target="ref\net472" />
-        <file src="ref\*.dll" target="ref\netstandard2.0" />
+        <file src="ref\**\*.*" target="ref" />
     </files>
 </package>

@@ -2,7 +2,7 @@
 
 namespace Bannerlord.ReferenceAssemblies;
 
-internal partial struct NuGetPackage : IComparable<NuGetPackage>, IComparable, IEquatable<NuGetPackage>
+partial struct NuGetPackage : IComparable<NuGetPackage>, IComparable, IEquatable<NuGetPackage>
 {
     public bool Equals(NuGetPackage other) => Name == other.Name && PkgVersion == other.PkgVersion;
     public override bool Equals(object? obj) => obj is NuGetPackage other && Equals(other);

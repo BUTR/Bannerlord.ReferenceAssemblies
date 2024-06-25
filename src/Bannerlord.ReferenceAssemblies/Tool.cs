@@ -12,6 +12,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using AsmResolver.DotNet;
 
 namespace Bannerlord.ReferenceAssemblies;
 
@@ -173,7 +174,41 @@ internal partial class Tool
         foreach (var file in rootFolder.GetFolder("bin").GetFolder("Win64_Shipping_Client").GetModuleFiles(isCore))
         {
             var outputFile = Path.Combine(outputFolder.Path, file.Name);
-            ProcessHelpers.Run("refasmer", $"{file.Path} -o {outputFile} -c");
+            ProcessHelpers.Run("assembly-publicizer", $"{file.Path} -o {outputFile} --strip-only");
+        }
+        
+        var net472Folder = outputFolder.CreateFolder("net472", CreationCollisionOption.OpenIfExists);
+        var netStandardFolder = outputFolder.CreateFolder("netstandard2.0", CreationCollisionOption.OpenIfExists);
+        //var netcoreapp30Folder = outputFolder.CreateFolder("netcoreapp3.0", CreationCollisionOption.OpenIfExists);
+        //var net60Folder = outputFolder.CreateFolder("net6.0", CreationCollisionOption.OpenIfExists);
+        foreach (var outputFile in outputFolder.GetFiles())
+        {
+            var assembly = AssemblyDefinition.FromFile(outputFile.Path);
+            if (assembly.Modules.First().OriginalTargetRuntime.IsNetStandard)
+            {
+                outputFile.Copy(net472Folder.CreateFile(outputFile.Name, CreationCollisionOption.ReplaceExisting));
+                outputFile.Copy(netStandardFolder.CreateFile(outputFile.Name, CreationCollisionOption.ReplaceExisting));
+                //outputFile.Copy(netcoreapp30Folder.CreateFile(outputFile.Name, CreationCollisionOption.ReplaceExisting));
+                //outputFile.Copy(net60Folder.CreateFile(outputFile.Name, CreationCollisionOption.ReplaceExisting));
+                outputFile.Delete();
+            }
+            else if (assembly.Modules.First().OriginalTargetRuntime.IsNetFramework)
+            {
+                outputFile.Move(net472Folder.CreateFile(outputFile.Name, CreationCollisionOption.ReplaceExisting));
+            }
+            /*
+            else if (assembly.Modules.First().OriginalTargetRuntime.IsNetCoreApp)
+            {
+                if (assembly.Modules.First().OriginalTargetRuntime.Version == new Version(3, 0))
+                {
+                    outputFile.Move(netcoreapp30Folder.CreateFile(outputFile.Name, CreationCollisionOption.ReplaceExisting));
+                }
+                if (assembly.Modules.First().OriginalTargetRuntime.Version == new Version(6, 0))
+                {
+                    outputFile.Move(net60Folder.CreateFile(outputFile.Name, CreationCollisionOption.ReplaceExisting));
+                }
+            }
+            */
         }
     }
 }

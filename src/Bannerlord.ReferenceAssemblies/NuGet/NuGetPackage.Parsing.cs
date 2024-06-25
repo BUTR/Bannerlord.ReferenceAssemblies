@@ -2,7 +2,7 @@
 
 namespace Bannerlord.ReferenceAssemblies;
 
-internal readonly partial struct NuGetPackage
+readonly partial struct NuGetPackage
 {
     private static readonly Regex RxSteamAppIdEmbedding = new(@"appId:(\d+)", RegexOptions.CultureInvariant | RegexOptions.Compiled);
     private static readonly Regex RxSteamBuildIdEmbedding = new(@"buildId:(\d+)", RegexOptions.CultureInvariant | RegexOptions.Compiled);

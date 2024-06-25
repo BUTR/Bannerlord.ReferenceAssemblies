@@ -107,8 +107,8 @@ internal partial class Tool
             .CreateFile($"{fileNameBase}.csproj", CreationCollisionOption.ReplaceExisting)
             .WriteAllText(GenerateCsproj(steamAppBranch, name));
 
-        foreach (var file in rootFolder.GetFolder("bin").GetFolder("Win64_Shipping_Client").GetModuleFiles(isCore))
-            file.Copy(nugetRefFolder.CreateFile(file.Name, CreationCollisionOption.ReplaceExisting));
+        foreach (var folder in rootFolder.GetFolder("bin").GetFolder("Win64_Shipping_Client").GetFolders())
+            folder.Copy(nugetRefFolder.CreateFolder(folder.Name, CreationCollisionOption.ReplaceExisting));
 
         var finalFolder = ExecutableFolder
             .CreateFolder("final", CreationCollisionOption.OpenIfExists);

@@ -7,7 +7,7 @@
         <title>Bannerlord Game Reference Assemblies</title>
         <owners>BUTR</owners>
         <authors>BUTR</authors>
-        <description>Contains stripped metadata-only libraries for building against Mount &amp;amp; Blade II: Bannerlord.</description>
+        <description>Contains stripped metadata-only libraries for building against Mount &amp; Blade II: Bannerlord.</description>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <license type="expression">MIT</license>
         <repository type="git" url="https://github.com/BUTR/Bannerlord.ReferenceAssemblies.git"/>

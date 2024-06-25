@@ -1,7 +1,6 @@
 ﻿using NuGet.Common;
 using NuGet.Configuration;
 using NuGet.Packaging.Core;
-using NuGet.Protocol;
 using NuGet.Protocol.Core.Types;
 using NuGet.Versioning;
 
@@ -9,7 +8,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -56,7 +54,7 @@ internal class NuGetFeed
         foreach (var version in data.Where(x => !x.IsPrerelease))
         {
             var v = version.Version.ToString(3);
-            var currentMax = dict.TryGetValue(v, out var c) ? c : null;
+            var currentMax = dict.GetValueOrDefault(v);
             if (currentMax is null) dict[v] = version;
             // Release reset their build index. For now everything that is higher than 200000 is considered EA
             // TODO: better fix?
@@ -66,7 +64,7 @@ internal class NuGetFeed
         foreach (var version in data.Where(x => x.IsPrerelease))
         {
             var v = version.Version.ToString(3);
-            var currentMax = dictBeta.TryGetValue(v, out var c) ? c : null;
+            var currentMax = dictBeta.GetValueOrDefault(v);
             if (currentMax is null) dictBeta[v] = version;
             // Release reset their build index. For now everything that is higher than 200000 is considered EA
             // TODO: better fix?
@@ -79,17 +77,17 @@ internal class NuGetFeed
             yield return value;
     }
 
-    private static async IAsyncEnumerable<IPackageSearchMetadata> GetMetadataAsync(IAsyncEnumerable<NuGetVersion> versions, Func<NuGetVersion, Task<IPackageSearchMetadata>> getMeta, CancellationToken cancellationToken = default)
+    private static async IAsyncEnumerable<IPackageSearchMetadata> GetMetadataAsync(IAsyncEnumerable<NuGetVersion> versions, Func<NuGetVersion, Task<IPackageSearchMetadata>> getMeta, [EnumeratorCancellation] CancellationToken ct = default)
     {
-        await foreach (var version in versions.WithCancellation(cancellationToken))
+        await foreach (var version in versions.WithCancellation(ct))
         {
             yield return await getMeta(version);
         }
     }
 
-    private static async IAsyncEnumerable<NuGetPackage> GetPackageVersionsAsync(IAsyncEnumerable<IPackageSearchMetadata> metadatas, [EnumeratorCancellation] CancellationToken cancellation = default)
+    private static async IAsyncEnumerable<NuGetPackage> GetPackageVersionsAsync(IAsyncEnumerable<IPackageSearchMetadata> metadatas, [EnumeratorCancellation] CancellationToken ct = default)
     {
-        await foreach (var metadata in metadatas.WithCancellation(cancellation))
+        await foreach (var metadata in metadatas.WithCancellation(ct))
         {
             var package = NuGetPackage.Get(metadata.Identity.Id, metadata.Identity.Version, metadata.Tags);
             if (package != null)
