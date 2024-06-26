@@ -1,4 +1,6 @@
-﻿using Bannerlord.ReferenceAssemblies.Options;
+﻿using AsmResolver.DotNet;
+
+using Bannerlord.ReferenceAssemblies.Options;
 
 using NuGet.Packaging;
 
@@ -12,7 +14,6 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using AsmResolver.DotNet;
 
 namespace Bannerlord.ReferenceAssemblies;
 
@@ -176,7 +177,7 @@ internal partial class Tool
             var outputFile = Path.Combine(outputFolder.Path, file.Name);
             ProcessHelpers.Run("assembly-publicizer", $"{file.Path} -o {outputFile} --strip-only");
         }
-        
+
         var net472Folder = outputFolder.CreateFolder("net472", CreationCollisionOption.OpenIfExists);
         var netStandardFolder = outputFolder.CreateFolder("netstandard2.0", CreationCollisionOption.OpenIfExists);
         //var netcoreapp30Folder = outputFolder.CreateFolder("netcoreapp3.0", CreationCollisionOption.OpenIfExists);
