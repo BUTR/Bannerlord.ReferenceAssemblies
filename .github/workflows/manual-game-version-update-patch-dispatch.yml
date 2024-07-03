@@ -18,7 +18,7 @@ jobs:
             BUTR/Bannerlord.ButterLib
             Aragas/Bannerlord.MBOptionScreen
             BUTR/Bannerlord.BLSE
-            BUTR/Bannerlord.BUTRLoader
+            # BUTR/Bannerlord.BUTRLoader
             BUTR/Bannerlord.BUTR.Shared
             BUTR/Bannerlord.Python
             BUTR/Bannerlord.PHP
