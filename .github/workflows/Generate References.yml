@@ -25,12 +25,12 @@ jobs:
         github-token: ${{secrets.GITHUB_TOKEN}}
      
     - name: Setup .NET 5
-      uses: actions/setup-dotnet@master
+      uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 5.x.x
 
     - name: Setup .NET 6
-      uses: actions/setup-dotnet@master
+      uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 6.x.x
 
@@ -46,7 +46,7 @@ jobs:
 
     - name: Check files
       id: check_files
-      run: echo "files_exists=$([[ "$(ls -A ./src/Bannerlord.ReferenceAssemblies/bin/Release/net8.0/final)" ]] && echo "true" || echo "false")" >> "$GITHUB_OUTPUT"
+      run: echo "files_exists=$(if [ -d ./src/Bannerlord.ReferenceAssemblies/bin/Release/net8.0/final ] && [ "$(ls -A ./src/Bannerlord.ReferenceAssemblies/bin/Release/net8.0/final)" ]; then echo 'true'; else echo 'false'; fi)" >> "$GITHUB_OUTPUT"
       shell: bash
     
     - name: Push to NuGet
