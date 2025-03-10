@@ -27,6 +27,10 @@ internal partial class Tool
     {
         {"BannerlordReferenceAssembliesDedicatedCustomServerHelper", "v1.2.0" },
     };
+    private static readonly HashSet<string> ExcludePublicMatrix = new()
+    {
+        {"BannerlordReferenceAssembliesDedicatedCustomServerHelper" },
+    };
 
     private static readonly IFolder ExecutableFolder = new FolderFromPath(AppDomain.CurrentDomain.BaseDirectory);
 
@@ -34,8 +38,6 @@ internal partial class Tool
 
     public Tool(GenerateOptions options)
     {
-        DepotDownloaderExt.Init();
-
         _options = options;
     }
 
@@ -59,7 +61,10 @@ internal partial class Tool
             Trace.WriteLine($"{key}: [{string.Join(", ", value)}]");
 
         Trace.WriteLine("Checking branches...");
-        var branches = GetAllBranches().ToList();
+        var branches = (await GetAllBranches()).ToList();
+        //var publicBranch = branches.First(x => x.Name == "public");
+        //if (branches.Any(x => x.BuildId == publicBranch.BuildId))
+        //    branches.Remove(publicBranch);
 
         var packageNameWithBuildIds = new Dictionary<string, List<uint>>();
         foreach (var (packageId, package) in packages)
@@ -76,15 +81,17 @@ internal partial class Tool
         var toDownload = new HashSet<SteamAppBranch>();
         foreach (var (packageId, buildIds) in packageNameWithBuildIds)
         {
-            toDownload.AddRange(branches.Where(x => (!SupportMatrix.TryGetValue(packageId, out var val) || new AlphanumComparatorFast().Compare(val, x.Name) <= 0) &&
-                                                    (!ExcludeMatrix.TryGetValue(packageId, out var val2) || new AlphanumComparatorFast().Compare(val2, x.Name) > 0) &&
-                                                    !buildIds.Contains(x.BuildId)).ToArray());
+            var missing = branches.Where(x => (!SupportMatrix.TryGetValue(packageId, out var val) || new AlphanumComparatorFast().Compare(val, x.Name) <= 0) &&
+                                              (!ExcludeMatrix.TryGetValue(packageId, out var val2) || new AlphanumComparatorFast().Compare(val2, x.Name) > 0) &&
+                                              (x.Name != "public" || !ExcludePublicMatrix.Contains(packageId)) &&
+                                              !buildIds.Contains(x.BuildId)).ToArray();
+            toDownload.AddRange(missing);
         }
 
         if (toDownload.Count == 0)
         {
             Trace.WriteLine("No new version detected! Exiting...");
-            DepotDownloaderExt.ContentDownloaderShutdownSteam3();
+            DepotDownloader.ContentDownloader.ShutdownSteam3();
             return;
         }
 

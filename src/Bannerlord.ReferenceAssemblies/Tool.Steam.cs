@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,6 +15,8 @@ namespace Bannerlord.ReferenceAssemblies;
 
 internal partial class Tool
 {
+    private static FieldInfo Steam3Field { get; } = typeof(DepotDownloader.ContentDownloader).GetField("steam3", BindingFlags.Static | BindingFlags.NonPublic)!;
+
     private SteamAppBranch ConvertVersion(string name, string buildId, bool isBeta) => new()
     {
         Name = name,
@@ -22,12 +25,13 @@ internal partial class Tool
         IsBeta = isBeta,
     };
 
-    private IEnumerable<SteamAppBranch> GetAllBranches()
+    private async Task<IEnumerable<SteamAppBranch>> GetAllBranches()
     {
-        DepotDownloaderExt.AccountSettingsStoreLoadFromFile("account.config");
-        DepotDownloaderExt.DepotDownloaderProgramInitializeSteam(_options.SteamLogin, _options.SteamPassword);
-        DepotDownloaderExt.ContentDownloadersteam3RequestAppInfo(_options.SteamAppId);
-        var depots = DepotDownloaderExt.ContentDownloaderGetSteam3AppSection(_options.SteamAppId);
+        DepotDownloader.AccountSettingsStore.LoadFromFile("account.config");
+        DepotDownloader.ContentDownloader.InitializeSteam3(_options.SteamLogin, _options.SteamPassword);
+        var steam3 = (DepotDownloader.Steam3Session) Steam3Field.GetValue(null)!;
+        await steam3.RequestAppInfo(_options.SteamAppId, false);
+        var depots = DepotDownloader.ContentDownloader.GetSteam3AppSection(_options.SteamAppId, SteamKit2.EAppInfoSection.Depots);
         var branches = depots["branches"];
         return branches.Children
             .Where(x => x["pwdrequired"].Value != "1" && x["lcsrequired"].Value != "1")
@@ -39,7 +43,7 @@ internal partial class Tool
     {
         foreach (var branch in toDownload)
             await DownloadBranchAsync(branch, ct);
-        DepotDownloaderExt.ContentDownloaderShutdownSteam3();
+        DepotDownloader.ContentDownloader.ShutdownSteam3();
     }
     private async Task DownloadBranchAsync(SteamAppBranch steamAppBranch, CancellationToken ct)
     {
@@ -47,18 +51,20 @@ internal partial class Tool
                 .CreateFolderAsync("depots", CreationCollisionOption.OpenIfExists, ct))
             .CreateFolderAsync(steamAppBranch.BuildId.ToString(), CreationCollisionOption.OpenIfExists, ct);
 
-        DepotDownloaderExt.ContentDownloaderConfigSetMaxDownloads(4);
-        DepotDownloaderExt.ContentDownloaderConfigSetInstallDirectory(folder.Path);
+        DepotDownloader.ContentDownloader.Config.MaxDownloads = 4;
+        DepotDownloader.ContentDownloader.Config.InstallDirectory = folder.Path;
 
         try
         {
             var fileListData = Resourcer.Resource.AsString("Resources/FileFilters.regexp");
-            var files = fileListData.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+            var files = fileListData.Split(['\n', '\r'], StringSplitOptions.RemoveEmptyEntries);
 
-            DepotDownloaderExt.ContentDownloaderConfigSetUsingFileList(true);
-            var filesToDownload = DepotDownloaderExt.ContentDownloaderConfigGetFilesToDownload();
+            DepotDownloader.ContentDownloader.Config.UsingFileList = true;
+            DepotDownloader.ContentDownloader.Config.FilesToDownload = [];
+            DepotDownloader.ContentDownloader.Config.FilesToDownloadRegex = [];
+            var filesToDownload = DepotDownloader.ContentDownloader.Config.FilesToDownload;
             filesToDownload.Clear();
-            var filesToDownloadRegex = DepotDownloaderExt.ContentDownloaderConfigGetFilesToDownloadRegex();
+            var filesToDownloadRegex = DepotDownloader.ContentDownloader.Config.FilesToDownloadRegex;
             filesToDownloadRegex.Clear();
 
             foreach (var fileEntry in files)
@@ -87,7 +93,7 @@ internal partial class Tool
             Trace.WriteLine($"Warning: Unable to load file filters: {ex}");
         }
 
-        await DepotDownloaderExt.ContentDownloaderDownloadAppAsync(
+        await DepotDownloader.ContentDownloader.DownloadAppAsync(
             _options.SteamAppId,
             _options.SteamDepotId.Select(x => (x, ulong.MaxValue)).ToList(),
             steamAppBranch.Name,
