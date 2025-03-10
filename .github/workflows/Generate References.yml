@@ -23,41 +23,33 @@ jobs:
       uses: butr/actions-common-setup@v2
       with:
         github-token: ${{secrets.GITHUB_TOKEN}}
-     
-    - name: Setup .NET 5
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 5.x.x
 
-    - name: Setup .NET 6
+    - name: Setup .NET 9
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: 6.x.x
+        dotnet-version: 9.x.x
 
     - name: Install Tools
       run: >-
-          dotnet tool install -g BepInEx.AssemblyPublicizer.Cli;
           dotnet tool install -g FetchBannerlordVersion.Tool;
 
     - name: Run Bannerlord.ReferenceAssemblies
-      run: >-
-          dotnet build src/DepotDownloader/DepotDownloader/DepotDownloader.csproj --configuration Release;
-          dotnet run --project src/Bannerlord.ReferenceAssemblies/Bannerlord.ReferenceAssemblies.csproj --configuration Release --steamLogin ${{secrets.STEAM_LOGIN}} --steamPassword ${{secrets.STEAM_PASSWORD}} --steamAppId 261550 --steamOS windows --steamOSArch 64 --steamDepotId 261551 261552 --feedUrl https://api.nuget.org/v3/index.json;
+      run: dotnet run --project src/Bannerlord.ReferenceAssemblies/Bannerlord.ReferenceAssemblies.csproj --configuration Release --steamLogin ${{secrets.STEAM_LOGIN}} --steamPassword ${{secrets.STEAM_PASSWORD}} --steamAppId 261550 --steamOS windows --steamOSArch 64 --steamDepotId 261551 261552 --feedUrl https://api.nuget.org/v3/index.json;
 
     - name: Check files
       id: check_files
-      run: echo "files_exists=$(if [ -d ./src/Bannerlord.ReferenceAssemblies/bin/Release/net8.0/final ] && [ "$(ls -A ./src/Bannerlord.ReferenceAssemblies/bin/Release/net8.0/final)" ]; then echo 'true'; else echo 'false'; fi)" >> "$GITHUB_OUTPUT"
+      run: echo "files_exists=$(if [ -d ./src/Bannerlord.ReferenceAssemblies/bin/Release/net9.0/final ] && [ "$(ls -A ./src/Bannerlord.ReferenceAssemblies/bin/Release/net9.0/final)" ]; then echo 'true'; else echo 'false'; fi)" >> "$GITHUB_OUTPUT"
       shell: bash
     
     - name: Push to NuGet
       if: steps.check_files.outputs.files_exists == 'true'
-      run: dotnet nuget push "./src/Bannerlord.ReferenceAssemblies/bin/Release/net8.0/final/*.nupkg" --skip-duplicate -k ${{secrets.NUGET_API_KEY}} -s https://www.nuget.org
+      run: dotnet nuget push "./src/Bannerlord.ReferenceAssemblies/bin/Release/net9.0/final/*.nupkg" --skip-duplicate -k ${{secrets.NUGET_API_KEY}} -s https://www.nuget.org
       shell: pwsh
 
     - name: Push to GPR
       if: steps.check_files.outputs.files_exists == 'true'
       run: |
-           for f in ./src/Bannerlord.ReferenceAssemblies/bin/Release/net8.0/final/*.nupkg
+           for f in ./src/Bannerlord.ReferenceAssemblies/bin/Release/net9.0/final/*.nupkg
            do
              curl -vX PUT -u "vslee:${{secrets.GITHUB_TOKEN}}" -F package=@$f https://nuget.pkg.github.com/BUTR/
            done
