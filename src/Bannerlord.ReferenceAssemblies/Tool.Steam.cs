@@ -93,6 +93,7 @@ internal partial class Tool
             Trace.WriteLine($"Warning: Unable to load file filters: {ex}");
         }
 
+        DepotDownloader.DepotConfigStore.Instance = null!;
         await DepotDownloader.ContentDownloader.DownloadAppAsync(
             _options.SteamAppId,
             _options.SteamDepotId.Select(x => (x, ulong.MaxValue)).ToList(),
