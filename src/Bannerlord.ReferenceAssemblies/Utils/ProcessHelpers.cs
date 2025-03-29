@@ -8,7 +8,7 @@ internal static class ProcessHelpers
     {
         using var proc = Process.Start(new ProcessStartInfo(fileName, args)
         {
-            WorkingDirectory = workingDirectory ?? ""
+            WorkingDirectory = workingDirectory ?? "",
         });
         proc!.WaitForExit();
         return proc.ExitCode;
