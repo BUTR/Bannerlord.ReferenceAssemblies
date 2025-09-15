@@ -35,8 +35,8 @@ internal partial class Tool
         var branches = depots["branches"];
         return branches.Children
             .Where(x => x["pwdrequired"].Value != "1" && x["lcsrequired"].Value != "1")
-            .Where(x => (ApplicationVersion.TryParse(x.Name, out var version) && version.ApplicationVersionType == ApplicationVersionType.Release) || x.Name == "public")
-            .Select(c => ConvertVersion(c.Name!, c["buildid"].Value!, c["description"].Value == "beta"));
+            .Where(x => (ApplicationVersion.TryParse(x.Name, out var version) && version.ApplicationVersionType == ApplicationVersionType.Release) || x.Name == "public" || x.Name == "beta")
+            .Select(c => ConvertVersion(c.Name!, c["buildid"].Value!, c["description"].Value == "beta" || c.Name == "beta"));
     }
 
     private async Task DownloadBranchesAsync(IEnumerable<SteamAppBranch> toDownload, CancellationToken ct)
