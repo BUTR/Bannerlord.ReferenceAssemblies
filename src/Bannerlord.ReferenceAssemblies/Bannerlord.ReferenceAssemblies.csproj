@@ -33,9 +33,9 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="protobuf-net" Version="3.2.46" />
+    <PackageReference Include="protobuf-net" Version="3.2.52" />
     <PackageReference Include="QRCoder" Version="1.6.0" />
-    <PackageReference Include="SteamKit2" Version="3.0.2" />
+    <PackageReference Include="SteamKit2" Version="3.3.0" />
     <Compile Include="..\DepotDownloader\DepotDownloader\*.cs" Exclude="..\DepotDownloader\DepotDownloader\Program.cs">
       <Link>DepotDownloader\*.cs</Link>
     </Compile>
