@@ -41,7 +41,14 @@ jobs:
       id: check_files
       run: echo "files_exists=$(if [ -d ./src/Bannerlord.ReferenceAssemblies/bin/Release/net9.0/final ] && [ "$(ls -A ./src/Bannerlord.ReferenceAssemblies/bin/Release/net9.0/final)" ]; then echo 'true'; else echo 'false'; fi)" >> "$GITHUB_OUTPUT"
       shell: bash
-    
+
+    - name: Upload NuGet packages
+      if: steps.check_files.outputs.files_exists == 'true'
+      uses: actions/upload-artifact@v4
+      with:
+        name: nuget-packages
+        path: ./src/Bannerlord.ReferenceAssemblies/bin/Release/net9.0/final/*.nupkg
+
     - name: Push to NuGet
       if: steps.check_files.outputs.files_exists == 'true'
       run: dotnet nuget push "./src/Bannerlord.ReferenceAssemblies/bin/Release/net9.0/final/*.nupkg" --skip-duplicate -k ${{secrets.NUGET_API_KEY}} -s https://www.nuget.org
@@ -52,7 +59,7 @@ jobs:
       run: |
            for f in ./src/Bannerlord.ReferenceAssemblies/bin/Release/net9.0/final/*.nupkg
            do
-             curl -vX PUT -u "vslee:${{secrets.GITHUB_TOKEN}}" -F package=@$f https://nuget.pkg.github.com/BUTR/
+             curl -vX PUT -u "BUTR:${{secrets.GITHUB_TOKEN}}" -F package=@$f https://nuget.pkg.github.com/BUTR/
            done
       shell: bash
       
