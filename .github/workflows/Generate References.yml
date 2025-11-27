@@ -51,8 +51,12 @@ jobs:
 
     - name: Push to NuGet
       if: steps.check_files.outputs.files_exists == 'true'
-      run: dotnet nuget push "./src/Bannerlord.ReferenceAssemblies/bin/Release/net9.0/final/*.nupkg" --skip-duplicate -k ${{secrets.NUGET_API_KEY}} -s https://www.nuget.org
-      shell: pwsh
+      run: |
+        for i in {1..3}; do
+          dotnet nuget push "./src/Bannerlord.ReferenceAssemblies/bin/Release/net9.0/final/*.nupkg" --skip-duplicate -k ${{ secrets.NUGET_KEY }} -s https://www.nuget.org && break
+          echo "Attempt $i failed, retrying in 30s..."
+          sleep 30
+        done
 
     - name: Push to GPR
       if: steps.check_files.outputs.files_exists == 'true'
@@ -62,25 +66,12 @@ jobs:
              curl -vX PUT -u "BUTR:${{secrets.GITHUB_TOKEN}}" -F package=@$f https://nuget.pkg.github.com/BUTR/
            done
       shell: bash
-      
-    - name: Dispatch
-      uses: guilouro/multiple-repositories-dispatch@master
+
+    - name: Sleep for 10 minutes
       if: steps.check_files.outputs.files_exists == 'true'
+      run: Start-Sleep -s 600
+      shell: pwsh
+
+    - uses: BUTR/.github/.github/actions/dispatch-game-update@master
       with:
-        repo_token: ${{secrets.REPO_ACCESS_TOKEN}}
-        repositories: |
-            BUTR/Bannerlord.ReferenceAssemblies.Documentation
-            BUTR/Bannerlord.Harmony
-            BUTR/Bannerlord.UIExtenderEx
-            BUTR/Bannerlord.ButterLib
-            Aragas/Bannerlord.MBOptionScreen
-            BUTR/Bannerlord.BLSE
-            BUTR/Bannerlord.BUTR.Shared
-            BUTR/Bannerlord.Python
-            BUTR/Bannerlord.PHP
-            BUTR/Bannerlord.DiscordRichPresence
-            BUTR/Bannerlord.PlayerSwitcher
-            BUTR/Bannerlord.YellToInspire
-            BUTR/Bannerlord.ReferenceAssemblies.Diff
-        event_type: game_version_update_patch
-        client_payload: '{"github": ${{ toJson(github) }}}'
+        token: ${{ secrets.REPO_ACCESS_TOKEN }}
