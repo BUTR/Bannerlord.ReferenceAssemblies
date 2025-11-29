@@ -22,6 +22,8 @@ internal partial class Tool
     private static readonly Dictionary<string, string> SupportMatrix = new()
     {
         {"BannerlordReferenceAssembliesMultiplayer", "v1.2.0" },
+        {"BannerlordReferenceAssembliesFastMode", "v1.3.4" },
+        {"BannerlordReferenceAssembliesNavalDLC", "v1.3.4" },
     };
     private static readonly Dictionary<string, string> ExcludeMatrix = new()
     {

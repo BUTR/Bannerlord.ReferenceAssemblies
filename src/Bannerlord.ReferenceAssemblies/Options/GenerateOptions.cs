@@ -15,6 +15,9 @@ internal class GenerateOptions
     [Option("steamAppId", Required = true)]
     public uint SteamAppId { get; set; } = default!;
 
+    [Option("steamDLCAppId", Required = false)]
+    public IEnumerable<uint> SteamDLCAppId { get; set; } = [];
+
     [Option("steamOS", Required = true)]
     public string SteamOS { get; set; } = default!;
 

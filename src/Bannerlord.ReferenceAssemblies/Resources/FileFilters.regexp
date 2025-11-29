@@ -1,6 +1,3 @@
 bin/Win64_Shipping_Client/Version.xml
-regex:bin\/Win64_Shipping_Client\/[^\/]*TaleWorlds.+
-regex:Modules\/CustomBattle\/bin\/Win64_Shipping_Client\/[^\/]+dll
-regex:Modules\/SandBox\/bin\/Win64_Shipping_Client\/[^\/]+dll
-regex:Modules\/SandBoxCore\/bin\/Win64_Shipping_Client\/[^\/]+dll
-regex:Modules\/StoryMode\/bin\/Win64_Shipping_Client\/[^\/]+dll
+regex:bin/Win64_Shipping_Client/[^/]*TaleWorlds.+
+regex:Modules/[^/]*/bin/Win64_Shipping_Client/[^/]+dll

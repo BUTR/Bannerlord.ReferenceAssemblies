@@ -31,6 +31,8 @@ internal partial class Tool
         DepotDownloader.ContentDownloader.InitializeSteam3(_options.SteamLogin, _options.SteamPassword);
         var steam3 = (DepotDownloader.Steam3Session) Steam3Field.GetValue(null)!;
         await steam3.RequestAppInfo(_options.SteamAppId, false);
+        foreach (var steamDLCAppId in _options.SteamDLCAppId)
+            await steam3.RequestAppInfo(steamDLCAppId, false);
         var depots = DepotDownloader.ContentDownloader.GetSteam3AppSection(_options.SteamAppId, SteamKit2.EAppInfoSection.Depots);
         var branches = depots["branches"];
         return branches.Children
@@ -103,5 +105,19 @@ internal partial class Tool
             null!,
             false,
             false).ConfigureAwait(false);
+
+        foreach (var appId in _options.SteamDLCAppId)
+        {
+            DepotDownloader.DepotConfigStore.Instance = null!;
+            await DepotDownloader.ContentDownloader.DownloadAppAsync(
+                appId,
+                [(appId, ulong.MaxValue)],
+                steamAppBranch.Name,
+                _options.SteamOS,
+                _options.SteamOSArch,
+                null!,
+                false,
+                false).ConfigureAwait(false);
+        }
     }
 }

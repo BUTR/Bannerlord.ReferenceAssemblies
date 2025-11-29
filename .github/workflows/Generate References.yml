@@ -35,7 +35,7 @@ jobs:
         dotnet tool install -g BepInEx.AssemblyPublicizer.Cli;
 
     - name: Run Bannerlord.ReferenceAssemblies
-      run: dotnet run --project src/Bannerlord.ReferenceAssemblies/Bannerlord.ReferenceAssemblies.csproj --configuration Release --steamLogin ${{secrets.STEAM_LOGIN}} --steamPassword ${{secrets.STEAM_PASSWORD}} --steamAppId 261550 --steamOS windows --steamOSArch 64 --steamDepotId 261551 261552 --feedUrl https://api.nuget.org/v3/index.json;
+      run: dotnet run --project src/Bannerlord.ReferenceAssemblies/Bannerlord.ReferenceAssemblies.csproj --configuration Release --steamLogin ${{secrets.STEAM_LOGIN}} --steamPassword ${{secrets.STEAM_PASSWORD}} --steamAppId 261550 --steamOS windows --steamOSArch 64 --steamDepotId 261551 261552 --steamDLCAppId 2927200 --feedUrl https://api.nuget.org/v3/index.json;
 
     - name: Check files
       id: check_files
