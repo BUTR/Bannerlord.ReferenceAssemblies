@@ -56,14 +56,13 @@ jobs:
     - name: Push to NuGet
       if: steps.check_files.outputs.files_exists == 'true'
       run: |
-        dotnet nuget push "./src/Bannerlord.ReferenceAssemblies/bin/Release/net9.0/final/*.nupkg" --skip-duplicate -k "${{ secrets.NUGET_KEY }}" -s "https://api.nuget.org/v3/index.json"
+        dotnet nuget push "./src/Bannerlord.ReferenceAssemblies/bin/Release/net9.0/final/*.nupkg" --skip-duplicate --api-key "${{ secrets.NUGET_KEY }}" -s "https://api.nuget.org/v3/index.json"
 
     - name: Push to GPR
       if: steps.check_files.outputs.files_exists == 'true'
       run: |
         dotnet nuget add source https://nuget.pkg.github.com/BUTR/index.json --name GitHub --username BUTR --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text
         dotnet nuget push "./src/Bannerlord.ReferenceAssemblies/bin/Release/net9.0/final/*.nupkg" --skip-duplicate --source GitHub
-      shell: pwsh
 
     - name: Sleep for 10 minutes
       if: steps.check_files.outputs.files_exists == 'true'
