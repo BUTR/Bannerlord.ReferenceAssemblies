@@ -64,12 +64,12 @@ internal partial class Tool
 
         Trace.WriteLine("Checking branches...");
         var branches = (await GetAllBranches()).ToList();
-        var publicBranch = branches.First(x => x.Name == "public");
-        if (branches.Any(x => x.BuildId == publicBranch.BuildId))
+        var publicBranch = branches.FirstOrDefault(x => x.Name == "public");
+        if (publicBranch != null && branches.Any(x => x != publicBranch && x.BuildId == publicBranch.BuildId))
             branches.Remove(publicBranch);
-        var bataBranch = branches.First(x => x.Name == "beta");
-        if (branches.Any(x => x.BuildId == bataBranch.BuildId))
-            branches.Remove(bataBranch);
+        var betaBranch = branches.FirstOrDefault(x => x.Name == "beta");
+        if (betaBranch != null && branches.Any(x => x != betaBranch && x.BuildId == betaBranch.BuildId))
+            branches.Remove(betaBranch);
 
         var packageNameWithBuildIds = new Dictionary<string, List<uint>>();
         foreach (var (packageId, package) in packages)
