@@ -56,6 +56,7 @@ jobs:
     - name: Remove NuGet sources
       if: steps.check_files.outputs.files_exists == 'true'
       run: |
+        dotnet nuget list source;
         dotnet nuget remove source nuget.org;
         dotnet nuget remove source butr.github;
 
