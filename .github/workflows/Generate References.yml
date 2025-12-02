@@ -7,10 +7,6 @@ on:
     - cron: "0 */8 * * *"
   workflow_dispatch:
 
-permissions:
-  contents: read
-  packages: write
-
 env:
   # Disable the .NET logo in the console output.
   DOTNET_NOLOGO: true
@@ -22,6 +18,9 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     steps:
     - name: Setup
       uses: butr/actions-common-setup@v2
@@ -68,8 +67,8 @@ jobs:
     - name: Push to GPR
       if: steps.check_files.outputs.files_exists == 'true'
       run: |
-        dotnet nuget add source https://nuget.pkg.github.com/BUTR/index.json --name GitHub --username BUTR --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text
-        dotnet nuget push "./src/Bannerlord.ReferenceAssemblies/bin/Release/net9.0/final/*.nupkg" --skip-duplicate --source GitHub
+        dotnet nuget add source https://nuget.pkg.github.com/BUTR/index.json --source GitHub
+        dotnet nuget push "./src/Bannerlord.ReferenceAssemblies/bin/Release/net9.0/final/*.nupkg" --skip-duplicate --api-key  ${{ secrets.GITHUB_TOKEN }} --source GitHub
 
     - name: Sleep for 10 minutes
       if: steps.check_files.outputs.files_exists == 'true'
@@ -79,3 +78,11 @@ jobs:
     - uses: BUTR/.github/.github/actions/dispatch-game-update@master
       with:
         token: ${{ secrets.REPO_ACCESS_TOKEN }}
+
+  workflow-keepalive:
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+    steps:
+      - uses: liskin/gh-workflow-keepalive@v1
