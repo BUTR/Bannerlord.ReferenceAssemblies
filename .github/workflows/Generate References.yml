@@ -67,7 +67,7 @@ jobs:
     - name: Push to GPR
       if: steps.check_files.outputs.files_exists == 'true'
       run: |
-        dotnet nuget add source https://nuget.pkg.github.com/BUTR/index.json --source GitHub
+        dotnet nuget add source https://nuget.pkg.github.com/BUTR/index.json --name GitHub
         dotnet nuget push "./src/Bannerlord.ReferenceAssemblies/bin/Release/net9.0/final/*.nupkg" --skip-duplicate --api-key  ${{ secrets.GITHUB_TOKEN }} --source GitHub
 
     - name: Sleep for 10 minutes
