@@ -295,6 +295,7 @@
       ],
       "version": "e1.5.5",
       "changeSet": 252341,
+      "publishedVersion": "1.5.5.252341",
       "moduleVersions": {},
       "manifests": {
         "1393601": "4152009641709127711"
@@ -308,6 +309,7 @@
       ],
       "version": "e1.5.5",
       "changeSet": 252939,
+      "publishedVersion": "1.5.5.252939",
       "moduleVersions": {},
       "manifests": {
         "1393601": "2759360164773019867"
@@ -321,6 +323,7 @@
       ],
       "version": "e1.5.6",
       "changeSet": 254632,
+      "publishedVersion": "1.5.6.254632",
       "moduleVersions": {},
       "manifests": {
         "1393601": "3749096284342279026"
