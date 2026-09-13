@@ -5443,6 +5443,7 @@
       ],
       "version": "e1.8.1",
       "changeSet": 2778,
+      "publishedVersion": "1.8.1.2778",
       "moduleVersions": {
         "BirthAndDeath": "e1.8.0",
         "CustomBattle": "e1.8.1",

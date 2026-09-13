@@ -297,6 +297,7 @@
       ],
       "version": "v1.1.0",
       "changeSet": 12734,
+      "publishedVersion": "1.1.0.12734",
       "moduleVersions": {
         "DedicatedCustomServerHelper": "v1.1.0",
         "Multiplayer": "v1.1.0",
@@ -422,6 +423,7 @@
       ],
       "version": "v1.1.4",
       "changeSet": 19633,
+      "publishedVersion": "1.1.4.19633",
       "moduleVersions": {
         "DedicatedCustomServerHelper": "v1.1.4",
         "Multiplayer": "v1.1.4",
@@ -457,6 +459,7 @@
       ],
       "version": "v1.1.5",
       "changeSet": 21456,
+      "publishedVersion": "1.1.5.21456",
       "moduleVersions": {
         "DedicatedCustomServerHelper": "v1.1.5",
         "Multiplayer": "v1.1.5",
@@ -474,6 +477,7 @@
       ],
       "version": "v1.1.5",
       "changeSet": 21456,
+      "publishedVersion": "1.1.5.21456",
       "moduleVersions": {
         "DedicatedCustomServerHelper": "v1.1.5",
         "Multiplayer": "v1.1.5",
