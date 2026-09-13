@@ -4546,12 +4546,13 @@
       ],
       "version": "e1.6.5",
       "changeSet": 295158,
+      "publishedVersion": "1.6.5.295158",
       "moduleVersions": {
-        "CustomBattle": "e1.6.5",
         "Native": "e1.6.5",
-        "SandBox": "e1.6.5",
+        "StoryMode": "e1.6.5",
         "SandBoxCore": "e1.6.5",
-        "StoryMode": "e1.6.5"
+        "SandBox": "e1.6.5",
+        "CustomBattle": "e1.6.5"
       },
       "manifests": {
         "261551": "5222291481192849771"
@@ -5364,15 +5365,16 @@
       ],
       "version": "e1.8.1",
       "changeSet": 2778,
+      "publishedVersion": "1.8.1.2778",
       "moduleVersions": {
-        "BirthAndDeath": "e1.8.0",
-        "CustomBattle": "e1.8.1",
-        "DedicatedCustomServerHelper": "e1.8.1",
-        "Multiplayer": "e1.8.1",
         "Native": "e1.8.1",
-        "SandBox": "e1.8.1",
+        "DedicatedCustomServerHelper": "e1.8.1",
+        "StoryMode": "e1.8.1",
         "SandBoxCore": "e1.8.1",
-        "StoryMode": "e1.8.1"
+        "SandBox": "e1.8.1",
+        "Multiplayer": "e1.8.1",
+        "BirthAndDeath": "e1.8.0",
+        "CustomBattle": "e1.8.1"
       },
       "manifests": {
         "261551": "8569624721287579536",
@@ -5552,15 +5554,16 @@
       ],
       "version": "v1.0.0",
       "changeSet": 4367,
+      "publishedVersion": "1.0.0.4367",
       "moduleVersions": {
-        "BirthAndDeath": "v1.0.0",
-        "CustomBattle": "v1.0.0",
-        "DedicatedCustomServerHelper": "v1.0.0",
-        "Multiplayer": "v1.0.0",
         "Native": "v1.0.0",
-        "SandBox": "v1.0.0",
+        "DedicatedCustomServerHelper": "v1.0.0",
+        "StoryMode": "v1.0.0",
         "SandBoxCore": "v1.0.0",
-        "StoryMode": "v1.0.0"
+        "SandBox": "v1.0.0",
+        "Multiplayer": "v1.0.0",
+        "BirthAndDeath": "v1.0.0",
+        "CustomBattle": "v1.0.0"
       },
       "manifests": {
         "261551": "2709087601557082961",
@@ -5663,15 +5666,16 @@
       ],
       "version": "v1.0.1",
       "changeSet": 4790,
+      "publishedVersion": "1.0.1.4790",
       "moduleVersions": {
-        "BirthAndDeath": "v1.0.1",
-        "CustomBattle": "v1.0.1",
-        "DedicatedCustomServerHelper": "v1.0.1",
-        "Multiplayer": "v1.0.1",
         "Native": "v1.0.1",
-        "SandBox": "v1.0.1",
+        "DedicatedCustomServerHelper": "v1.0.1",
+        "StoryMode": "v1.0.1",
         "SandBoxCore": "v1.0.1",
-        "StoryMode": "v1.0.1"
+        "SandBox": "v1.0.1",
+        "Multiplayer": "v1.0.1",
+        "BirthAndDeath": "v1.0.1",
+        "CustomBattle": "v1.0.1"
       },
       "manifests": {
         "261551": "7107771765186531837",
