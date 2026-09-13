@@ -261,3 +261,9 @@ __pycache__/
 
 # ModLib
 [Mm]odlib/
+# Local run profiles contain Steam credentials
+src/Bannerlord.ReferenceAssemblies/Properties/launchSettings.json
+src/.idea/
+
+# DepotDownloader writes the Steam session next to where it is run
+account.config

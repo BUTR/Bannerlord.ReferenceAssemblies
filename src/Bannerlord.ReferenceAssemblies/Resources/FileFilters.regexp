@@ -1,3 +1,0 @@
-bin/Win64_Shipping_Client/Version.xml
-regex:bin/Win64_Shipping_Client/[^/]*TaleWorlds.+
-regex:Modules/[^/]*/bin/Win64_Shipping_Client/[^/]+dll

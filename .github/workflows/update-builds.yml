@@ -1,0 +1,90 @@
+name: Update Build Registry
+
+# Steam only exposes the manifests of the branches that exist right now. Once TaleWorlds moves a branch
+# to a new build, the manifest of the old one is gone from the app info and nothing but our own record
+# can point at it again. So this runs often, writes what Steam currently shows into builds/<appId>.json
+# for the game, the dedicated server and the Modding Kit, and reads the version of anything new from a
+# few small files.
+
+on:
+  schedule:
+    - cron: "0 */3 * * *"
+  workflow_dispatch:
+    inputs:
+      fillVersions:
+        description: "How many builds per app may have their version read in this run"
+        required: false
+        default: "25"
+
+concurrency:
+  group: steam-account
+  cancel-in-progress: false
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  STEAM_LOGIN: ${{secrets.STEAM_LOGIN}}
+  STEAM_PASSWORD: ${{secrets.STEAM_PASSWORD}}
+  TOOL: src/Bannerlord.ReferenceAssemblies/bin/Release/net10.0/Bannerlord.ReferenceAssemblies
+  FINAL: src/Bannerlord.ReferenceAssemblies/bin/Release/net10.0/final
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          submodules: recursive
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.x.x
+
+      - name: Build
+        run: dotnet build src/Bannerlord.ReferenceAssemblies/Bannerlord.ReferenceAssemblies.csproj --configuration Release
+
+      - name: Update the game registry
+        run: $TOOL update --app game --fillVersions ${{github.event.inputs.fillVersions || 25}}
+
+      - name: Update the dedicated server registry
+        run: $TOOL update --app server --fillVersions ${{github.event.inputs.fillVersions || 25}}
+
+      - name: Update the Modding Kit registry
+        run: $TOOL update --app moddingkit --fillVersions ${{github.event.inputs.fillVersions || 25}}
+
+      - name: Commit the registries
+        run: |
+          if [ -z "$(git status --porcelain builds)" ]; then
+            echo "No registry changes."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add builds
+          git commit -m "chore: update build registry"
+          git pull --rebase
+          git push
+
+      # Reads the registries alone, so it contacts neither Steam nor NuGet.
+      - name: Check whether anything is outstanding
+        id: pending
+        run: |
+          PENDING=""
+          for app in game server moddingkit; do
+            $TOOL generate --app $app --dryRun
+            PENDING="$PENDING $(cat $FINAL/pending-builds.txt)"
+          done
+          PENDING=$(echo $PENDING)
+          echo "builds=$PENDING" >> "$GITHUB_OUTPUT"
+          echo "Outstanding: ${PENDING:-none}"
+
+      # A push made with the default token starts no other workflow, so generation is asked for directly.
+      - name: Trigger reference generation
+        if: steps.pending.outputs.builds != ''
+        env:
+          GH_TOKEN: ${{secrets.REPO_ACCESS_TOKEN}}
+        run: gh workflow run generate-references.yml --ref ${{github.ref_name}}

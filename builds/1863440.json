@@ -1,0 +1,1044 @@
+{
+  "appId": 1863440,
+  "builds": [
+    {
+      "buildId": 9618969,
+      "date": "2022-09-29T16:50:37Z",
+      "branches": [
+        "public"
+      ],
+      "version": "e1.8.1",
+      "changeSet": 1942,
+      "moduleVersions": {
+        "DedicatedCustomServerHelper": "e1.8.1",
+        "Multiplayer": "e1.8.1",
+        "Native": "e1.8.1"
+      },
+      "manifests": {
+        "1863441": "2018690851699428689"
+      }
+    },
+    {
+      "buildId": 9721558,
+      "date": "2022-10-14T12:04:15Z",
+      "branches": [
+        "public"
+      ],
+      "version": "e1.8.1",
+      "changeSet": 2778,
+      "moduleVersions": {
+        "DedicatedCustomServerHelper": "e1.8.1",
+        "Multiplayer": "e1.8.1",
+        "Native": "e1.8.1"
+      },
+      "manifests": {
+        "1863441": "7555999510391698070"
+      }
+    },
+    {
+      "buildId": 9773636,
+      "date": "2022-10-21T19:47:27Z",
+      "branches": [
+        "public"
+      ],
+      "version": "e1.9.0",
+      "changeSet": 3526,
+      "moduleVersions": {
+        "DedicatedCustomServerHelper": "e1.9.0",
+        "Multiplayer": "e1.9.0",
+        "Native": "e1.9.0"
+      },
+      "manifests": {
+        "1863441": "3850455236985668052"
+      }
+    },
+    {
+      "buildId": 9789948,
+      "date": "2022-10-25T07:01:56Z",
+      "branches": [
+        "public"
+      ],
+      "version": "v1.0.0",
+      "changeSet": 3624,
+      "moduleVersions": {
+        "DedicatedCustomServerHelper": "v1.0.0",
+        "Multiplayer": "v1.0.0",
+        "Native": "v1.0.0"
+      },
+      "manifests": {
+        "1863441": "1323210432640176271"
+      }
+    },
+    {
+      "buildId": 9827894,
+      "date": "2022-10-29T11:45:51Z",
+      "branches": [
+        "public"
+      ],
+      "version": "v1.0.0",
+      "changeSet": 4064,
+      "moduleVersions": {
+        "DedicatedCustomServerHelper": "v1.0.0",
+        "Multiplayer": "v1.0.0",
+        "Native": "v1.0.0"
+      },
+      "manifests": {
+        "1863441": "6498665084413014813"
+      }
+    },
+    {
+      "buildId": 9892121,
+      "date": "2022-11-08T11:28:05Z",
+      "branches": [
+        "public"
+      ],
+      "version": "v1.0.1",
+      "changeSet": 4441,
+      "moduleVersions": {
+        "DedicatedCustomServerHelper": "v1.0.1",
+        "Multiplayer": "v1.0.1",
+        "Native": "v1.0.1"
+      },
+      "manifests": {
+        "1863441": "2730097369372320671"
+      }
+    },
+    {
+      "buildId": 9916881,
+      "date": "2022-11-11T10:28:57Z",
+      "branches": [
+        "public"
+      ],
+      "version": "v1.0.1",
+      "changeSet": 4790,
+      "moduleVersions": {
+        "DedicatedCustomServerHelper": "v1.0.1",
+        "Multiplayer": "v1.0.1",
+        "Native": "v1.0.1"
+      },
+      "manifests": {
+        "1863441": "6424013869019351034"
+      }
+    },
+    {
+      "buildId": 9917865,
+      "date": "2022-11-11T12:59:04Z",
+      "branches": [
+        "public"
+      ],
+      "version": "v1.0.1",
+      "changeSet": 4833,
+      "moduleVersions": {
+        "DedicatedCustomServerHelper": "v1.0.1",
+        "Multiplayer": "v1.0.1",
+        "Native": "v1.0.1"
+      },
+      "manifests": {
+        "1863441": "4536577725431821974"
+      }
+    },
+    {
+      "buildId": 9957926,
+      "date": "2022-11-17T12:06:29Z",
+      "branches": [
+        "public"
+      ],
+      "version": "v1.0.1",
+      "changeSet": 5218,
+      "moduleVersions": {
+        "DedicatedCustomServerHelper": "v1.0.1",
+        "Multiplayer": "v1.0.1",
+        "Native": "v1.0.1"
+      },
+      "manifests": {
+        "1863441": "2465802833142083907"
+      }
+    },
+    {
+      "buildId": 9966758,
+      "date": "2022-11-18T10:03:24Z",
+      "branches": [
+        "public"
+      ],
+      "version": "v1.0.1",
+      "changeSet": 5325,
+      "moduleVersions": {
+        "DedicatedCustomServerHelper": "v1.0.1",
+        "Multiplayer": "v1.0.1",
+        "Native": "v1.0.1"
+      },
+      "manifests": {
+        "1863441": "2015080997967818215"
+      }
+    },
+    {
+      "buildId": 10045590,
+      "date": "2022-11-30T09:40:00Z",
+      "branches": [
+        "public"
+      ],
+      "version": "v1.0.2",
+      "changeSet": 6150,
+      "moduleVersions": {
+        "DedicatedCustomServerHelper": "v1.0.2",
+        "Multiplayer": "v1.0.2",
+        "Native": "v1.0.2"
+      },
+      "manifests": {
+        "1863441": "8429340210402709394"
+      }
+    },
+    {
+      "buildId": 10064266,
+      "date": "2022-12-02T10:59:56Z",
+      "branches": [
+        "public"
+      ],
+      "version": "v1.0.2",
+      "changeSet": 6549,
+      "moduleVersions": {
+        "DedicatedCustomServerHelper": "v1.0.2",
+        "Multiplayer": "v1.0.2",
+        "Native": "v1.0.2"
+      },
+      "manifests": {
+        "1863441": "4765380423718562544"
+      }
+    },
+    {
+      "buildId": 10094802,
+      "date": "2022-12-07T11:30:39Z",
+      "branches": [
+        "public"
+      ],
+      "version": "v1.0.2",
+      "changeSet": 6960,
+      "moduleVersions": {
+        "DedicatedCustomServerHelper": "v1.0.2",
+        "Multiplayer": "v1.0.2",
+        "Native": "v1.0.2"
+      },
+      "manifests": {
+        "1863441": "7251980542663435121"
+      }
+    },
+    {
+      "buildId": 10263704,
+      "date": "2023-01-05T19:11:33Z",
+      "branches": [
+        "public"
+      ],
+      "version": "v1.0.3",
+      "changeSet": 9055,
+      "moduleVersions": {
+        "DedicatedCustomServerHelper": "v1.0.3",
+        "Multiplayer": "v1.0.3",
+        "Native": "v1.0.3"
+      },
+      "manifests": {
+        "1863441": "2828936527109527698"
+      }
+    },
+    {
+      "buildId": 10367150,
+      "date": "2023-01-20T13:40:25Z",
+      "branches": [
+        "public"
+      ],
+      "version": "v1.0.3",
+      "changeSet": 9860,
+      "moduleVersions": {
+        "DedicatedCustomServerHelper": "v1.0.3",
+        "Multiplayer": "v1.0.3",
+        "Native": "v1.0.3"
+      },
+      "manifests": {
+        "1863441": "8884782580405359074"
+      }
+    },
+    {
+      "buildId": 10663884,
+      "date": "2023-03-01T11:55:30Z",
+      "branches": [
+        "public"
+      ],
+      "version": "v1.1.0",
+      "changeSet": 12734,
+      "moduleVersions": {
+        "DedicatedCustomServerHelper": "v1.1.0",
+        "Multiplayer": "v1.1.0",
+        "Native": "v1.1.0"
+      },
+      "manifests": {
+        "1863441": "3652027755961975023"
+      }
+    },
+    {
+      "buildId": 10719209,
+      "date": "2023-03-08T11:48:08Z",
+      "branches": [
+        "public"
+      ],
+      "version": "v1.1.0",
+      "changeSet": 12734,
+      "moduleVersions": {
+        "DedicatedCustomServerHelper": "v1.1.0",
+        "Multiplayer": "v1.1.0",
+        "Native": "v1.1.0"
+      },
+      "manifests": {
+        "1863441": "2000620328441011107"
+      }
+    },
+    {
+      "buildId": 10745951,
+      "date": "2023-03-11T09:52:02Z",
+      "branches": [
+        "public"
+      ],
+      "version": "v1.1.1",
+      "changeSet": 14148,
+      "moduleVersions": {
+        "DedicatedCustomServerHelper": "v1.1.1",
+        "Multiplayer": "v1.1.1",
+        "Native": "v1.1.1"
+      },
+      "manifests": {
+        "1863441": "1408611263280482422"
+      }
+    },
+    {
+      "buildId": 10818687,
+      "date": "2023-03-21T12:37:06Z",
+      "branches": [
+        "public"
+      ],
+      "version": "v1.1.2",
+      "changeSet": 14580,
+      "moduleVersions": {
+        "DedicatedCustomServerHelper": "v1.1.2",
+        "Multiplayer": "v1.1.2",
+        "Native": "v1.1.2"
+      },
+      "manifests": {
+        "1863441": "2103250184216914054"
+      }
+    },
+    {
+      "buildId": 10836604,
+      "date": "2023-03-23T11:44:29Z",
+      "branches": [
+        "public"
+      ],
+      "version": "v1.1.2",
+      "changeSet": 15068,
+      "moduleVersions": {
+        "DedicatedCustomServerHelper": "v1.1.2",
+        "Multiplayer": "v1.1.2",
+        "Native": "v1.1.2"
+      },
+      "manifests": {
+        "1863441": "1532431411611018718"
+      }
+    },
+    {
+      "buildId": 10993311,
+      "date": "2023-04-17T09:50:33Z",
+      "branches": [
+        "public"
+      ],
+      "version": "v1.1.3",
+      "changeSet": 16165,
+      "moduleVersions": {
+        "DedicatedCustomServerHelper": "v1.1.3",
+        "Multiplayer": "v1.1.3",
+        "Native": "v1.1.3"
+      },
+      "manifests": {
+        "1863441": "1935466872614516041"
+      }
+    },
+    {
+      "buildId": 11206702,
+      "date": "2023-05-18T12:13:59Z",
+      "branches": [
+        "public"
+      ],
+      "version": "v1.1.4",
+      "changeSet": 17949,
+      "moduleVersions": {
+        "DedicatedCustomServerHelper": "v1.1.4",
+        "Multiplayer": "v1.1.4",
+        "Native": "v1.1.4"
+      },
+      "manifests": {
+        "1863441": "7139703167184275246"
+      }
+    },
+    {
+      "buildId": 11314154,
+      "date": "2023-05-25T08:49:10Z",
+      "branches": [
+        "public"
+      ],
+      "version": "v1.1.4",
+      "changeSet": 19633,
+      "moduleVersions": {
+        "DedicatedCustomServerHelper": "v1.1.4",
+        "Multiplayer": "v1.1.4",
+        "Native": "v1.1.4"
+      },
+      "manifests": {
+        "1863441": "9128353761272641577"
+      }
+    },
+    {
+      "buildId": 11315573,
+      "date": "2023-05-25T12:52:03Z",
+      "branches": [
+        "public"
+      ],
+      "version": "v1.1.4",
+      "changeSet": 19633,
+      "moduleVersions": {
+        "DedicatedCustomServerHelper": "v1.1.4",
+        "Multiplayer": "v1.1.4",
+        "Native": "v1.1.4"
+      },
+      "manifests": {
+        "1863441": "3258269999086644406"
+      }
+    },
+    {
+      "buildId": 11542356,
+      "date": "2023-06-23T11:16:34Z",
+      "branches": [
+        "public"
+      ],
+      "version": "v1.1.5",
+      "changeSet": 21456,
+      "moduleVersions": {
+        "DedicatedCustomServerHelper": "v1.1.5",
+        "Multiplayer": "v1.1.5",
+        "Native": "v1.1.5"
+      },
+      "manifests": {
+        "1863441": "4499392701836451896"
+      }
+    },
+    {
+      "buildId": 11544196,
+      "date": "2023-06-23T12:20:53Z",
+      "branches": [
+        "public"
+      ],
+      "version": "v1.1.5",
+      "changeSet": 21456,
+      "moduleVersions": {
+        "DedicatedCustomServerHelper": "v1.1.5",
+        "Multiplayer": "v1.1.5",
+        "Native": "v1.1.5"
+      },
+      "manifests": {
+        "1863441": "4833145037347740888"
+      }
+    },
+    {
+      "buildId": 12048945,
+      "date": "2023-08-29T07:41:21Z",
+      "branches": [
+        "public"
+      ],
+      "version": "v1.1.5",
+      "changeSet": 21456,
+      "moduleVersions": {
+        "DedicatedCustomServerHelper": "v1.1.5",
+        "Multiplayer": "v1.1.5",
+        "Native": "v1.1.5"
+      },
+      "manifests": {
+        "1863441": "4311380515169007643"
+      }
+    },
+    {
+      "buildId": 12214860,
+      "date": "2023-09-18T11:26:02Z",
+      "branches": [
+        "public"
+      ],
+      "version": "v1.1.6",
+      "changeSet": 26219,
+      "moduleVersions": {
+        "DedicatedCustomServerHelper": "v1.1.6",
+        "Multiplayer": "v1.1.6",
+        "Native": "v1.1.6"
+      },
+      "manifests": {
+        "1863441": "5121359781504196320"
+      }
+    },
+    {
+      "buildId": 12781967,
+      "date": "2023-11-23T13:45:41Z",
+      "branches": [
+        "beta"
+      ],
+      "version": null,
+      "changeSet": null,
+      "contentUnavailable": true,
+      "manifests": {
+        "1863441": "6664163270190323017"
+      }
+    },
+    {
+      "buildId": 12838579,
+      "date": "2023-11-30T11:58:29Z",
+      "branches": [
+        "beta"
+      ],
+      "version": null,
+      "changeSet": null,
+      "contentUnavailable": true,
+      "manifests": {
+        "1863441": "5479444899567587289"
+      }
+    },
+    {
+      "buildId": 12959756,
+      "date": "2023-12-14T18:32:29Z",
+      "branches": [
+        "public"
+      ],
+      "version": "v1.2.7",
+      "changeSet": 31207,
+      "moduleVersions": {
+        "Multiplayer": "v1.2.7",
+        "Native": "v1.2.7"
+      },
+      "manifests": {
+        "1863441": "6258578396144418434"
+      }
+    },
+    {
+      "buildId": 13019076,
+      "date": "2023-12-21T12:54:00Z",
+      "branches": [
+        "public"
+      ],
+      "version": "v1.2.8",
+      "changeSet": 31588,
+      "moduleVersions": {
+        "Multiplayer": "v1.2.8",
+        "Native": "v1.2.8"
+      },
+      "manifests": {
+        "1863441": "3608205093852726084"
+      }
+    },
+    {
+      "buildId": 13051084,
+      "date": "2023-12-27T11:36:55Z",
+      "branches": [
+        "public"
+      ],
+      "version": "v1.2.8",
+      "changeSet": 31739,
+      "moduleVersions": {
+        "Multiplayer": "v1.2.8",
+        "Native": "v1.2.8"
+      },
+      "manifests": {
+        "1863441": "1294406362749374519"
+      }
+    },
+    {
+      "buildId": 13053045,
+      "date": "2023-12-27T18:09:03Z",
+      "branches": [
+        "public"
+      ],
+      "version": "v1.2.8",
+      "changeSet": 31807,
+      "moduleVersions": {
+        "Multiplayer": "v1.2.8",
+        "Native": "v1.2.8"
+      },
+      "manifests": {
+        "1863441": "8889581567137961843"
+      }
+    },
+    {
+      "buildId": 13336541,
+      "date": "2024-02-01T16:57:53Z",
+      "branches": [
+        "public"
+      ],
+      "version": "v1.2.9",
+      "changeSet": 33689,
+      "moduleVersions": {
+        "Multiplayer": "v1.2.9",
+        "Native": "v1.2.9"
+      },
+      "manifests": {
+        "1863441": "7891222559195413232"
+      }
+    },
+    {
+      "buildId": 13401604,
+      "date": "2024-02-08T09:38:23Z",
+      "branches": [
+        "public"
+      ],
+      "version": "v1.2.9",
+      "changeSet": 34019,
+      "moduleVersions": {
+        "Multiplayer": "v1.2.9",
+        "Native": "v1.2.9"
+      },
+      "manifests": {
+        "1863441": "8997470464008373536"
+      }
+    },
+    {
+      "buildId": 13612516,
+      "date": "2024-03-01T11:38:51Z",
+      "branches": [
+        "public"
+      ],
+      "version": "v1.2.9",
+      "changeSet": 34269,
+      "moduleVersions": {
+        "Multiplayer": "v1.2.9",
+        "Native": "v1.2.9"
+      },
+      "manifests": {
+        "1863441": "3075037148613644384"
+      }
+    },
+    {
+      "buildId": 14241297,
+      "date": "2024-05-03T14:26:34Z",
+      "branches": [
+        "public"
+      ],
+      "version": "v1.2.9",
+      "changeSet": 38481,
+      "moduleVersions": {
+        "Multiplayer": "v1.2.9",
+        "Native": "v1.2.9"
+      },
+      "manifests": {
+        "1863441": "1953115110015917154"
+      }
+    },
+    {
+      "buildId": 14858842,
+      "date": "2024-06-27T12:55:54Z",
+      "branches": [
+        "public"
+      ],
+      "version": "v1.2.10",
+      "changeSet": 42197,
+      "moduleVersions": {
+        "Multiplayer": "v1.2.10",
+        "Native": "v1.2.10"
+      },
+      "manifests": {
+        "1863441": "4172642688379721958"
+      }
+    },
+    {
+      "buildId": 15163353,
+      "date": "2024-07-26T13:28:36Z",
+      "branches": [
+        "beta"
+      ],
+      "version": null,
+      "changeSet": null,
+      "contentUnavailable": true,
+      "manifests": {
+        "1863441": "6512353215517330166"
+      }
+    },
+    {
+      "buildId": 15164372,
+      "date": "2024-07-26T15:20:47Z",
+      "branches": [
+        "v1.2.11"
+      ],
+      "version": null,
+      "changeSet": null,
+      "contentUnavailable": true,
+      "manifests": {
+        "1863441": "8289181221596438742"
+      }
+    },
+    {
+      "buildId": 15276684,
+      "date": "2024-08-09T12:25:56Z",
+      "branches": [
+        "public"
+      ],
+      "version": "v1.2.11",
+      "changeSet": 45697,
+      "moduleVersions": {
+        "Multiplayer": "v1.2.11",
+        "Native": "v1.2.11"
+      },
+      "manifests": {
+        "1863441": "7052515236756384060"
+      }
+    },
+    {
+      "buildId": 15491413,
+      "date": "2024-08-26T13:07:38Z",
+      "branches": [
+        "public"
+      ],
+      "version": "v1.2.11",
+      "changeSet": 47257,
+      "moduleVersions": {
+        "Multiplayer": "v1.2.11",
+        "Native": "v1.2.11"
+      },
+      "manifests": {
+        "1863441": "8207171899938311470"
+      }
+    },
+    {
+      "buildId": 16599204,
+      "date": "2024-12-02T11:29:41Z",
+      "branches": [
+        "public"
+      ],
+      "version": "v1.2.12",
+      "changeSet": 54620,
+      "moduleVersions": {
+        "Multiplayer": "v1.2.12",
+        "Native": "v1.2.12"
+      },
+      "manifests": {
+        "1863441": "7213132082777869062"
+      }
+    },
+    {
+      "buildId": 16625610,
+      "date": "2024-12-04T07:59:25Z",
+      "branches": [
+        "v1.2.12"
+      ],
+      "version": null,
+      "changeSet": null,
+      "contentUnavailable": true,
+      "manifests": {
+        "1863441": "7428798821783670546"
+      }
+    },
+    {
+      "buildId": 16722699,
+      "date": "2024-12-12T14:50:30Z",
+      "branches": [
+        "public"
+      ],
+      "version": "v1.2.12",
+      "changeSet": 55913,
+      "moduleVersions": {
+        "Multiplayer": "v1.2.12",
+        "Native": "v1.2.12"
+      },
+      "manifests": {
+        "1863441": "107475740371760128"
+      }
+    },
+    {
+      "buildId": 20420062,
+      "date": "2025-10-17T11:35:02Z",
+      "branches": [
+        "beta"
+      ],
+      "version": null,
+      "changeSet": null,
+      "contentUnavailable": true,
+      "manifests": {
+        "1863441": "5242457063672004529"
+      }
+    },
+    {
+      "buildId": 20561825,
+      "date": "2025-10-27T18:01:39Z",
+      "branches": [
+        "beta"
+      ],
+      "version": null,
+      "changeSet": null,
+      "contentUnavailable": true,
+      "manifests": {
+        "1863441": "8503568460532417582"
+      }
+    },
+    {
+      "buildId": 20908017,
+      "date": "2025-11-26T07:53:48Z",
+      "branches": [
+        "public"
+      ],
+      "version": "v1.3.4",
+      "changeSet": 101885,
+      "moduleVersions": {
+        "FastMode": "v1.3.4",
+        "Multiplayer": "v1.3.4",
+        "Native": "v1.3.4"
+      },
+      "manifests": {
+        "1863441": "2566114725429331678"
+      }
+    },
+    {
+      "buildId": 21057792,
+      "date": "2025-12-05T11:53:23Z",
+      "branches": [
+        "public"
+      ],
+      "version": "v1.3.9",
+      "changeSet": 103684,
+      "moduleVersions": {
+        "FastMode": "v1.3.9",
+        "Multiplayer": "v1.3.9",
+        "Native": "v1.3.9"
+      },
+      "manifests": {
+        "1863441": "409910924000556270"
+      }
+    },
+    {
+      "buildId": 21097750,
+      "date": "2025-12-08T11:57:22Z",
+      "branches": [
+        "public"
+      ],
+      "version": "v1.3.10",
+      "changeSet": 103977,
+      "moduleVersions": {
+        "FastMode": "v1.3.10",
+        "Multiplayer": "v1.3.10",
+        "Native": "v1.3.10"
+      },
+      "manifests": {
+        "1863441": "3591016996277438849"
+      }
+    },
+    {
+      "buildId": 21209126,
+      "date": "2025-12-16T14:38:21Z",
+      "branches": [
+        "public"
+      ],
+      "version": "v1.3.11",
+      "changeSet": 104956,
+      "moduleVersions": {
+        "FastMode": "v1.3.11",
+        "Multiplayer": "v1.3.11",
+        "Native": "v1.3.11"
+      },
+      "manifests": {
+        "1863441": "1538790603709657204"
+      }
+    },
+    {
+      "buildId": 21305671,
+      "date": "2025-12-24T14:56:16Z",
+      "branches": [
+        "public"
+      ],
+      "version": "v1.3.13",
+      "changeSet": 105604,
+      "moduleVersions": {
+        "FastMode": "v1.3.13",
+        "Multiplayer": "v1.3.13",
+        "Native": "v1.3.13"
+      },
+      "manifests": {
+        "1863441": "3258931890393741107"
+      }
+    },
+    {
+      "buildId": 21699294,
+      "date": "2026-02-03T09:36:28Z",
+      "branches": [
+        "public"
+      ],
+      "version": "v1.3.14",
+      "changeSet": 107738,
+      "moduleVersions": {
+        "FastMode": "v1.3.14",
+        "Multiplayer": "v1.3.14",
+        "Native": "v1.3.14"
+      },
+      "manifests": {
+        "1863441": "7285896760155897369"
+      }
+    },
+    {
+      "buildId": 22053898,
+      "date": "2026-02-23T14:21:19Z",
+      "branches": [
+        "public"
+      ],
+      "version": "v1.3.15",
+      "changeSet": 109330,
+      "moduleVersions": {
+        "FastMode": "v1.3.15",
+        "Multiplayer": "v1.3.15",
+        "Native": "v1.3.15"
+      },
+      "manifests": {
+        "1863441": "1909082230441132748"
+      }
+    },
+    {
+      "buildId": 22125002,
+      "date": "2026-03-02T12:16:22Z",
+      "branches": [
+        "public"
+      ],
+      "version": "v1.3.15",
+      "changeSet": 109797,
+      "moduleVersions": {
+        "FastMode": "v1.3.15",
+        "Multiplayer": "v1.3.15",
+        "Native": "v1.3.15"
+      },
+      "manifests": {
+        "1863441": "5405412549198619572"
+      }
+    },
+    {
+      "buildId": 23232800,
+      "date": "2026-05-21T14:24:31Z",
+      "branches": [
+        "public"
+      ],
+      "version": "v1.4.5",
+      "changeSet": 114659,
+      "moduleVersions": {
+        "ExampleSoundMod": "v1.4.5",
+        "FastMode": "v1.4.5",
+        "Multiplayer": "v1.4.5",
+        "Native": "v1.4.5"
+      },
+      "manifests": {
+        "1863441": "8886816811279506992"
+      }
+    },
+    {
+      "buildId": 23594136,
+      "date": "2026-06-05T23:09:45Z",
+      "branches": [
+        "public"
+      ],
+      "version": "v1.4.5",
+      "changeSet": 115234,
+      "moduleVersions": {
+        "ExampleSoundMod": "v1.4.5",
+        "FastMode": "v1.4.5",
+        "Multiplayer": "v1.4.5",
+        "Native": "v1.4.5"
+      },
+      "manifests": {
+        "1863441": "427565167944352539"
+      }
+    },
+    {
+      "buildId": 23604766,
+      "date": "2026-06-06T23:08:49Z",
+      "branches": [
+        "public"
+      ],
+      "version": "v1.4.5",
+      "changeSet": 115237,
+      "moduleVersions": {
+        "ExampleSoundMod": "v1.4.5",
+        "FastMode": "v1.4.5",
+        "Multiplayer": "v1.4.5",
+        "Native": "v1.4.5"
+      },
+      "manifests": {
+        "1863441": "4088006708298384221"
+      }
+    },
+    {
+      "buildId": 23679324,
+      "date": "2026-06-11T11:03:07Z",
+      "branches": [
+        "public"
+      ],
+      "version": "v1.4.6",
+      "changeSet": 115439,
+      "moduleVersions": {
+        "ExampleSoundMod": "v1.4.6",
+        "FastMode": "v1.4.6",
+        "Multiplayer": "v1.4.6",
+        "Native": "v1.4.6"
+      },
+      "manifests": {
+        "1863441": "9219168949853611410"
+      }
+    },
+    {
+      "buildId": 24085374,
+      "date": "2026-07-08T13:20:08Z",
+      "branches": [
+        "public",
+        "v1.4.7"
+      ],
+      "version": "v1.4.7",
+      "changeSet": 117131,
+      "moduleVersions": {
+        "ExampleSoundMod": "v1.4.7",
+        "FastMode": "v1.4.7",
+        "Multiplayer": "v1.4.7",
+        "Native": "v1.4.7"
+      },
+      "manifests": {
+        "1863441": "7509788240638442211"
+      }
+    },
+    {
+      "buildId": 24571419,
+      "date": "2026-08-10T11:59:56Z",
+      "branches": [
+        "public"
+      ],
+      "version": "v1.4.8",
+      "changeSet": 118999,
+      "moduleVersions": {
+        "ExampleSoundMod": "v1.4.8",
+        "FastMode": "v1.4.8",
+        "Multiplayer": "v1.4.8",
+        "Native": "v1.4.8"
+      },
+      "manifests": {
+        "1863441": "4619456710482553639"
+      }
+    },
+    {
+      "buildId": 25057613,
+      "date": "2026-09-01T14:16:16Z",
+      "branches": [
+        "beta"
+      ],
+      "version": "v1.5.2",
+      "changeSet": 121216,
+      "moduleVersions": {
+        "ExampleSoundMod": "v1.5.2",
+        "HeadlessClientLauncher": "v1.5.2",
+        "ModdingAnimationsResources": "v1.5.2",
+        "Multiplayer": "v1.5.2",
+        "Native": "v1.5.2"
+      },
+      "manifests": {
+        "1863441": "1770739514283191533"
+      }
+    }
+  ]
+}

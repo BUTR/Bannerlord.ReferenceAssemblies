@@ -1,41 +1,33 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Resources\FileFilters.regexp" />
-    <EmbeddedResource Include="Resources\package-csproj-template.xml" />
-    <EmbeddedResource Include="Resources\metapackage-csproj-template.xml" />
-    <EmbeddedResource Include="Resources\metapackage-nuspec-template.xml" />
-    <EmbeddedResource Include="Resources\package-nuspec-template.xml" />
+    <Using Include="System.Text.RegularExpressions" />
+    <InternalsVisibleTo Include="Bannerlord.ReferenceAssemblies.Tests" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="AsmResolver.DotNet" Version="5.5.1" />
-    <PackageReference Include="AsmResolver.PE.File" Version="5.5.1" />
-    <PackageReference Include="Bannerlord.ModuleManager" Version="5.0.226" />
+    <PackageReference Include="BepInEx.AssemblyPublicizer" Version="0.4.3" />
     <PackageReference Include="CommandLineParser" Version="2.9.1" />
-    <PackageReference Include="NuGet.Configuration" Version="6.10.0" />
-    <PackageReference Include="NuGet.Protocol" Version="6.10.0" />
-    <PackageReference Include="PCLExt.FileStorage-devel" Version="1.5.0.319" />
-    <PackageReference Include="Fody" Version="6.7.0" PrivateAssets="all" />
-    <PackageReference Include="Resourcer.Fody" Version="1.8.1" PrivateAssets="all" />
-    <PackageReference Include="System.Linq.Async" Version="6.0.1" />
+    <PackageReference Include="NuGet.Protocol" Version="7.9.0" />
   </ItemGroup>
-  
+
+  <!-- DepotDownloader is compiled in from the submodule; the rest of this group are its dependencies. -->
   <ItemGroup>
-    <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.183">
+    <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.333">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="protobuf-net" Version="3.2.52" />
-    <PackageReference Include="QRCoder" Version="1.6.0" />
-    <PackageReference Include="SteamKit2" Version="3.3.0" />
+    <PackageReference Include="protobuf-net" Version="3.4.21" />
+    <PackageReference Include="QRCoder" Version="1.8.0" />
+    <PackageReference Include="SteamKit2" Version="3.4.0" />
     <Compile Include="..\DepotDownloader\DepotDownloader\*.cs" Exclude="..\DepotDownloader\DepotDownloader\Program.cs">
       <Link>DepotDownloader\*.cs</Link>
     </Compile>

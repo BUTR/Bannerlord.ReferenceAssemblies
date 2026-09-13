@@ -1,0 +1,144 @@
+name: GenerateReferences
+
+# Packs the builds that the registry knows about but the feed does not have yet, for the game, then the
+# dedicated server, then the Modding Kit. The registry supplies the depot manifests, so this is not
+# limited to whatever branches Steam happens to expose today. Downloads still require Steam to serve
+# the recorded manifests.
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - "builds/**"
+  repository_dispatch:
+    types: [game_version_update]
+  workflow_dispatch:
+    inputs:
+      app:
+        description: "Which app to generate"
+        type: choice
+        options: [all, game, server, moddingkit]
+        default: all
+      buildId:
+        description: "Specific build ids to generate, space separated. Leave empty to take whatever the feed is missing."
+        required: false
+        default: ""
+      maxBuilds:
+        description: "Maximum number of builds to generate per app in this run"
+        required: false
+        default: "4"
+      checkFeed:
+        description: "Read NuGet first and reconcile the registry's published markers"
+        type: boolean
+        default: false
+
+# One Steam session at a time: a second login with the same account replaces the first.
+concurrency:
+  group: steam-account
+  cancel-in-progress: false
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  STEAM_LOGIN: ${{secrets.STEAM_LOGIN}}
+  STEAM_PASSWORD: ${{secrets.STEAM_PASSWORD}}
+  TOOL: src/Bannerlord.ReferenceAssemblies/bin/Release/net10.0/Bannerlord.ReferenceAssemblies
+  FINAL: src/Bannerlord.ReferenceAssemblies/bin/Release/net10.0/final
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 1
+      fail-fast: false
+      matrix:
+        app: ${{ github.event.inputs.app == 'game' && fromJSON('["game"]') || github.event.inputs.app == 'server' && fromJSON('["server"]') || github.event.inputs.app == 'moddingkit' && fromJSON('["moddingkit"]') || fromJSON('["game", "server", "moddingkit"]') }}
+    permissions:
+      id-token: write
+      contents: write
+      packages: write
+    steps:
+    - name: Setup
+      uses: butr/actions-common-setup@v2
+      with:
+        github-token: ${{secrets.GITHUB_TOKEN}}
+
+    - name: Setup .NET 10
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 10.x.x
+
+    - name: Build
+      run: dotnet build src/Bannerlord.ReferenceAssemblies/Bannerlord.ReferenceAssemblies.csproj --configuration Release
+
+    - name: Generate ${{matrix.app}} reference assemblies
+      run: >-
+        $TOOL generate --app ${{matrix.app}}
+        --maxBuilds ${{github.event.inputs.maxBuilds || 4}}
+        ${{github.event.inputs.checkFeed == 'true' && '--checkFeed' || ''}}
+        ${{github.event.inputs.buildId && format('--buildId {0}', github.event.inputs.buildId) || ''}}
+
+    - name: Check for packages
+      id: packages
+      run: echo "exists=$(ls $FINAL/*.nupkg >/dev/null 2>&1 && echo true || echo false)" >> "$GITHUB_OUTPUT"
+
+    - name: Upload NuGet packages
+      if: steps.packages.outputs.exists == 'true'
+      uses: actions/upload-artifact@v4
+      with:
+        name: nuget-packages-${{matrix.app}}
+        path: ${{env.FINAL}}/*.nupkg
+
+    - name: Remove NuGet sources
+      if: steps.packages.outputs.exists == 'true'
+      run: |
+        dotnet nuget remove source Source;
+        dotnet nuget remove source nuget.org;
+
+    - name: NuGet login (trusted publishing)
+      if: steps.packages.outputs.exists == 'true'
+      uses: NuGet/login@v1
+      id: nuget-login
+      with:
+        user: Aragas
+
+    - name: Push to NuGet
+      if: steps.packages.outputs.exists == 'true'
+      run: |
+        dotnet nuget add source https://api.nuget.org/v3/index.json --name NuGet
+        dotnet nuget push "$FINAL/*.nupkg" --skip-duplicate --api-key "${{ steps.nuget-login.outputs.NUGET_API_KEY }}" --source NuGet
+
+    - name: Push to GPR
+      if: steps.packages.outputs.exists == 'true'
+      run: |
+        dotnet nuget add source https://nuget.pkg.github.com/BUTR/index.json --name GitHub --username BUTR --password ${{ secrets.REPO_ACCESS_TOKEN }} --store-password-in-clear-text
+        dotnet nuget push "$FINAL/*.nupkg" --skip-duplicate --api-key ${{ secrets.REPO_ACCESS_TOKEN }} --source GitHub
+
+    # Only after the push, so nothing is recorded as published that never reached the feed.
+    - name: Record what was published
+      if: steps.packages.outputs.exists == 'true'
+      run: $TOOL mark-published --app ${{matrix.app}} --buildId $(cat $FINAL/generated-builds.txt)
+
+    - name: Commit the registry
+      if: steps.packages.outputs.exists == 'true'
+      run: |
+        if [ -z "$(git status --porcelain builds)" ]; then
+          echo "No registry changes."
+          exit 0
+        fi
+        git config user.name "github-actions[bot]"
+        git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        git add builds
+        git commit -m "chore: record published ${{matrix.app}} reference assemblies"
+        git pull --rebase
+        git push
+
+    - name: Wait for NuGet to index the packages
+      if: steps.packages.outputs.exists == 'true' && matrix.app == 'game'
+      run: sleep 600
+
+    - uses: BUTR/.github/.github/actions/dispatch-game-update@master
+      if: steps.packages.outputs.exists == 'true' && matrix.app == 'game'
+      with:
+        token: ${{ secrets.REPO_ACCESS_TOKEN }}

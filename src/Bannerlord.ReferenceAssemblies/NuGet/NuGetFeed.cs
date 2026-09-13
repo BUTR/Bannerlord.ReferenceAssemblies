@@ -1,97 +1,61 @@
-﻿using NuGet.Common;
-using NuGet.Configuration;
-using NuGet.Packaging.Core;
+using NuGet.Common;
+using NuGet.Protocol;
 using NuGet.Protocol.Core.Types;
-using NuGet.Versioning;
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Bannerlord.ReferenceAssemblies;
 
-internal class NuGetFeed
+internal sealed class NuGetFeed(string url)
 {
-    private readonly SourceRepository _sourceRepository;
+    public const string DefaultUrl = "https://api.nuget.org/v3/index.json";
 
-    public NuGetFeed(string feedUrl, string? feedUser, string? feedPassword)
+    private static readonly Regex RxBuildIdTag = new(@"buildId:(\d+)", RegexOptions.CultureInvariant);
+    private static readonly Regex RxAppIdTag = new(@"appId:(\d+)", RegexOptions.CultureInvariant);
+
+    /// <summary>
+    /// What the feed already carries for the app: the build ids from the buildId tag every package has,
+    /// and the package versions. Versions matter too, because two Steam builds can report the same game
+    /// version and changeset, and the second would pack to a version that already exists.
+    ///
+    /// Each id is looked up exactly. Searching by name instead returns everyone else's packages that
+    /// merely start the same way, such as the adwitkow.Bannerlord.ReferenceAssemblies mirror, whose tags
+    /// carry the very same build ids. The meta package and Core are both read because the meta package is
+    /// missing for a couple of older versions that Core has.
+    ///
+    /// Only packages tagged with this app count. The game and the dedicated server can report the same
+    /// version, and the tag is what keeps one from marking the other's builds as published.
+    /// </summary>
+    public async Task<(IReadOnlySet<uint> BuildIds, IReadOnlySet<string> Versions)> GetPublishedAsync(App app, CancellationToken ct)
     {
-        var packageSource = new PackageSource(feedUrl, "Feed1", true, false, false)
+        var repository = Repository.Factory.GetCoreV3(url);
+        var metadataResource = await repository.GetResourceAsync<PackageMetadataResource>(ct)
+                               ?? throw new InvalidOperationException($"{url} offers no package metadata resource.");
+        using var cache = new SourceCacheContext();
+
+        var packageIds =
+            from suffix in new[] { "", ".EarlyAccess" }
+            from module in new string?[] { null, "Core" }
+            select app.PackageId(module, suffix);
+
+        var buildIds = new HashSet<uint>();
+        var versions = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var packageId in packageIds)
         {
-            Credentials = new PackageSourceCredential(feedUrl, feedUser ?? "", feedPassword ?? "", true, string.Empty),
-            MaxHttpRequestsPerSource = 8,
-        };
+            foreach (var metadata in await metadataResource.GetMetadataAsync(packageId, true, true, cache, NullLogger.Instance, ct))
+            {
+                if (metadata.Identity is not { } identity || !string.Equals(identity.Id, packageId, StringComparison.OrdinalIgnoreCase))
+                    continue;
 
-        _sourceRepository = new SourceRepository(packageSource, Repository.Provider.GetCoreV3());
-    }
+                // An untagged package cannot be attributed, and counting it could skip a build that was
+                // never published. Leaving it out only risks building something twice.
+                var tags = metadata.Tags ?? "";
+                if (RxAppIdTag.Match(tags) is not { Success: true } appTag || uint.Parse(appTag.Groups[1].Value) != app.AppId)
+                    continue;
 
-    public async Task<IReadOnlyDictionary<string, IReadOnlyList<NuGetPackage>>> GetVersionsAsync(CancellationToken ct)
-    {
-        var packageLister = await _sourceRepository.GetResourceAsync<PackageSearchResource>(ct);
-        var foundPackages = (await packageLister.SearchAsync("Bannerlord.ReferenceAssemblies", new SearchFilter(true), 0, 50, NullLogger.Instance, ct))
-            .Where(x => !x.Identity.Id.Contains("EarlyAccess", StringComparison.OrdinalIgnoreCase));
-
-        var sourceCacheContext = new SourceCacheContext();
-        var finderPackageByIdResource = await _sourceRepository.GetResourceAsync<FindPackageByIdResource>(ct);
-        var metadataResource = await _sourceRepository.GetResourceAsync<PackageMetadataResource>(ct);
-
-        return await foundPackages.ToAsyncEnumerable().SelectAwait(async package =>
-        {
-            var versions = MaxVersions(finderPackageByIdResource.GetAllVersionsAsync(package.Identity.Id, sourceCacheContext, NullLogger.Instance, ct));
-            var metadatas = GetMetadataAsync(versions, version => metadataResource.GetMetadataAsync(new PackageIdentity(package.Identity.Id, version), sourceCacheContext, NullLogger.Instance, ct), ct);
-            return (package.Identity.Id, (IReadOnlyList<NuGetPackage>) await GetPackageVersionsAsync(metadatas, ct).ToListAsync(ct));
-        }).ToDictionaryAsync(x => x.Item1, x => x.Item2, ct);
-    }
-
-    private static async IAsyncEnumerable<NuGetVersion> MaxVersions(Task<IEnumerable<NuGetVersion>> source)
-    {
-        var data = (await source).ToList();
-        var dict = new Dictionary<string, NuGetVersion>();
-        var dictBeta = new Dictionary<string, NuGetVersion>();
-        foreach (var version in data.Where(x => !x.IsPrerelease))
-        {
-            var v = version.Version.ToString(3);
-            var currentMax = dict.GetValueOrDefault(v);
-            if (currentMax is null) dict[v] = version;
-            // Release reset their build index. For now everything that is higher than 200000 is considered EA
-            // TODO: better fix?
-            else if (version.Version.Build < 100000 && currentMax.Version < version.Version) dict[v] = version;
-            else if (currentMax.Version < version.Version) dict[v] = version;
+                versions.Add(identity.Version.ToNormalizedString());
+                if (RxBuildIdTag.Match(tags) is { Success: true } buildTag)
+                    buildIds.Add(uint.Parse(buildTag.Groups[1].Value));
+            }
         }
-        foreach (var version in data.Where(x => x.IsPrerelease))
-        {
-            var v = version.Version.ToString(3);
-            var currentMax = dictBeta.GetValueOrDefault(v);
-            if (currentMax is null) dictBeta[v] = version;
-            // Release reset their build index. For now everything that is higher than 200000 is considered EA
-            // TODO: better fix?
-            else if (version.Version.Build < 100000 && currentMax.Version < version.Version) dictBeta[v] = version;
-            else if (currentMax.Version < version.Version) dictBeta[v] = version;
-        }
-        foreach (var value in dict.Values)
-            yield return value;
-        foreach (var value in dictBeta.Values)
-            yield return value;
-    }
-
-    private static async IAsyncEnumerable<IPackageSearchMetadata> GetMetadataAsync(IAsyncEnumerable<NuGetVersion> versions, Func<NuGetVersion, Task<IPackageSearchMetadata>> getMeta, [EnumeratorCancellation] CancellationToken ct = default)
-    {
-        await foreach (var version in versions.WithCancellation(ct))
-        {
-            yield return await getMeta(version);
-        }
-    }
-
-    private static async IAsyncEnumerable<NuGetPackage> GetPackageVersionsAsync(IAsyncEnumerable<IPackageSearchMetadata> metadatas, [EnumeratorCancellation] CancellationToken ct = default)
-    {
-        await foreach (var metadata in metadatas.WithCancellation(ct))
-        {
-            var package = NuGetPackage.Get(metadata.Identity.Id, metadata.Identity.Version, metadata.Tags);
-            if (package != null)
-                yield return package.Value;
-        }
+        return (buildIds, versions);
     }
 }
