@@ -1310,12 +1310,13 @@
       ],
       "version": "e1.4.1",
       "changeSet": 232500,
+      "publishedVersion": "1.4.1.232500",
       "moduleVersions": {
-        "CustomBattle": "e1.4.1",
         "Native": "e1.4.1",
-        "SandBox": "e1.4.1",
+        "StoryMode": "e1.4.1",
         "SandBoxCore": "e1.4.1",
-        "StoryMode": "e1.4.1"
+        "SandBox": "e1.4.1",
+        "CustomBattle": "e1.4.1"
       },
       "manifests": {
         "261551": "927936367092692812"
@@ -1329,12 +1330,13 @@
       ],
       "version": "e1.4.1",
       "changeSet": 232571,
+      "publishedVersion": "1.4.1.232571",
       "moduleVersions": {
-        "CustomBattle": "e1.4.1",
         "Native": "e1.4.1",
-        "SandBox": "e1.4.1",
+        "StoryMode": "e1.4.1",
         "SandBoxCore": "e1.4.1",
-        "StoryMode": "e1.4.1"
+        "SandBox": "e1.4.1",
+        "CustomBattle": "e1.4.1"
       },
       "manifests": {
         "261551": "2605926339682754116"
@@ -1383,12 +1385,13 @@
       ],
       "version": "e1.4.2",
       "changeSet": 235840,
+      "publishedVersion": "1.4.2.235840",
       "moduleVersions": {
-        "CustomBattle": "e1.4.2",
         "Native": "e1.4.2",
-        "SandBox": "e1.4.2",
+        "StoryMode": "e1.4.2",
         "SandBoxCore": "e1.4.2",
-        "StoryMode": "e1.4.2"
+        "SandBox": "e1.4.2",
+        "CustomBattle": "e1.4.2"
       },
       "manifests": {
         "261551": "7570247706189258768"
@@ -1625,12 +1628,13 @@
       ],
       "version": "e1.4.3",
       "changeSet": 237633,
+      "publishedVersion": "1.4.3.237633",
       "moduleVersions": {
-        "CustomBattle": "e1.4.3",
         "Native": "e1.4.3",
-        "SandBox": "e1.4.3",
+        "StoryMode": "e1.4.3",
         "SandBoxCore": "e1.4.3",
-        "StoryMode": "e1.4.3"
+        "SandBox": "e1.4.3",
+        "CustomBattle": "e1.4.3"
       },
       "manifests": {
         "261551": "8836113776932414562"
