@@ -334,6 +334,7 @@
       ],
       "version": "e1.5.6",
       "changeSet": 255341,
+      "publishedVersion": "1.5.6.255341",
       "moduleVersions": {},
       "manifests": {
         "1393601": "3224012095107393908"
@@ -347,6 +348,7 @@
       ],
       "version": "e1.5.6",
       "changeSet": 255751,
+      "publishedVersion": "1.5.6.255751",
       "moduleVersions": {},
       "manifests": {
         "1393601": "6208877386242440842"
@@ -360,6 +362,7 @@
       ],
       "version": "e1.5.7",
       "changeSet": 257988,
+      "publishedVersion": "1.5.7.257988",
       "moduleVersions": {},
       "manifests": {
         "1393601": "4268860865416224382"
@@ -386,6 +389,7 @@
       ],
       "version": "e1.5.7",
       "changeSet": 258515,
+      "publishedVersion": "1.5.7.258515",
       "moduleVersions": {},
       "manifests": {
         "1393601": "8416087299804869371"
@@ -412,6 +416,7 @@
       ],
       "version": "e1.5.7",
       "changeSet": 258831,
+      "publishedVersion": "1.5.7.258831",
       "moduleVersions": {},
       "manifests": {
         "1393601": "6888798143041357065"
@@ -425,6 +430,7 @@
       ],
       "version": "e1.5.7",
       "changeSet": 259225,
+      "publishedVersion": "1.5.7.259225",
       "moduleVersions": {},
       "manifests": {
         "1393601": "216240090408502612"
@@ -438,6 +444,7 @@
       ],
       "version": "e1.5.7",
       "changeSet": 259658,
+      "publishedVersion": "1.5.7.259658",
       "moduleVersions": {},
       "manifests": {
         "1393601": "6268530563247083278"
@@ -451,6 +458,7 @@
       ],
       "version": "e1.5.7",
       "changeSet": 260102,
+      "publishedVersion": "1.5.7.260102",
       "moduleVersions": {},
       "manifests": {
         "1393601": "4294702417042281146"
@@ -464,6 +472,7 @@
       ],
       "version": "e1.5.7",
       "changeSet": 261159,
+      "publishedVersion": "1.5.7.261159",
       "moduleVersions": {},
       "manifests": {
         "1393601": "4152472784740790673"
