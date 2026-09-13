@@ -5,11 +5,11 @@ name: GenerateReferences
 # limited to whatever branches Steam happens to expose today. Downloads still require Steam to serve
 # the recorded manifests.
 
+# master is protected, so the registry is pushed back as the butr-registry-bot app, which the branch rules
+# let through. A push made with a real token would start any workflow listening for it, so this one is
+# started only on request: by Update Build Registry through `gh workflow run`, by hand, or by dispatch.
+
 on:
-  push:
-    branches: [master]
-    paths:
-      - "builds/**"
   repository_dispatch:
     types: [game_version_update]
   workflow_dispatch:
@@ -59,10 +59,17 @@ jobs:
       contents: write
       packages: write
     steps:
-    - name: Setup
-      uses: butr/actions-common-setup@v2
+    - name: Registry bot token
+      id: bot
+      uses: actions/create-github-app-token@v2
       with:
-        github-token: ${{secrets.GITHUB_TOKEN}}
+        app-id: ${{vars.REGISTRY_APP_ID}}
+        private-key: ${{secrets.REGISTRY_APP_KEY}}
+
+    - uses: actions/checkout@v5
+      with:
+        submodules: recursive
+        token: ${{steps.bot.outputs.token}}
 
     - name: Setup .NET 10
       uses: actions/setup-dotnet@v4
@@ -90,12 +97,6 @@ jobs:
         name: nuget-packages-${{matrix.app}}
         path: ${{env.FINAL}}/*.nupkg
 
-    - name: Remove NuGet sources
-      if: steps.packages.outputs.exists == 'true'
-      run: |
-        dotnet nuget remove source Source;
-        dotnet nuget remove source nuget.org;
-
     - name: NuGet login (trusted publishing)
       if: steps.packages.outputs.exists == 'true'
       uses: NuGet/login@v1
@@ -105,15 +106,11 @@ jobs:
 
     - name: Push to NuGet
       if: steps.packages.outputs.exists == 'true'
-      run: |
-        dotnet nuget add source https://api.nuget.org/v3/index.json --name NuGet
-        dotnet nuget push "$FINAL/*.nupkg" --skip-duplicate --api-key "${{ steps.nuget-login.outputs.NUGET_API_KEY }}" --source NuGet
+      run: dotnet nuget push "$FINAL/*.nupkg" --skip-duplicate --api-key "${{ steps.nuget-login.outputs.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json
 
     - name: Push to GPR
       if: steps.packages.outputs.exists == 'true'
-      run: |
-        dotnet nuget add source https://nuget.pkg.github.com/BUTR/index.json --name GitHub --username BUTR --password ${{ secrets.REPO_ACCESS_TOKEN }} --store-password-in-clear-text
-        dotnet nuget push "$FINAL/*.nupkg" --skip-duplicate --api-key ${{ secrets.REPO_ACCESS_TOKEN }} --source GitHub
+      run: dotnet nuget push "$FINAL/*.nupkg" --skip-duplicate --api-key ${{ secrets.REPO_ACCESS_TOKEN }} --source https://nuget.pkg.github.com/BUTR/index.json
 
     # Only after the push, so nothing is recorded as published that never reached the feed.
     - name: Record what was published
@@ -127,8 +124,8 @@ jobs:
           echo "No registry changes."
           exit 0
         fi
-        git config user.name "github-actions[bot]"
-        git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        git config user.name "butr-registry-bot[bot]"
+        git config user.email "328763592+butr-registry-bot[bot]@users.noreply.github.com"
         git add builds
         git commit -m "chore: record published ${{matrix.app}} reference assemblies"
         git pull --rebase

@@ -29,9 +29,19 @@ jobs:
     permissions:
       contents: write
     steps:
+      # master is protected; the registry is pushed back as the butr-registry-bot app, which the branch
+      # rules let through. Its token lives for an hour and can only write this repository's contents.
+      - name: Registry bot token
+        id: bot
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{vars.REGISTRY_APP_ID}}
+          private-key: ${{secrets.REGISTRY_APP_KEY}}
+
       - uses: actions/checkout@v5
         with:
           submodules: recursive
+          token: ${{steps.bot.outputs.token}}
 
       - name: Setup .NET 10
         uses: actions/setup-dotnet@v4
@@ -58,8 +68,8 @@ jobs:
           fi
           echo "The feed and the registries disagreed; recording the feed:"
           git --no-pager diff --stat builds
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config user.name "butr-registry-bot[bot]"
+          git config user.email "328763592+butr-registry-bot[bot]@users.noreply.github.com"
           git add builds
           git commit -m "chore: reconcile published markers with NuGet"
           git pull --rebase

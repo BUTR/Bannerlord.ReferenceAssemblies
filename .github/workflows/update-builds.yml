@@ -35,9 +35,19 @@ jobs:
     permissions:
       contents: write
     steps:
+      # master is protected; the registry is pushed back as the butr-registry-bot app, which the branch
+      # rules let through. Its token lives for an hour and can only write this repository's contents.
+      - name: Registry bot token
+        id: bot
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{vars.REGISTRY_APP_ID}}
+          private-key: ${{secrets.REGISTRY_APP_KEY}}
+
       - uses: actions/checkout@v5
         with:
           submodules: recursive
+          token: ${{steps.bot.outputs.token}}
 
       - name: Setup .NET 10
         uses: actions/setup-dotnet@v4
@@ -62,8 +72,8 @@ jobs:
             echo "No registry changes."
             exit 0
           fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config user.name "butr-registry-bot[bot]"
+          git config user.email "328763592+butr-registry-bot[bot]@users.noreply.github.com"
           git add builds
           git commit -m "chore: update build registry"
           git pull --rebase
@@ -82,7 +92,8 @@ jobs:
           echo "builds=$PENDING" >> "$GITHUB_OUTPUT"
           echo "Outstanding: ${PENDING:-none}"
 
-      # A push made with the default token starts no other workflow, so generation is asked for directly.
+      # Generation is asked for directly rather than through a push trigger, so that the registry commits
+      # of the three workflows cannot start each other.
       - name: Trigger reference generation
         if: steps.pending.outputs.builds != ''
         env:
