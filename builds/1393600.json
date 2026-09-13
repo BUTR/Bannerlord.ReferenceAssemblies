@@ -1296,6 +1296,7 @@
       ],
       "version": "e1.7.0",
       "changeSet": 304003,
+      "publishedVersion": "1.7.0.304003",
       "moduleVersions": {},
       "manifests": {
         "1393601": "2938122226764391426"
@@ -1309,6 +1310,7 @@
       ],
       "version": "e1.7.1",
       "changeSet": 305759,
+      "publishedVersion": "1.7.1.305759",
       "moduleVersions": {},
       "manifests": {
         "1393601": "3732045677310531778"
@@ -1335,6 +1337,7 @@
       ],
       "version": "e1.7.1",
       "changeSet": 306438,
+      "publishedVersion": "1.7.1.306438",
       "moduleVersions": {},
       "manifests": {
         "1393601": "8065855103137650105"
