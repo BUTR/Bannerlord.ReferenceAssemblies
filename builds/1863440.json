@@ -903,10 +903,11 @@
       ],
       "version": "v1.3.15",
       "changeSet": 109797,
+      "publishedVersion": "1.3.15.109797",
       "moduleVersions": {
+        "Native": "v1.3.15",
         "FastMode": "v1.3.15",
-        "Multiplayer": "v1.3.15",
-        "Native": "v1.3.15"
+        "Multiplayer": "v1.3.15"
       },
       "manifests": {
         "1863441": "5405412549198619572"
@@ -920,11 +921,12 @@
       ],
       "version": "v1.4.5",
       "changeSet": 114659,
+      "publishedVersion": "1.4.5.114659",
       "moduleVersions": {
-        "ExampleSoundMod": "v1.4.5",
+        "Native": "v1.4.5",
         "FastMode": "v1.4.5",
         "Multiplayer": "v1.4.5",
-        "Native": "v1.4.5"
+        "ExampleSoundMod": "v1.4.5"
       },
       "manifests": {
         "1863441": "8886816811279506992"
@@ -938,11 +940,12 @@
       ],
       "version": "v1.4.5",
       "changeSet": 115234,
+      "publishedVersion": "1.4.5.115234",
       "moduleVersions": {
-        "ExampleSoundMod": "v1.4.5",
+        "Native": "v1.4.5",
         "FastMode": "v1.4.5",
         "Multiplayer": "v1.4.5",
-        "Native": "v1.4.5"
+        "ExampleSoundMod": "v1.4.5"
       },
       "manifests": {
         "1863441": "427565167944352539"
@@ -956,11 +959,12 @@
       ],
       "version": "v1.4.5",
       "changeSet": 115237,
+      "publishedVersion": "1.4.5.115237",
       "moduleVersions": {
-        "ExampleSoundMod": "v1.4.5",
+        "Native": "v1.4.5",
         "FastMode": "v1.4.5",
         "Multiplayer": "v1.4.5",
-        "Native": "v1.4.5"
+        "ExampleSoundMod": "v1.4.5"
       },
       "manifests": {
         "1863441": "4088006708298384221"
