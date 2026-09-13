@@ -2202,6 +2202,7 @@
       ],
       "version": "v1.4.5",
       "changeSet": 114928,
+      "publishedVersion": "1.4.5.114928",
       "moduleVersions": {},
       "manifests": {
         "1393601": "731142700674474948"
@@ -2217,6 +2218,7 @@
       ],
       "version": "v1.4.7",
       "changeSet": 117377,
+      "publishedVersion": "1.4.7.117377",
       "moduleVersions": {},
       "manifests": {
         "1393601": "4355057738458763897"
@@ -2230,6 +2232,7 @@
       ],
       "version": "v1.4.8",
       "changeSet": 119303,
+      "publishedVersion": "1.4.8.119303",
       "moduleVersions": {},
       "manifests": {
         "1393601": "8768748780073621530"
@@ -2257,6 +2260,7 @@
       ],
       "version": "v1.5.2",
       "changeSet": 121216,
+      "publishedVersion": "1.5.2.121216-beta",
       "moduleVersions": {},
       "manifests": {
         "1393601": "4117090230488104793"

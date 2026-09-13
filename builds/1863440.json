@@ -974,6 +974,7 @@
       ],
       "version": "v1.4.6",
       "changeSet": 115439,
+      "publishedVersion": "1.4.6.115439",
       "moduleVersions": {
         "ExampleSoundMod": "v1.4.6",
         "FastMode": "v1.4.6",
@@ -993,6 +994,7 @@
       ],
       "version": "v1.4.7",
       "changeSet": 117131,
+      "publishedVersion": "1.4.7.117131",
       "moduleVersions": {
         "ExampleSoundMod": "v1.4.7",
         "FastMode": "v1.4.7",
@@ -1011,6 +1013,7 @@
       ],
       "version": "v1.4.8",
       "changeSet": 118999,
+      "publishedVersion": "1.4.8.118999",
       "moduleVersions": {
         "ExampleSoundMod": "v1.4.8",
         "FastMode": "v1.4.8",
@@ -1029,6 +1032,7 @@
       ],
       "version": "v1.5.2",
       "changeSet": 121216,
+      "publishedVersion": "1.5.2.121216-beta",
       "moduleVersions": {
         "ExampleSoundMod": "v1.5.2",
         "HeadlessClientLauncher": "v1.5.2",

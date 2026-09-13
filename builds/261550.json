@@ -6617,6 +6617,7 @@
       ],
       "version": "v1.2.9",
       "changeSet": 36960,
+      "publishedVersion": "1.2.9.36960",
       "moduleVersions": {
         "BirthAndDeath": "v1.2.9",
         "CustomBattle": "v1.2.9",
@@ -6971,6 +6972,7 @@
       ],
       "version": "v1.3.4",
       "changeSet": 102350,
+      "publishedVersion": "1.3.4.102350",
       "moduleVersions": {
         "BirthAndDeath": "v1.3.4",
         "CustomBattle": "v1.3.4",
@@ -7257,6 +7259,7 @@
       ],
       "version": "v1.3.10",
       "changeSet": 103977,
+      "publishedVersion": "1.3.10.103977",
       "moduleVersions": {
         "BirthAndDeath": "v1.3.10",
         "CustomBattle": "v1.3.10",
@@ -7282,6 +7285,7 @@
       ],
       "version": "v1.3.10",
       "changeSet": 104176,
+      "publishedVersion": "1.3.10.104176",
       "moduleVersions": {
         "BirthAndDeath": "v1.3.10",
         "CustomBattle": "v1.3.10",
