@@ -131,11 +131,18 @@ jobs:
         git pull --rebase
         git push
 
-    - name: Wait for NuGet to index the packages
+    # The game's current stable and beta versions, now that their packages are on the feed. BUTR/.github
+    # sets the org variables from them, waits for NuGet to index, and tells the mod repositories.
+    - name: Current game versions
       if: steps.packages.outputs.exists == 'true' && matrix.app == 'game'
-      run: sleep 600
+      id: versions
+      run: $TOOL versions --app game
 
-    - uses: BUTR/.github/.github/actions/dispatch-game-update@master
-      if: steps.packages.outputs.exists == 'true' && matrix.app == 'game'
-      with:
-        token: ${{ secrets.REPO_ACCESS_TOKEN }}
+    - name: Tell BUTR/.github the current versions
+      if: steps.versions.outputs.published == 'true'
+      env:
+        GH_TOKEN: ${{secrets.REPO_ACCESS_TOKEN}}
+      run: >-
+        jq -n --arg stable "${{steps.versions.outputs.stable}}" --arg beta "${{steps.versions.outputs.beta}}"
+        '{event_type: "game_versions", client_payload: {stable: $stable, beta: $beta}}'
+        | gh api repos/BUTR/.github/dispatches --input -

@@ -16,9 +16,11 @@ internal static class UpdateCommand
         await steam.ConnectAsync();
 
         Log.Info("Reading Steam branches...");
+        var branches = steam.GetBranches().ToList();
+        registry.Current = branches.ToDictionary(x => x.Name, x => x.BuildId);
         var added = 0;
         var updated = 0;
-        foreach (var branch in steam.GetBranches())
+        foreach (var branch in branches)
         {
             Log.Info($"  {branch.Name}: build {branch.BuildId} ({branch.TimeUpdated:yyyy-MM-dd}) {string.Join(" ", branch.Manifests.Select(x => $"{x.Key}={x.Value}"))}");
 

@@ -10,6 +10,8 @@ namespace Bannerlord.ReferenceAssemblies;
 /// generate       - downloads the builds the registry says are not on the feed yet, strips the
 ///                  assemblies and packs them.
 /// mark-published - records which builds the feed carries, so the other two never have to ask NuGet.
+/// versions       - reports the current stable and beta versions from the registry, for the org variables
+///                  the mod repositories build against.
 /// </summary>
 public static class Program
 {
@@ -27,10 +29,11 @@ public static class Program
         var exitCode = 0;
         try
         {
-            await Parser.Default.ParseArguments<UpdateOptions, GenerateOptions, MarkPublishedOptions>(args).MapResult(
+            await Parser.Default.ParseArguments<UpdateOptions, GenerateOptions, MarkPublishedOptions, VersionsOptions>(args).MapResult(
                 (UpdateOptions o) => UpdateCommand.RunAsync(o, ctrlC.Token),
                 (GenerateOptions o) => GenerateCommand.RunAsync(o, ctrlC.Token),
                 (MarkPublishedOptions o) => MarkPublishedCommand.RunAsync(o, ctrlC.Token),
+                (VersionsOptions o) => VersionsCommand.RunAsync(o),
                 _ =>
                 {
                     exitCode = 1;

@@ -23,6 +23,13 @@ internal sealed class BuildRegistry
 
     public uint AppId { get; set; }
 
+    /// <summary>
+    /// The build each branch points at right now, by branch name, as of the last update. This is the one
+    /// piece of the registry that describes the present rather than the past: it is what says which build
+    /// is the current stable and which the current beta, and a branch that Steam has removed drops out.
+    /// </summary>
+    public Dictionary<string, uint> Current { get; set; } = [];
+
     public List<BuildEntry> Builds { get; set; } = [];
 
     [JsonIgnore]

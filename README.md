@@ -86,8 +86,24 @@ $TOOL mark-published --app game --buildId 21112791
 $TOOL mark-published --app game --fromFeed
 ```
 
+### Report current versions
+
+Print the current stable and beta versions from the registry, and whether both are published:
+
+```sh
+$TOOL versions --app game
+```
+
+Stable is the build on the `public` branch; beta is the build on the `beta` branch, or stable when there
+is none. The result is also written to `final/versions.json` and, in a workflow, to `GITHUB_OUTPUT`.
+
 ## Automation
 
 [Update Build Registry](.github/workflows/update-builds.yml) checks for builds every three hours and
 requests [generation](.github/workflows/generate-references.yml) when packages are missing.
 [Verify Feed](.github/workflows/verify-feed.yml) checks the registries against NuGet nightly.
+
+Once the packages for both the stable and the beta build are published, the update and generate
+workflows send the current versions to [BUTR/.github](https://github.com/BUTR/.github) as a
+`game_versions` dispatch. Its sync workflow sets the `GAME_VERSION_STABLE` and `GAME_VERSION_BETA`
+organisation variables and notifies the mod repositories.

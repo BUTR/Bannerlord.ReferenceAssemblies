@@ -82,6 +82,11 @@ internal sealed class MarkPublishedOptions : CommonOptions
     public string FeedUrl { get; set; } = NuGetFeed.DefaultUrl;
 }
 
+[Verb("versions", HelpText = "Reports the current stable and beta versions of the app from the registry, and whether both are on the feed. Contacts nothing.")]
+internal sealed class VersionsOptions : CommonOptions
+{
+}
+
 /// <summary>Where the work lands. Only <c>final</c> is read by anything else: the workflows pick the packages up there.</summary>
 internal sealed record Paths(string Root)
 {
@@ -89,11 +94,14 @@ internal sealed record Paths(string Root)
     public string Ref(uint buildId) => Path.Combine(Root, "ref", buildId.ToString());
     public string Final => Path.Combine(Root, "final");
 
-    public string WriteBuildList(string fileName, IEnumerable<BuildEntry> builds)
+    public string WriteFinal(string fileName, string content)
     {
         Directory.CreateDirectory(Final);
         var path = Path.Combine(Final, fileName);
-        File.WriteAllText(path, string.Join(" ", builds.Select(x => x.BuildId)));
+        File.WriteAllText(path, content);
         return path;
     }
+
+    public string WriteBuildList(string fileName, IEnumerable<BuildEntry> builds) =>
+        WriteFinal(fileName, string.Join(" ", builds.Select(x => x.BuildId)));
 }

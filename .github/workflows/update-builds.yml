@@ -67,11 +67,14 @@ jobs:
         run: $TOOL update --app moddingkit --fillVersions ${{github.event.inputs.fillVersions || 25}}
 
       - name: Commit the registries
+        id: commit
         run: |
           if [ -z "$(git status --porcelain builds)" ]; then
             echo "No registry changes."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
+          echo "changed=true" >> "$GITHUB_OUTPUT"
           git config user.name "butr-registry-bot[bot]"
           git config user.email "328763592+butr-registry-bot[bot]@users.noreply.github.com"
           git add builds
@@ -99,3 +102,20 @@ jobs:
         env:
           GH_TOKEN: ${{secrets.REPO_ACCESS_TOKEN}}
         run: gh workflow run generate-references.yml --ref ${{github.ref_name}}
+
+      # The game's current stable and beta versions, as the registry now records them. BUTR/.github turns
+      # them into the GAME_VERSION_STABLE and GAME_VERSION_BETA variables the mod repositories build against,
+      # so they are only sent once both builds' packages are on the feed. Sent from here as well as from the
+      # generate run, because a beta branch that Steam removes changes the versions without any new build.
+      - name: Current game versions
+        id: versions
+        run: $TOOL versions --app game
+
+      - name: Tell BUTR/.github the current versions
+        if: steps.commit.outputs.changed == 'true' && steps.versions.outputs.published == 'true'
+        env:
+          GH_TOKEN: ${{secrets.REPO_ACCESS_TOKEN}}
+        run: >-
+          jq -n --arg stable "${{steps.versions.outputs.stable}}" --arg beta "${{steps.versions.outputs.beta}}"
+          '{event_type: "game_versions", client_payload: {stable: $stable, beta: $beta}}'
+          | gh api repos/BUTR/.github/dispatches --input -
