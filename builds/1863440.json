@@ -1,6 +1,10 @@
 {
   "appId": 1863440,
-  "current": {},
+  "current": {
+    "public": 24571419,
+    "beta": 25057613,
+    "v1.4.7": 24085374
+  },
   "builds": [
     {
       "buildId": 9618969,
