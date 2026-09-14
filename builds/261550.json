@@ -1441,6 +1441,7 @@
       ],
       "version": "e1.4.2",
       "changeSet": 235840,
+      "publishedVersion": "1.4.2.235840",
       "moduleVersions": {
         "CustomBattle": "e1.4.2",
         "Native": "e1.4.2",

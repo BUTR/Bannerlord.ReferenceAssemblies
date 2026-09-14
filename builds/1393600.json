@@ -135,6 +135,7 @@
       ],
       "version": "e1.5.3",
       "changeSet": 243624,
+      "publishedVersion": "1.5.3.243624",
       "moduleVersions": {},
       "manifests": {
         "1393601": "5222078024083329166"
