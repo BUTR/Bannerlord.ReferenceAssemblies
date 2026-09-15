@@ -8235,6 +8235,7 @@
       ],
       "version": "v1.5.3",
       "changeSet": 122374,
+      "publishedVersion": "1.5.3.122374-beta",
       "moduleVersions": {
         "Native": "v1.5.3",
         "NavalDLC": "v1.3.3",
