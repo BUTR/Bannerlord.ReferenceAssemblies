@@ -1110,6 +1110,7 @@
       ],
       "version": "v1.5.3",
       "changeSet": 122374,
+      "publishedVersion": "1.5.3.122374-beta",
       "moduleVersions": {
         "HeadlessClientLauncher": "v1.5.3",
         "ModdingAnimationsResources": "v1.5.3",
