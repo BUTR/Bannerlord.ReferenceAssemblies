@@ -2,6 +2,7 @@ using NuGet.Packaging;
 
 using System.IO.Compression;
 using System.Text.Json;
+using System.Xml.Linq;
 
 using Xunit;
 
@@ -13,8 +14,8 @@ namespace Bannerlord.ReferenceAssemblies.Tests;
 /// </summary>
 public sealed class GuiPackagerTests : IDisposable
 {
-    private const string BasePackage = "Bannerlord.ReferenceAssemblies.GUI.v1";
-    private const string DlcPackage = "Bannerlord.ReferenceAssemblies.GUI.v1.NavalDLC";
+    private const string BasePackage = "Bannerlord.ReferenceAssemblies.GUI.v2";
+    private const string DlcPackage = "Bannerlord.ReferenceAssemblies.GUI.v2.NavalDLC";
 
     private readonly string _root = Path.Combine(Path.GetTempPath(), $"gui-packager-{Guid.NewGuid():N}");
     private string Game => Path.Combine(_root, "depots", "24573425");
@@ -24,7 +25,7 @@ public sealed class GuiPackagerTests : IDisposable
     {
         Module(Game, "Native", """<Module><Id value="Native"/><Version value="v1.4.8"/><ModuleType value="Official"/><DependedModules/></Module>""");
         File(Game, "Modules/Native/GUI/Prefabs/Options/ExposureOptionsList.xml", "<Prefab>base</Prefab>");
-        File(Game, "Modules/Native/GUI/Brushes/Native.xml", "<Brushes/>");
+        File(Game, "Modules/Native/GUI/Brushes/Native.xml", """<Brushes><Brush Name="Native.Button"><Layers><BrushLayer Name="Default" Sprite="General\button" /></Layers></Brush></Brushes>""");
         File(Game, "Modules/Native/GUI/NativeSpriteData.xml", SpriteData("ui_fonts", alwaysLoad: true, "ui_order"));
         File(Game, "Modules/Native/GUI/Fonts/NativeLanguages.xml", "<Languages DefaultLanguage=\"English\"/>");
         File(Game, "Modules/Native/GUI/Fonts/Nested/Other.xml", "<Other/>"); // not packed: only the Fonts folder's own XML is
@@ -39,7 +40,14 @@ public sealed class GuiPackagerTests : IDisposable
               <DependedModules><DependedModule Id="Native" DependentVersion="v1.4.8" Optional="false"/></DependedModules>
             </Module>
             """);
-        File(Game, "Modules/SandBox/GUI/Prefabs/Clan/ClanScreen.xml", "<Prefab>clan</Prefab>");
+        File(Game, "Modules/SandBox/GUI/Prefabs/Clan/ClanScreen.xml", """
+            <Prefab>
+              <Parameters><Parameter Name="Title" DefaultValue="Clan" /><Parameter Name="Brush" /></Parameters>
+              <Window>
+                <ClanBase Id="Root"><Children><TextWidget Text="*Title" /><ListPanel><Children><TextWidget /></Children></ListPanel></Children></ClanBase>
+              </Window>
+            </Prefab>
+            """);
 
         Module(Dlc, "NavalDLC", """
             <Module><Id value="NavalDLC"/><Version value="v1.2.8"/><RequiredBaseVersion value="v1.4.8"/><ModuleType value="OfficialOptional"/>
@@ -60,11 +68,12 @@ public sealed class GuiPackagerTests : IDisposable
 
     private static void Module(string folder, string name, string subModule) => File(folder, $"Modules/{name}/SubModule.xml", subModule);
 
-    /// <summary>Sprite data in the game's shape: the first category may be marked AlwaysLoad.</summary>
+    /// <summary>Sprite data in the game's shape: the first category may be marked AlwaysLoad, and has a sprite of its own name.</summary>
     private static string SpriteData(string first, bool alwaysLoad, params string[] others) =>
-        $"<SpriteData><SpriteCategories><SpriteCategory><Name>{first}</Name>{(alwaysLoad ? "<AlwaysLoad />" : "")}</SpriteCategory>"
-        + string.Concat(others.Select(x => $"<SpriteCategory><Name>{x}</Name></SpriteCategory>"))
-        + "</SpriteCategories><SpriteParts/></SpriteData>";
+        $"<SpriteData><SpriteCategories><SpriteCategory><Name>{first}</Name><SpriteSheetCount>1</SpriteSheetCount>{(alwaysLoad ? "<AlwaysLoad />" : "")}</SpriteCategory>"
+        + string.Concat(others.Select(x => $"<SpriteCategory><Name>{x}</Name><SpriteSheetCount>1</SpriteSheetCount></SpriteCategory>"))
+        + $"</SpriteCategories><SpriteParts><SpritePart><Name>{first}_part</Name><CategoryName>{first}</CategoryName></SpritePart></SpriteParts>"
+        + $"<Sprites><GenericSprite><Name>{first}_sprite</Name><SpritePartName>{first}_part</SpritePartName></GenericSprite></Sprites></SpriteData>";
 
     private static void File(string folder, string relative, string content)
     {
@@ -101,38 +110,125 @@ public sealed class GuiPackagerTests : IDisposable
         Assert.Single(packages, x => Path.GetFileName(x) == $"{id}.1.4.8.119303.nupkg");
 
     [Fact]
-    public void The_base_package_carries_the_game_modules_XML_byte_for_byte_and_nothing_of_the_DLC()
+    public void The_base_package_carries_data_written_from_the_game_modules_and_none_of_their_files()
     {
         var entries = Entries(PackageOf(Pack(), BasePackage));
         var gui = entries.Keys.Where(x => x.StartsWith("gui/", StringComparison.Ordinal)).Order(StringComparer.Ordinal);
         Assert.Equal(
         [
-            "gui/Native/GUI/Brushes/Native.xml",
-            "gui/Native/GUI/Fonts/NativeLanguages.xml",
-            "gui/Native/GUI/NativeSpriteData.xml",
-            "gui/Native/GUI/Prefabs/Options/ExposureOptionsList.xml",
-            "gui/SandBox/GUI/Prefabs/Clan/ClanScreen.xml",
+            "gui/Native/GUI/Prefabs/Options/ExposureOptionsList.json",
+            "gui/SandBox/GUI/Prefabs/Clan/ClanScreen.json",
+            "gui/brushes.json",
             "gui/fonts.json",
             "gui/manifest.json",
             "gui/movies.json",
+            "gui/prefabs.json",
             "gui/spriteCategories.json",
+            "gui/sprites.json",
             "gui/types.json",
             "gui/uiSounds.json",
         ], gui);
-        Assert.Equal(System.IO.File.ReadAllBytes(Path.Combine(Game, "Modules/Native/GUI/Prefabs/Options/ExposureOptionsList.xml")), entries["gui/Native/GUI/Prefabs/Options/ExposureOptionsList.xml"]);
-        Assert.Equal(System.IO.File.ReadAllBytes(Path.Combine(Game, "Modules/Native/GUI/NativeSpriteData.xml")), entries["gui/Native/GUI/NativeSpriteData.xml"]);
         Assert.DoesNotContain(entries.Keys, x => x.StartsWith("lib/", StringComparison.Ordinal) || x.StartsWith("ref/", StringComparison.Ordinal));
         Assert.Equal(GuiPackager.Props(BasePackage), System.Text.Encoding.UTF8.GetString(entries[$"build/{BasePackage}.props"]));
+
+        using var tree = JsonDocument.Parse(entries["gui/Native/GUI/Prefabs/Options/ExposureOptionsList.json"]);
+        Assert.Equal("ExposureOptionsList", tree.RootElement.GetProperty("name").GetString());
+        Assert.Equal("Native", tree.RootElement.GetProperty("module").GetString());
+        Assert.Equal("""{"n":"Prefab","c":["base"]}""", tree.RootElement.GetProperty("root").GetRawText());
+
+        using var brushes = JsonDocument.Parse(entries["gui/brushes.json"]);
+        var brush = Assert.Single(brushes.RootElement.GetProperty("brushes").EnumerateArray());
+        Assert.Equal("Native.Button", brush.GetProperty("name").GetString());
+        Assert.Equal("Brushes/Native.xml", brush.GetProperty("file").GetString());
+        Assert.Equal("General\\button", brush.GetProperty("layers")[0].GetProperty("sprite").GetString());
+
+        using var sprites = JsonDocument.Parse(entries["gui/sprites.json"]);
+        Assert.Equal(["ui_fonts", "ui_order"], sprites.RootElement.GetProperty("categories").EnumerateArray().Select(x => x.GetProperty("name").GetString()));
+        Assert.Equal("ui_fonts", Assert.Single(sprites.RootElement.GetProperty("sprites").EnumerateArray()).GetProperty("category").GetString());
+    }
+
+    [Fact]
+    public void No_package_carries_an_XML_file()
+    {
+        foreach (var package in Pack())
+            Assert.DoesNotContain(Entries(package).Keys, x => x.EndsWith(".xml", StringComparison.OrdinalIgnoreCase) && x != "[Content_Types].xml");
+    }
+
+    [Fact]
+    public void The_props_list_every_JSON_file_under_gui_as_one_item_type()
+    {
+        var props = XDocument.Parse(GuiPackager.Props(BasePackage));
+        var item = Assert.Single(props.Descendants("ItemGroup").Elements());
+        Assert.Equal("BannerlordGameGuiData", item.Name.LocalName);
+        Assert.Equal("$(MSBuildThisFileDirectory)../gui/**/*.json", (string?) item.Attribute("Include"));
+        Assert.Equal(BasePackage, (string?) item.Attribute("Package"));
+    }
+
+    [Fact]
+    public void The_prefab_index_lists_every_prefab_of_the_package_with_its_tree()
+    {
+        var entries = Entries(PackageOf(Pack(), BasePackage));
+        using var index = JsonDocument.Parse(entries["gui/prefabs.json"]);
+        var prefabs = index.RootElement.GetProperty("prefabs").EnumerateArray().ToList();
+        Assert.Equal(["ExposureOptionsList", "ClanScreen"], prefabs.Select(x => x.GetProperty("name").GetString()));
+        Assert.All(prefabs, x => Assert.Contains($"gui/{x.GetProperty("file").GetString()}", entries.Keys));
+        Assert.Equal("SandBox", prefabs[1].GetProperty("module").GetString());
+    }
+
+    [Fact]
+    public void Every_tree_has_one_index_entry_whose_tags_root_tag_and_parameters_match_it()
+    {
+        foreach (var package in Pack())
+        {
+            var entries = Entries(package);
+            using var index = JsonDocument.Parse(entries["gui/prefabs.json"]);
+            var listed = index.RootElement.GetProperty("prefabs").EnumerateArray().ToList();
+            Assert.Equal(
+                entries.Keys.Where(x => x.Contains("/GUI/Prefabs/", StringComparison.Ordinal)).Order(StringComparer.Ordinal),
+                listed.Select(x => $"gui/{x.GetProperty("file").GetString()}").Order(StringComparer.Ordinal));
+
+            foreach (var entry in listed)
+            {
+                using var tree = JsonDocument.Parse(entries[$"gui/{entry.GetProperty("file").GetString()}"], new JsonDocumentOptions { MaxDepth = PrefabTrees.MaxDepth });
+                var root = tree.RootElement.GetProperty("root");
+                Assert.Equal(Nodes(root).Select(Name).Distinct().Order(StringComparer.Ordinal), entry.GetProperty("tags").EnumerateArray().Select(x => x.GetString()));
+
+                var window = Name(root) == "Window" ? root : Children(root).FirstOrDefault(x => Name(x) == "Window");
+                var first = window.ValueKind == JsonValueKind.Object ? window.GetProperty("c").EnumerateArray().FirstOrDefault() : default;
+                Assert.Equal(first.ValueKind == JsonValueKind.Object ? Name(first) : null, entry.GetProperty("rootTag").GetString());
+
+                var parameters = Children(root).Where(x => Name(x) == "Parameters").Take(1).SelectMany(Children)
+                    .Select(x => $"{Attribute(x, "Name")}={Attribute(x, "DefaultValue")}");
+                Assert.Equal(parameters, entry.GetProperty("parameters").EnumerateArray()
+                    .Select(x => $"{x.GetProperty("name").GetString()}={(x.TryGetProperty("defaultValue", out var value) ? value.GetString() : null)}"));
+            }
+        }
+
+        using var clan = JsonDocument.Parse(Entries(PackageOf(Pack("clan"), BasePackage))["gui/prefabs.json"]);
+        var screen = clan.RootElement.GetProperty("prefabs").EnumerateArray().Single(x => x.GetProperty("name").GetString() == "ClanScreen");
+        Assert.Equal("ClanBase", screen.GetProperty("rootTag").GetString());
+        Assert.Equal(2, screen.GetProperty("parameters").GetArrayLength());
+
+        static string? Name(JsonElement node) => node.GetProperty("n").GetString();
+        static string? Attribute(JsonElement node, string name) => node.TryGetProperty("a", out var a) && a.TryGetProperty(name, out var value) ? value.GetString() : null;
+        static IEnumerable<JsonElement> Children(JsonElement node) =>
+            node.TryGetProperty("c", out var c) ? c.EnumerateArray().Where(x => x.ValueKind == JsonValueKind.Object) : [];
+        static IEnumerable<JsonElement> Nodes(JsonElement node) => Children(node).SelectMany(Nodes).Prepend(node);
     }
 
     [Fact]
     public void The_DLC_package_carries_the_DLC_module_only()
     {
         var entries = Entries(PackageOf(Pack(), DlcPackage));
-        Assert.Equal("<Prefab>naval</Prefab>", System.Text.Encoding.UTF8.GetString(entries["gui/NavalDLC/GUI/Prefabs/Options/Naval/ExposureOptionsList.xml"]));
+        using var tree = JsonDocument.Parse(entries["gui/NavalDLC/GUI/Prefabs/Options/Naval/ExposureOptionsList.json"]);
+        Assert.Equal("""{"n":"Prefab","c":["naval"]}""", tree.RootElement.GetProperty("root").GetRawText());
         Assert.DoesNotContain(entries.Keys, x => x.StartsWith("gui/Native/", StringComparison.Ordinal) || x.StartsWith("gui/SandBox/", StringComparison.Ordinal));
         Assert.Contains($"build/{DlcPackage}.props", entries.Keys);
-        Assert.Equal(System.IO.File.ReadAllBytes(Path.Combine(Dlc, "Modules/NavalDLC/GUI/NavalDLCSpriteData.xml")), entries["gui/NavalDLC/GUI/NavalDLCSpriteData.xml"]);
+
+        using var sprites = JsonDocument.Parse(entries["gui/sprites.json"]);
+        var category = Assert.Single(sprites.RootElement.GetProperty("categories").EnumerateArray());
+        Assert.Equal("ui_naval_common", category.GetProperty("name").GetString());
+        Assert.Equal("NavalDLC", category.GetProperty("module").GetString());
 
         using var manifest = JsonDocument.Parse(entries["gui/manifest.json"]);
         var module = Assert.Single(manifest.RootElement.GetProperty("modules").EnumerateArray());
@@ -146,7 +242,7 @@ public sealed class GuiPackagerTests : IDisposable
     {
         using var manifest = JsonDocument.Parse(Entries(PackageOf(Pack(), BasePackage))["gui/manifest.json"]);
         var root = manifest.RootElement;
-        Assert.Equal(1, root.GetProperty("formatVersion").GetInt32());
+        Assert.Equal(2, root.GetProperty("formatVersion").GetInt32());
         Assert.Equal(BasePackage, root.GetProperty("package").GetString());
         Assert.Equal("v1.4.8", root.GetProperty("gameVersion").GetString());
         Assert.Equal(119303, root.GetProperty("changeSet").GetInt32());
@@ -189,10 +285,10 @@ public sealed class GuiPackagerTests : IDisposable
     {
         var packages = Pack(version: "e1.4.8");
         Assert.Equal(
-            ["Bannerlord.ReferenceAssemblies.GUI.v1.EarlyAccess.1.4.8.119303.nupkg", "Bannerlord.ReferenceAssemblies.GUI.v1.NavalDLC.EarlyAccess.1.4.8.119303.nupkg"],
+            ["Bannerlord.ReferenceAssemblies.GUI.v2.EarlyAccess.1.4.8.119303.nupkg", "Bannerlord.ReferenceAssemblies.GUI.v2.NavalDLC.EarlyAccess.1.4.8.119303.nupkg"],
             packages.Select(Path.GetFileName).Order(StringComparer.Ordinal));
         var entries = Entries(packages[0]);
-        Assert.Contains("build/Bannerlord.ReferenceAssemblies.GUI.v1.EarlyAccess.props", entries.Keys);
+        Assert.Contains("build/Bannerlord.ReferenceAssemblies.GUI.v2.EarlyAccess.props", entries.Keys);
     }
 
     [Fact]
@@ -207,6 +303,19 @@ public sealed class GuiPackagerTests : IDisposable
             Assert.Equal(a.Select(x => x.Key), b.Select(x => x.Key));
             Assert.All(a.Zip(b), x => Assert.Equal(x.First.Value, x.Second.Value));
         }
+    }
+
+    [Theory]
+    [InlineData("SandBox", "SandBox", true, false)]
+    [InlineData("SandBox", null, true, false)]
+    [InlineData(null, "Native", true, false)]
+    [InlineData("SandBox", "NavalDLC", false, true)]
+    [InlineData("NavalDLC", "SandBox", false, true)]
+    [InlineData("NavalDLC", "NavalDLC", false, true)]
+    public void A_movie_call_with_a_DLC_class_or_ViewModel_is_the_DLC_package_s(string? classModule, string? viewModelModule, bool inBase, bool inDlc)
+    {
+        Assert.Equal(inBase, GuiPackager.OwnsCall(classModule, viewModelModule, dlcPackage: false, x => x != "NavalDLC"));
+        Assert.Equal(inDlc, GuiPackager.OwnsCall(classModule, viewModelModule, dlcPackage: true, x => x == "NavalDLC"));
     }
 
     [Fact]
@@ -226,13 +335,13 @@ public sealed class GuiPackagerTests : IDisposable
     }
 
     [Fact]
-    public void Every_JSON_file_is_format_version_1()
+    public void Every_JSON_file_is_format_version_2()
     {
         foreach (var package in Pack())
         foreach (var (name, bytes) in Entries(package).Where(x => x.Key.EndsWith(".json", StringComparison.Ordinal)))
         {
             using var json = JsonDocument.Parse(bytes);
-            Assert.True(json.RootElement.GetProperty("formatVersion").GetInt32() == 1, $"{Path.GetFileName(package)}: {name}");
+            Assert.True(json.RootElement.GetProperty("formatVersion").GetInt32() == 2, $"{Path.GetFileName(package)}: {name}");
         }
     }
 
@@ -250,12 +359,11 @@ public sealed class GuiPackagerTests : IDisposable
     }
 
     [Fact]
-    public void The_fonts_are_the_font_files_the_game_loads_and_the_languages_XML_is_packed_as_is()
+    public void The_fonts_are_the_font_files_the_game_loads_and_neither_they_nor_the_languages_XML_are_packed()
     {
         var packages = Pack();
         var entries = Entries(PackageOf(packages, BasePackage));
-        Assert.Equal(System.IO.File.ReadAllBytes(Path.Combine(Game, "Modules/Native/GUI/Fonts/NativeLanguages.xml")), entries["gui/Native/GUI/Fonts/NativeLanguages.xml"]);
-        Assert.DoesNotContain(entries.Keys, x => x.EndsWith(".fnt", StringComparison.Ordinal));
+        Assert.DoesNotContain(entries.Keys, x => x.Contains("/Fonts/", StringComparison.Ordinal) || x.EndsWith(".fnt", StringComparison.Ordinal));
 
         using var fonts = JsonDocument.Parse(entries["gui/fonts.json"]);
         Assert.Equal(["FiraSans", "Galahad"], fonts.RootElement.GetProperty("fonts").EnumerateArray().Select(x => x.GetString()));

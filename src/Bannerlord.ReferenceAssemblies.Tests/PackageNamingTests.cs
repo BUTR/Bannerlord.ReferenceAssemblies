@@ -81,8 +81,8 @@ public sealed class PackageNamingTests
     }
 
     [Theory]
-    [InlineData("", "Bannerlord.ReferenceAssemblies.GUI.v1", "Bannerlord.ReferenceAssemblies.GUI.v1.NavalDLC")]
-    [InlineData(".EarlyAccess", "Bannerlord.ReferenceAssemblies.GUI.v1.EarlyAccess", "Bannerlord.ReferenceAssemblies.GUI.v1.NavalDLC.EarlyAccess")]
+    [InlineData("", "Bannerlord.ReferenceAssemblies.GUI.v2", "Bannerlord.ReferenceAssemblies.GUI.v2.NavalDLC")]
+    [InlineData(".EarlyAccess", "Bannerlord.ReferenceAssemblies.GUI.v2.EarlyAccess", "Bannerlord.ReferenceAssemblies.GUI.v2.NavalDLC.EarlyAccess")]
     public void GUI_package_ids_carry_the_format_version_and_put_a_DLC_module_after_it(string suffix, string expectedBase, string expectedDlc)
     {
         Assert.Equal(expectedBase, App.Game.PackageId(GuiPackager.BaseModule, suffix));
@@ -104,11 +104,38 @@ public sealed class PackageNamingTests
     [InlineData("Modules/Native/GUI/Brushes/Native.xml", true)]
     [InlineData("Modules/Native/GUI/NativeSpriteData.xml", true)]
     [InlineData("Modules/Native/GUI/Prefabs/NativeSpriteData.xml", true)]
-    [InlineData("Modules/Native/GUI/Fonts/NativeLanguages.xml", true)]
+    [InlineData("Modules/Native/GUI/Fonts/NativeLanguages.xml", false)]
     [InlineData("Modules/Native/GUI/Fonts/Galahad/Galahad.xml", false)]
     [InlineData("Modules/Native/ModuleData/items.xml", false)]
-    public void The_GUI_packages_take_prefab_brush_sprite_data_and_font_language_XML_only(string path, bool packed) =>
+    public void The_GUI_packages_are_written_from_prefab_brush_and_sprite_data_XML_only(string path, bool packed) =>
         Assert.Equal(packed, App.GuiFileFilter.IsMatch(path));
+
+    [Fact]
+    public void The_GUI_marker_is_stored_under_the_name_of_the_current_format()
+    {
+        // A new format starts every build over, so a bump of FormatVersion needs a new marker name.
+        Assert.Equal($"publishedGuiV{GuiPackager.FormatVersion}Version", BuildEntry.PublishedGuiVersionName);
+
+        var registry = Path.Combine(Path.GetTempPath(), $"registry-{Guid.NewGuid():N}.json");
+        try
+        {
+            File.WriteAllText(registry, """
+                { "appId": 261550, "builds": [ { "buildId": 1, "version": "v1.4.8", "changeSet": 119303, "branches": ["public"], "publishedGuiVersion": "1.4.8.119303" } ] }
+                """);
+            var loaded = BuildRegistry.Load(registry, App.Game);
+            Assert.Null(loaded.Find(1)!.PublishedGuiVersion);
+
+            loaded.Find(1)!.PublishedGuiVersion = "1.4.8.119303";
+            loaded.Save();
+            var saved = File.ReadAllText(registry);
+            Assert.Contains("\"publishedGuiV2Version\": \"1.4.8.119303\"", saved, StringComparison.Ordinal);
+            Assert.DoesNotContain("\"publishedGuiVersion\"", saved, StringComparison.Ordinal);
+        }
+        finally
+        {
+            File.Delete(registry);
+        }
+    }
 
     [Fact]
     public void The_GUI_marker_is_kept_apart_from_the_reference_one()

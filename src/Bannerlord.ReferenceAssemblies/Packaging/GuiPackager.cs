@@ -22,9 +22,11 @@ internal sealed record UiSoundSchema(int FormatVersion, string Prefix, List<stri
 
 /// <summary>
 /// Turns a game folder into the GUI packages: one with every module of the game itself, and one per DLC
-/// module. Each carries the prefab and brush XML as the depot has it, a manifest of its modules, the
-/// movies the build loads with their ViewModels, and the build's widget and ViewModel types. Nothing in
-/// them reaches a mod's compilation; build/&lt;id&gt;.props only lists the files for an analyzer to pick up.
+/// module. Each carries data written from the game's files, none of the files themselves: a JSON tree per
+/// prefab with an index of them, the brushes and sprites by name and what they refer to, a manifest of its
+/// modules, the movies the build loads with their ViewModels, and the build's widget and ViewModel types.
+/// Nothing in them reaches a mod's compilation; build/&lt;id&gt;.props only lists the files for an analyzer to
+/// pick up.
 ///
 /// The DLC split follows the folders the download put each app's depots in: a module under a DLC app's
 /// folder is that DLC's. The game folder holds the DLC too, copied over it as Steam installs a DLC, so the
@@ -36,14 +38,15 @@ internal sealed class GuiPackager(Paths paths)
     /// <summary>
     /// The layout of the package contents, and the version in the package ids. A published package can never
     /// be repacked under its id, so a change the consumer has to handle differently gets a new family of ids,
-    /// GUI.v2, packed again for every build, old ones included; the v1 packages stay as they are. A consumer
-    /// then references the family it reads, and finds it for every build.
+    /// packed again for every build, old ones included. Format 1 (GUI.v1) carried the game's XML byte for byte;
+    /// format 2 (GUI.v2) carries only data written from it. A consumer references the family it reads, and
+    /// finds it for every build.
     /// </summary>
-    public const int FormatVersion = 1;
+    public const int FormatVersion = 2;
 
     /// <summary>
-    /// The module part of the package ids, with the format version: Bannerlord.ReferenceAssemblies.GUI.v1, and
-    /// .GUI.v1.&lt;DlcModule&gt; for a DLC.
+    /// The module part of the package ids, with the format version: Bannerlord.ReferenceAssemblies.GUI.v2, and
+    /// .GUI.v2.&lt;DlcModule&gt; for a DLC.
     /// </summary>
     public static readonly string BaseModule = $"GUI.v{FormatVersion}";
 
@@ -90,15 +93,15 @@ internal sealed class GuiPackager(Paths paths)
         foreach (var unresolved in categories.Unresolved)
             Log.Info($"    unresolved: {unresolved.Caller}: {unresolved.Reason} ({unresolved.Via})");
 
-        var packages = new List<string>();
+        var packed = new List<PackedGui>();
         var content = new PackContent(build, scanner, movies, categories, objects);
-        packages.Add(PackOne(spec, null,
+        packed.Add(PackOne(spec, null,
             modules.Where(x => !x.Dlc).ToList(), gameFolder, content,
             owner => owner is null || !dlcModules.ContainsKey(owner)));
 
         foreach (var (module, dlcFolder) in dlcModules.OrderBy(x => x.Key, StringComparer.OrdinalIgnoreCase))
         {
-            packages.Add(PackOne(spec, module,
+            packed.Add(PackOne(spec, module,
                 modules.Where(x => string.Equals(x.Folder, module, StringComparison.OrdinalIgnoreCase)).ToList(), dlcFolder, content,
                 owner => string.Equals(owner, module, StringComparison.OrdinalIgnoreCase)));
         }
@@ -106,9 +109,14 @@ internal sealed class GuiPackager(Paths paths)
         new GuiChecks(gameFolder, modules, build, scanner).Run(
             categories,
             Fonts(gameFolder, modules, includeEngine: true).Fonts,
-            UiSounds(gameFolder, modules).Sounds);
-        return packages;
+            UiSounds(gameFolder, modules).Sounds,
+            packed.SelectMany(x => x.Brushes.Brushes).ToList(),
+            packed.SelectMany(x => x.Sprites.Sprites).ToList());
+        return packed.Select(x => x.Path).ToList();
     }
+
+    /// <summary>A package written, with the brushes and sprites it lists for the checks across all of them.</summary>
+    private sealed record PackedGui(string Path, BrushSchema Brushes, SpriteSchema Sprites);
 
     /// <summary>What the scan of the build found, split between the packages by module.</summary>
     private sealed record PackContent(GameAssemblies Build, BuildScanner Scanner, MovieSchema Movies, SpriteCategorySchema Categories,
@@ -203,7 +211,7 @@ internal sealed class GuiPackager(Paths paths)
     }
 
     /// <summary>The base package when dlc is null, else the package of that DLC module.</summary>
-    private string PackOne(PackageSpec spec, string? dlc, List<GuiModule> modules, string sourceFolder,
+    private PackedGui PackOne(PackageSpec spec, string? dlc, List<GuiModule> modules, string sourceFolder,
         PackContent content, Func<string?, bool> ownsModule)
     {
         var (build, scanner, movies, categories, objects) = content;
@@ -214,12 +222,29 @@ internal sealed class GuiPackager(Paths paths)
         Directory.CreateDirectory(staging);
 
         var files = new List<(string Source, string Target)>();
+        var prefabs = new List<PrefabEntry>();
         foreach (var module in modules)
-            files.AddRange(GuiFiles(Path.Combine(sourceFolder, "Modules", module.Folder), module.Folder));
+        foreach (var (source, target) in GuiFiles(Path.Combine(sourceFolder, "Modules", module.Folder), module.Folder).Where(x => x.Target.Contains("/GUI/Prefabs/", StringComparison.Ordinal)))
+        {
+            var file = Path.ChangeExtension(target["gui/".Length..], ".json");
+            var name = Path.GetFileNameWithoutExtension(source);
+            var document = PrefabTrees.Load(source);
+            var tree = PrefabTrees.Write(document, name, module.Folder);
+            // The tree must be the document the patches run against, or an XPath could answer otherwise.
+            if (PrefabTrees.Difference(document, PrefabTrees.Rebuild(tree)) is { } difference)
+                throw new InvalidDataException($"The tree of {module.Folder}/{target[$"gui/{module.Folder}/".Length..]} does not rebuild the prefab the game loads: {difference}");
+            var treePath = Path.Combine(staging, "gui", file);
+            Directory.CreateDirectory(Path.GetDirectoryName(treePath)!);
+            File.WriteAllBytes(treePath, tree);
+            files.Add((treePath, $"gui/{file}"));
+            prefabs.Add(PrefabTrees.Entry(document, name, module.Folder, file));
+        }
+        var brushes = BrushReader.Read(sourceFolder, modules);
+        var sprites = SpriteReader.Read(sourceFolder, modules);
 
         var manifest = new GuiManifest(FormatVersion, packageId, spec.GameVersion, spec.ChangeSet, spec.BuildId, modules);
         var ownMovies = new MovieSchema(FormatVersion,
-            movies.Calls.Where(x => ownsModule(x.ClassAssembly.Module)).ToList(),
+            movies.Calls.Where(x => OwnsCall(x.ClassAssembly.Module, x.ViewModelAssembly?.Module, dlc is not null, ownsModule)).ToList(),
             movies.Unresolved.Where(x => ownsModule(x.ClassAssembly.Module)).ToList());
         var types = TypeSchemaReader.Read(build, scanner, x => ownsModule(x.Module), objects);
         var ownCategories = new SpriteCategorySchema(FormatVersion,
@@ -231,18 +256,19 @@ internal sealed class GuiPackager(Paths paths)
         var fonts = Fonts(sourceFolder, modules, includeEngine: dlc is null);
         var sounds = UiSounds(sourceFolder, modules);
 
-        foreach (var (source, target) in files.Where(x => x.Target.EndsWith("SpriteData.xml", StringComparison.Ordinal)))
-            Log.Info($"    {target}: {new FileInfo(source).Length / 1024} KiB");
-
         AddJson("manifest.json", manifest);
         AddJson("movies.json", ownMovies);
         AddJson("types.json", types);
         AddJson("spriteCategories.json", ownCategories);
         AddJson("fonts.json", fonts);
         AddJson("uiSounds.json", sounds);
+        AddJson("prefabs.json", new PrefabIndex(FormatVersion, prefabs));
+        AddJson("brushes.json", brushes);
+        AddJson("sprites.json", sprites);
         files.Add((WriteText(staging, $"{packageId}.props", Props(packageId)), $"build/{packageId}.props"));
 
-        Log.Info($"  {packageId}: {string.Join(", ", modules.Select(m => $"{m.Folder} {files.Count(f => f.Target.StartsWith($"gui/{m.Folder}/", StringComparison.Ordinal))}"))} file(s); "
+        Log.Info($"  {packageId}: {string.Join(", ", modules.Select(m => $"{m.Folder} {prefabs.Count(x => x.Module == m.Folder)}"))} prefab(s), {brushes.Brushes.Count} brush(es), "
+                 + $"{sprites.Sprites.Count} sprite(s) in {sprites.Categories.Count} categories; "
                  + $"{ownMovies.Calls.Count} movie pair(s), {types.Widgets.Count} widget(s) ({types.Widgets.Count(x => x.Events.Count > 0)} raising events), "
                  + $"{types.ViewModels.Count} ViewModel(s), {types.Objects.Count} object type(s), {ownCategories.Classes.Count} class(es) loading sprite categories, "
                  + $"{fonts.Fonts.Count} font(s), {sounds.Sounds.Count} UI sound(s)");
@@ -252,7 +278,7 @@ internal sealed class GuiPackager(Paths paths)
             packageId,
             spec.Version,
             dlc is null ? "Bannerlord Game GUI" : $"Bannerlord Game GUI: {dlc}",
-            $"The prefab and brush XML of {(dlc is null ? "Mount & Blade II: Bannerlord" : $"the {dlc} DLC of Mount & Blade II: Bannerlord")}, with the movies it loads and the types it binds to, for analyzers that check UI patches. Adds nothing to compilation.",
+            $"The UI of {(dlc is null ? "Mount & Blade II: Bannerlord" : $"the {dlc} DLC of Mount & Blade II: Bannerlord")} as data, for analyzers that check UI patches: a JSON tree of each prefab, the brushes and sprites, the movies it loads and the types it binds to. Carries none of the game's files, and adds nothing to compilation.",
             new[] { "bannerlord", "gui", "prefabs" }.Concat(spec.FeedTags).Append(spec.ModuleVersionTag(dlc)));
         builder.DevelopmentDependency = true;
         foreach (var (source, target) in files.OrderBy(x => x.Target, StringComparer.Ordinal))
@@ -261,16 +287,26 @@ internal sealed class GuiPackager(Paths paths)
         Directory.CreateDirectory(paths.Final);
         var path = NuGetPackages.Save(builder, paths.Final);
         Log.Info($"  {Path.GetFileName(path)} ({new FileInfo(path).Length / 1024} KiB)");
-        return path;
+        return new PackedGui(path, brushes, sprites);
 
         void AddJson<T>(string name, T value) => files.Add((Write(staging, name, value), $"gui/{name}"));
     }
 
     /// <summary>
+    /// Whether a package has a movie call: the base package when neither the class nor the ViewModel is a DLC's,
+    /// a DLC's package when either is its own. A base screen that a DLC hands a ViewModel of its own loads
+    /// that pairing only with the DLC.
+    /// </summary>
+    internal static bool OwnsCall(string? classModule, string? viewModelModule, bool dlcPackage, Func<string?, bool> ownsModule) =>
+        dlcPackage
+            ? ownsModule(classModule) || viewModelModule is not null && ownsModule(viewModelModule)
+            : ownsModule(classModule) && ownsModule(viewModelModule ?? classModule);
+
+    /// <summary>
     /// The fonts the game loads. FontFactory.LoadAllFonts adds a font for every .fnt file in the Fonts folder
     /// of each resource folder, by its file name, and a brush naming any other font gets the language's
     /// default. Those folders are the engine's GUI/GauntletUI/Fonts, in the base package, and each module's
-    /// GUI/Fonts. The Languages XML beside them only maps these fonts to other languages; it is packed as is.
+    /// GUI/Fonts. The Languages XML beside them only maps these fonts to other languages, and is not packed.
     /// </summary>
     internal static FontSchema Fonts(string sourceFolder, IEnumerable<GuiModule> modules, bool includeEngine)
     {
@@ -342,7 +378,7 @@ internal sealed class GuiPackager(Paths paths)
         }
     }
 
-    /// <summary>A module's prefab and brush XML, byte for byte, under gui/&lt;module&gt;/ with the path it has in the module.</summary>
+    /// <summary>The prefab, brush and sprite data XML of a module the packages are written from, each with gui/&lt;module&gt;/ and the path it has in the module.</summary>
     internal static IEnumerable<(string Source, string Target)> GuiFiles(string moduleFolder, string module)
     {
         if (!Directory.Exists(moduleFolder))
@@ -357,14 +393,14 @@ internal sealed class GuiPackager(Paths paths)
 
     /// <summary>
     /// The files as items, and nothing else: turning them into compiler input is the consumer's business,
-    /// so the package does not tie itself to one analyzer. The first segment of %(RecursiveDir) is the module.
+    /// so the package does not tie itself to one analyzer. Every file is JSON, so one item type covers them;
+    /// the pattern is recursive because the prefab trees sit below gui/, under their module.
     /// </summary>
     internal static string Props(string packageId) =>
         $"""
          <Project>
            <ItemGroup>
-             <BannerlordGameGuiFile Include="$(MSBuildThisFileDirectory)../gui/**/*.xml" Visible="false" Package="{packageId}" />
-             <BannerlordGameGuiData Include="$(MSBuildThisFileDirectory)../gui/*.json" Visible="false" Package="{packageId}" />
+             <BannerlordGameGuiData Include="$(MSBuildThisFileDirectory)../gui/**/*.json" Visible="false" Package="{packageId}" />
            </ItemGroup>
          </Project>
 

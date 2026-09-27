@@ -60,8 +60,8 @@ internal sealed record App(
     /// </summary>
     public bool PacksGui { get; init; }
 
-    /// <summary>The prefab, brush, sprite data and font language XML a GUI package carries, by path relative to the game folder.</summary>
-    public static readonly Regex GuiFileFilter = Filter(@"^Modules/[^/]+/GUI/((Prefabs|Brushes)/.+|Fonts/[^/]+|[^/]+SpriteData)\.xml$");
+    /// <summary>The prefab, brush and sprite data XML a GUI package is written from, by path relative to the game folder.</summary>
+    public static readonly Regex GuiFileFilter = Filter(@"^Modules/[^/]+/GUI/((Prefabs|Brushes)/.+|[^/]+SpriteData)\.xml$");
 
     /// <summary>The font files, downloaded only for their names: the fonts the game loads. Not packed.</summary>
     public static readonly Regex FontFileFilter = Filter(@"^(GUI/GauntletUI|Modules/[^/]+/GUI)/Fonts/.+\.fnt$");

@@ -15,8 +15,8 @@ See the .NET documentation on [reference assemblies](https://docs.microsoft.com/
 | Dedicated server, engine only | `Bannerlord.ReferenceAssemblies.Server.Core` | `Bannerlord.ReferenceAssemblies.Server.Core.EarlyAccess` |
 | Modding Kit, everything | `Bannerlord.ReferenceAssemblies.ModdingKit` | `Bannerlord.ReferenceAssemblies.ModdingKit.EarlyAccess` |
 | Modding Kit, engine only | `Bannerlord.ReferenceAssemblies.ModdingKit.Core` | `Bannerlord.ReferenceAssemblies.ModdingKit.Core.EarlyAccess` |
-| Game GUI, without DLC | `Bannerlord.ReferenceAssemblies.GUI.v1` | `Bannerlord.ReferenceAssemblies.GUI.v1.EarlyAccess` |
-| Game GUI, one DLC module | `Bannerlord.ReferenceAssemblies.GUI.v1.NavalDLC` | `Bannerlord.ReferenceAssemblies.GUI.v1.NavalDLC.EarlyAccess` |
+| Game GUI, without DLC | `Bannerlord.ReferenceAssemblies.GUI.v2` | `Bannerlord.ReferenceAssemblies.GUI.v2.EarlyAccess` |
+| Game GUI, one DLC module | `Bannerlord.ReferenceAssemblies.GUI.v2.NavalDLC` | `Bannerlord.ReferenceAssemblies.GUI.v2.NavalDLC.EarlyAccess` |
 
 Choose the package family for the application you target. Use the all-modules package for the game,
 or select Core and individual module packages as needed; SandBox is shown above as an example.
@@ -38,10 +38,18 @@ DLC packages follow the game package version. Their `moduleVersion:` tag records
 
 The GUI packages carry the game's UI for analyzers such as `Bannerlord.UIExtenderEx.Analyzers`, which check a
 mod's prefab patches against every game version it supports. They add nothing to compilation or output, and
-are marked as development dependencies. Each package contains:
+are marked as development dependencies. They carry none of the game's files, only data written from them, all
+of it JSON. Each package contains:
 
-- `gui/<Module>/GUI/Prefabs/**/*.xml`, `gui/<Module>/GUI/Brushes/**/*.xml`, `gui/<Module>/GUI/*SpriteData.xml` and
-  `gui/<Module>/GUI/Fonts/*.xml`, copied byte for byte from the game;
+- `gui/<Module>/GUI/Prefabs/**/*.json`: each prefab as a tree of `{ "n", "a", "c" }` nodes (the element name, its
+  attributes and its children, in document order). It is the document the game loads, without comments and
+  whitespace-only text, so an XPath gives the same answer on it as in game. The deepest prefabs nest to about 72
+  JSON levels, past the default `MaxDepth` of 64 in System.Text.Json;
+- `gui/prefabs.json`: the index of the trees, with each prefab's module, file, root tag, tags and parameters;
+- `gui/brushes.json`: the brushes by name, with their base brush, font, layers, styles, animations and sounds, and
+  the sprites these name; no visual values;
+- `gui/sprites.json`: the sprite categories, with `alwaysLoad`, and every sprite a `Sprite` value can name, with its
+  category;
 - `gui/manifest.json`: the modules, with their ids, versions, types and dependencies, in load order;
 - `gui/movies.json`: the movies the game loads and the ViewModel each is loaded with, traced from the
   assemblies' method bodies;
@@ -51,17 +59,17 @@ are marked as development dependencies. Each package contains:
 - `gui/uiSounds.json`: the sound names a brush can give as `Audio`;
 - `gui/types.json`: the widget classes with the events they raise, the ViewModels, and the objects widget
   properties hold, with their members;
-- `build/<PackageId>.props`, which lists the files as `BannerlordGameGuiFile` and `BannerlordGameGuiData` items.
+- `build/<PackageId>.props`, which lists every file, `gui/**/*.json`, as `BannerlordGameGuiData` items.
 
 The base package holds every module of the game itself. Each DLC module gets a package of its own, because a
 DLC is optional: an analyzer checks a patch without it, and with it when the mod references the DLC package.
 The packages are versioned exactly like the reference packages, so a mod restores the base and the DLC package
 of the same build with the same `$(GameVersion).*`. Only the game app has GUI packages.
 
-The `v1` in the id is the format of the contents, the same number as `formatVersion` in the JSON files. A published
-package cannot be changed, so a format a consumer has to read differently is published under new ids, `GUI.v2`,
-for every build, old ones included. The `v1` packages stay as they are, and a consumer references the format it
-reads.
+The `v2` in the id is the format of the contents, the same number as `formatVersion` in the JSON files. A published
+package cannot be changed, so a format a consumer has to read differently is published under new ids for every
+build, old ones included, and a consumer references the format it reads. Format 1, `GUI.v1`, carried the game's
+prefab, brush and sprite data XML byte for byte; its packages are unlisted.
 
 ## Supported builds
 

@@ -5,8 +5,8 @@ using System.Xml.Linq;
 namespace Bannerlord.ReferenceAssemblies;
 
 /// <summary>
-/// The acceptance checks run on every pack, against the game's own prefabs and brushes: what they name
-/// should be in the packed data. Nothing here changes a package; the exceptions are logged. Most are
+/// The acceptance checks run on every pack, against the game's own prefabs and brushes, read from the XML the
+/// packages are written from: what they name should be in the packed data. Nothing here changes a package; the exceptions are logged. Most are
 /// mistakes in the game's own XML, which the data rightly says do nothing, and a new one is either such a
 /// mistake or something the scanner missed.
 /// </summary>
@@ -20,6 +20,7 @@ internal sealed class GuiChecks
     private readonly Dictionary<string, XElement?> _prefabs = new(StringComparer.Ordinal);
     private readonly List<XElement> _brushes = [];
     private readonly HashSet<string> _spriteCategories = new(StringComparer.Ordinal);
+    private readonly HashSet<string> _spriteDataSprites = new(StringComparer.Ordinal);
 
     public GuiChecks(string gameFolder, IReadOnlyList<GuiModule> modules, GameAssemblies build, BuildScanner scanner)
     {
@@ -35,21 +36,82 @@ internal sealed class GuiChecks
                 _prefabs[Path.GetFileNameWithoutExtension(source)] = XDocument.Load(source).Root;
             else if (target.Contains("/GUI/Brushes/", StringComparison.Ordinal) && XDocument.Load(source).Root is { } brushes)
                 _brushes.Add(brushes);
-            else if (target.EndsWith("SpriteData.xml", StringComparison.Ordinal))
-                foreach (var name in XDocument.Load(source).Root?.Element("SpriteCategories")?.Elements("SpriteCategory").Select(x => (string?) x.Element("Name")) ?? [])
+            else if (target.EndsWith("SpriteData.xml", StringComparison.Ordinal) && XDocument.Load(source).Root is { } spriteData)
+            {
+                foreach (var name in spriteData.Element("SpriteCategories")?.Elements("SpriteCategory").Select(x => (string?) x.Element("Name")) ?? [])
                     if (name is { Length: > 0 })
                         _spriteCategories.Add(name.Trim());
+                foreach (var name in spriteData.Element("Sprites")?.Elements().Select(x => (string?) x.Element("Name")) ?? [])
+                    if (name is not null)
+                        _spriteDataSprites.Add(name);
+            }
         }
     }
 
-    public void Run(SpriteCategorySchema categories, IReadOnlyCollection<string> fonts, IReadOnlyCollection<string> sounds)
+    public void Run(SpriteCategorySchema categories, IReadOnlyCollection<string> fonts, IReadOnlyCollection<string> sounds,
+        IReadOnlyCollection<BrushEntry> brushes, IReadOnlyCollection<SpriteEntry> sprites)
     {
         CheckCommands();
         CheckDottedAttributes();
         CheckCategoriesDefined(categories);
         CheckFonts(fonts);
         CheckSounds(sounds);
+        CheckBrushReferences(brushes);
+        CheckSprites(brushes, sprites);
     }
+
+    /// <summary>
+    /// Every brush a prefab names, by Brush, by BrushName in its constants, or by IconBrush, should be in
+    /// brushes.json. The sounds are counted against the brush XML: the packed ones should be all the loader reads.
+    /// </summary>
+    private void CheckBrushReferences(IReadOnlyCollection<BrushEntry> brushes)
+    {
+        var known = brushes.Select(x => x.Name).ToHashSet(StringComparer.Ordinal);
+        var exceptions = new SortedDictionary<string, int>(StringComparer.Ordinal);
+        var checkedCount = 0;
+        foreach (var (_, attribute) in PrefabAttributes().Where(x => x.Attribute.Name.LocalName is "Brush" or "BrushName" or "IconBrush"))
+        {
+            if (!IsLiteral(attribute.Value))
+                continue;
+            checkedCount++;
+            if (!known.Contains(attribute.Value))
+                Count(exceptions, $"{attribute.Name.LocalName}=\"{attribute.Value}\"");
+        }
+        Report("Brush check", $"{checkedCount} brush name(s) in the prefabs checked against {known.Count} brush(es), {exceptions.Values.Sum()} naming no brush; "
+                              + $"{brushes.Sum(x => x.EventSounds.Count)} event and {brushes.Sum(x => x.StateSounds.Count)} state sound(s) packed of "
+                              + $"{LoaderSounds("EventSounds")} and {LoaderSounds("StateSounds")} in the brush XML", exceptions);
+
+        // The loader reads the first SoundProperties of a brush, and in it the first list of each kind.
+        int LoaderSounds(string kind) => _brushes.SelectMany(x => x.Elements())
+            .Sum(x => x.Element("SoundProperties")?.Element(kind)?.Elements().Count() ?? 0);
+    }
+
+    /// <summary>
+    /// Every sprite the prefabs and brushes name that the game's sprite data defines should be in sprites.json.
+    /// The ones it does not define are reported: the game draws nothing for them.
+    /// </summary>
+    private void CheckSprites(IReadOnlyCollection<BrushEntry> brushes, IReadOnlyCollection<SpriteEntry> sprites)
+    {
+        var packed = sprites.Select(x => x.Name).ToHashSet(StringComparer.Ordinal);
+        var named = PrefabAttributes().Where(x => x.Attribute.Name.LocalName.EndsWith("Sprite", StringComparison.Ordinal)).Select(x => x.Attribute.Value)
+            .Concat(brushes.SelectMany(x => x.Layers.Concat(x.Styles.SelectMany(s => s.Layers))).SelectMany(x => new[] { x.Sprite, x.OverlaySprite }).OfType<string>())
+            .Where(IsLiteral)
+            .ToList();
+        var missing = new SortedDictionary<string, int>(StringComparer.Ordinal);
+        var undefined = new SortedDictionary<string, int>(StringComparer.Ordinal);
+        foreach (var sprite in named)
+        {
+            if (!_spriteDataSprites.Contains(sprite))
+                Count(undefined, sprite);
+            else if (!packed.Contains(sprite))
+                Count(missing, sprite);
+        }
+        Report("Sprite check", $"{named.Count} sprite name(s) in the prefabs and brushes checked against {packed.Count} packed sprite(s), {missing.Values.Sum()} defined by the sprite data but not packed", missing);
+        Report("  not defined by any sprite data", $"{undefined.Count} name(s)", undefined);
+    }
+
+    /// <summary>A value written out, rather than a binding (@), a constant (!) or a prefab parameter (*).</summary>
+    private static bool IsLiteral(string value) => value.Length > 0 && value[0] is not ('@' or '!' or '*');
 
     /// <summary>
     /// Every Command.&lt;name&gt; attribute should name an event the element's widget class, or one of its

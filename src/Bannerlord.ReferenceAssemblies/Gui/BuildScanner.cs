@@ -16,7 +16,8 @@ internal sealed record MovieSchema(int FormatVersion, List<MovieCall> Calls, Lis
 /// <summary>
 /// A movie and the ViewModel it is loaded with, for one concrete class that makes the call. Module and
 /// assembly are the class's: a DLC class inheriting a base screen's call is the DLC's. The ViewModel is null
-/// for a movie loaded without a data source.
+/// for a movie loaded without a data source. ViewModelAssembly is the one defining the ViewModel, which puts
+/// a base class's call with a DLC's ViewModel in the DLC's package.
 /// </summary>
 internal sealed record MovieCall(
     string Movie,
@@ -30,7 +31,8 @@ internal sealed record MovieCall(
     bool Paired,
     string Via,
     [property: JsonIgnore] GameAssembly ClassAssembly,
-    [property: JsonIgnore] IReadOnlyList<string> ViewModelBases);
+    [property: JsonIgnore] IReadOnlyList<string> ViewModelBases,
+    [property: JsonIgnore] GameAssembly? ViewModelAssembly);
 
 /// <summary>A movie name that comes from outside the build or is computed at runtime.</summary>
 internal sealed record UnresolvedMovieCall(
@@ -154,6 +156,7 @@ internal sealed partial class BuildScanner
             var flow = FlowOf(caller);
             var args = flow.Arguments(index);
             var callerName = CallerName(caller);
+            var guards = TypeGuards(caller, flow, index, args[2]);
 
             foreach (var concrete in ConcreteClasses(caller, host))
             {
@@ -174,6 +177,18 @@ internal sealed partial class BuildScanner
                 {
                     viewModels.Add(Origin.OfType(DeclaredType(caller, args[2]), null, "declared type"));
                     complete = false;
+                }
+                if (guards is not null)
+                {
+                    // Behind `is T`, the call only ever gets a T, and never null. A type the trace did not find
+                    // is not ruled out; with nothing left, the checked types themselves are what is known.
+                    var checkedViewModels = viewModels.Where(x => x.Type is { } type ? guards.Any(g => IsA(type, g)) : x.Value is not null).ToList();
+                    if (checkedViewModels.Count == 0)
+                    {
+                        checkedViewModels = guards.Select(x => Origin.OfType(TypeNames.Definition(x), x, "type check")).ToList();
+                        complete = false;
+                    }
+                    viewModels = checkedViewModels;
                 }
 
                 var classAssembly = _build.OwnerOf(concrete) ?? owner;
@@ -199,7 +214,8 @@ internal sealed partial class BuildScanner
                 foreach (var (movie, viewModel) in pairs)
                 {
                     var bases = viewModel.Type is { } viewModelType ? _build.SelfAndBases(viewModelType).Skip(1).Select(TypeNames.Definition).ToList() : [];
-                    calls.Add(new MovieCall(movie.Value!, viewModel.Value, classAssembly.Module, classAssembly.FileName, callerName, className, overrideView, gameStateScreen, paired, Via(movie), classAssembly, bases));
+                    calls.Add(new MovieCall(movie.Value!, viewModel.Value, classAssembly.Module, classAssembly.FileName, callerName, className, overrideView, gameStateScreen, paired, Via(movie), classAssembly, bases,
+                        viewModel.Type is { } definition ? _build.OwnerOf(definition) : null));
                 }
 
                 foreach (var movie in movies.Where(x => !x.Resolved))
@@ -245,6 +261,87 @@ internal sealed partial class BuildScanner
             && TypeNames.Format(signature.ParameterTypes[0], null) == StringType
             && TypeNames.Format(signature.ParameterTypes[1], null) == TypeSchemaReader.ViewModelType;
     }
+
+    /// <summary>
+    /// The types a value is checked to be on every path to an instruction, by `is T`: an isinst whose result a
+    /// branch tests, the instruction lying on the side where the value is a T. Null when some path gets there
+    /// unchecked. The check must be on the value itself: the same local, argument, or field or property of
+    /// `this`, which is not traced for a store between the check and the call. A check that the value is not
+    /// a T only rules out that one type, so it is not taken for a guard.
+    /// </summary>
+    private List<TypeDefinition>? TypeGuards(MethodDefinition method, Flow flow, int index, IReadOnlyList<int> value)
+    {
+        if (ValueKey(method, flow, value) is not { } key)
+            return null;
+        var guards = new List<TypeDefinition>();
+        var reachesStart = flow.WalkBackEdges(index, (branch, next) =>
+        {
+            var code = flow.Code[branch].OpCode.Code;
+            if (code is not (CilCode.Brtrue or CilCode.Brtrue_S or CilCode.Brfalse or CilCode.Brfalse_S) || flow.Stack(branch) is not { Count: > 0 } stack
+                || CheckedType(method, flow, stack[^1], key) is not { } type)
+                return false;
+            // brtrue jumps when the value is a T, brfalse falls through then.
+            var whenT = code is CilCode.Brtrue or CilCode.Brtrue_S ? next != branch + 1 : next == branch + 1;
+            if (!whenT)
+                return false;
+            guards.Add(type);
+            return true;
+        });
+        return reachesStart || guards.Count == 0 ? null : guards.Distinct().ToList();
+    }
+
+    /// <summary>The T of an `isinst T` on the keyed value, directly or through a local that only ever holds such a result.</summary>
+    private TypeDefinition? CheckedType(MethodDefinition method, Flow flow, IReadOnlyList<int> producers, string key)
+    {
+        var tests = new List<int>();
+        foreach (var producer in producers)
+        {
+            if (producer < 0)
+                return null;
+            var instruction = flow.Code[producer];
+            if (instruction.OpCode.Code == CilCode.Isinst)
+            {
+                tests.Add(producer);
+                continue;
+            }
+            if (!instruction.IsLdloc())
+                return null;
+            var local = instruction.GetLocalVariable(flow.Body.LocalVariables);
+            var stores = Enumerable.Range(0, flow.Code.Count).Where(i => flow.Code[i].IsStloc() && flow.Code[i].GetLocalVariable(flow.Body.LocalVariables) == local).ToList();
+            if (stores.Count == 0 || stores.Any(i => !flow.IsReachable(i) || flow.Stack(i).Count == 0 || flow.Stack(i)[^1].Any(p => p < 0 || flow.Code[p].OpCode.Code != CilCode.Isinst)))
+                return null;
+            tests.AddRange(stores.SelectMany(i => flow.Stack(i)[^1]));
+        }
+        var types = tests.Distinct().Select(x => flow.Code[x]).Select(x => x.Operand as ITypeDefOrRef).Distinct().ToList();
+        if (types is not [{ } checkedType] || tests.Any(x => ValueKey(method, flow, flow.Arguments(x)[0]) != key))
+            return null;
+        return _build.Resolve(checkedType);
+    }
+
+    /// <summary>
+    /// A name for the value some instructions push, when they all read the same one: a local, an argument, or a
+    /// field or parameterless getter of `this`. Null for anything else.
+    /// </summary>
+    private static string? ValueKey(MethodDefinition method, Flow flow, IReadOnlyList<int> producers)
+    {
+        var keys = producers.Select(x => x < 0 ? null : Key(flow.Code[x], x)).Distinct().ToList();
+        return keys is [{ } key] ? key : null;
+
+        string? Key(CilInstruction instruction, int index) => instruction switch
+        {
+            _ when instruction.IsLdloc() => $"L:{instruction.GetLocalVariable(flow.Body.LocalVariables)?.Index}",
+            _ when instruction.IsLdarg() => $"A:{instruction.GetParameter(method.Parameters)?.Index}",
+            { OpCode.Code: CilCode.Ldsfld, Operand: IFieldDescriptor field } => $"S:{GameAssemblies.FieldKey(field)}",
+            { OpCode.Code: CilCode.Ldfld, Operand: IFieldDescriptor field } when flow.IsThis(flow.Arguments(index)[0]) => $"F:{GameAssemblies.FieldKey(field)}",
+            { OpCode.Code: CilCode.Call or CilCode.Callvirt, Operand: IMethodDescriptor { Name.Value: ['g', 'e', 't', '_', ..] } getter }
+                when getter.Signature is { HasThis: true, ParameterTypes.Count: 0 } && flow.IsThis(flow.Arguments(index)[0]) => $"P:{GameAssemblies.MethodKey(getter)}",
+            _ => null,
+        };
+    }
+
+    /// <summary>Whether a type is the given class or interface, or derives from or implements it.</summary>
+    private bool IsA(TypeDefinition type, TypeDefinition target) =>
+        _build.SelfAndBases(type).Any(x => x == target || target.IsInterface && x.Interfaces.Any(i => _build.Resolve(i.Interface) == target));
 
     /// <summary>The type a compiler-generated closure or state machine belongs to.</summary>
     private static TypeDefinition HostType(TypeDefinition type)
@@ -1146,6 +1243,28 @@ internal sealed partial class BuildScanner
                     reachesStart = true;
                 foreach (var predecessor in _predecessors[i])
                     work.Push(predecessor);
+            }
+            return reachesStart;
+        }
+
+        /// <summary>
+        /// As <see cref="WalkBack"/>, but the visitor is given each step as an edge: the instruction, and the one
+        /// after it on the path, so that it can tell which way a branch went.
+        /// </summary>
+        public bool WalkBackEdges(int index, Func<int, int, bool> stop)
+        {
+            var reachesStart = _predecessors[index].Count == 0;
+            var seen = new HashSet<(int, int)>();
+            var expanded = new HashSet<int>();
+            var work = new Stack<(int Instruction, int Next)>(_predecessors[index].Select(x => (x, index)));
+            while (work.TryPop(out var edge))
+            {
+                if (!seen.Add(edge) || stop(edge.Instruction, edge.Next) || !expanded.Add(edge.Instruction))
+                    continue;
+                if (_predecessors[edge.Instruction].Count == 0)
+                    reachesStart = true;
+                foreach (var predecessor in _predecessors[edge.Instruction])
+                    work.Push((predecessor, edge.Instruction));
             }
             return reachesStart;
         }

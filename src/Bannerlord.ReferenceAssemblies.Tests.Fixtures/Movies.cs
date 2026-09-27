@@ -330,6 +330,46 @@ namespace Fixtures.Movies
 
     public class NavalMapBarLayer : MapBarLayer { }
 
+    public class OverlayVM : ViewModel { }
+
+    public class EncounterOverlayVM : OverlayVM { }
+
+    public class SettlementOverlayVM : OverlayVM { }
+
+    public class PortSettlementOverlayVM : SettlementOverlayVM { }
+
+    public static class OverlayFactory
+    {
+        public static OverlayVM Get(int kind)
+        {
+            if (kind == 0)
+                return new EncounterOverlayVM();
+            if (kind == 1)
+                return new SettlementOverlayVM();
+            return new PortSettlementOverlayVM();
+        }
+    }
+
+    /// <summary>
+    /// One field that may hold any overlay, and the movie picked by a type check on it, as
+    /// GauntletMenuOverlayBaseView does: each movie gets only the ViewModels its check lets through.
+    /// </summary>
+    public class OverlayView
+    {
+        private OverlayVM _dataSource;
+
+        public void Initialize(GauntletLayer layer, int kind)
+        {
+            _dataSource = OverlayFactory.Get(kind);
+            if (_dataSource is EncounterOverlayVM)
+                layer.LoadMovie("EncounterOverlay", _dataSource);
+            else if (_dataSource is SettlementOverlayVM)
+                layer.LoadMovie("SettlementOverlay", _dataSource);
+            else
+                layer.LoadMovie("AnyOverlay", _dataSource);
+        }
+    }
+
     public class MapBarView
     {
         protected MapBarLayer _layer;
