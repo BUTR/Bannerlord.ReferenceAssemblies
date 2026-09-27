@@ -8,7 +8,7 @@ internal sealed record UnresolvedEvent(string Caller, string Via, string Reason)
 
 internal sealed partial class BuildScanner
 {
-    private const string EventFiredKey = $"{TypeSchemaReader.WidgetType}::EventFired(";
+    private string EventFiredKey => $"{_build.WidgetType}::EventFired(";
 
     private Dictionary<TypeDefinition, (SortedSet<string> Events, List<UnresolvedEvent> Unresolved)>? _events;
     private readonly Dictionary<(TypeDefinition, PropertyDefinition), List<string>?> _assignedTypes = [];
@@ -94,7 +94,7 @@ internal sealed partial class BuildScanner
         if (!declared.IsInterface && !declared.IsAbstract && !_build.Assignable(declared).Skip(1).Any())
             return null;
         // A widget held by a widget is never reached through a dotted attribute, only objects are.
-        if (_build.DerivesFrom(declared, TypeSchemaReader.WidgetType))
+        if (_build.DerivesFrom(declared, _build.WidgetType))
             return null;
 
         var field = (property.GetMethod is { } getter ? Accessors(getter).Getter : null) ?? (property.SetMethod is { } setter ? Accessors(setter).Setter : null);

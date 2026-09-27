@@ -49,6 +49,9 @@ internal sealed record EnumType(string Type, List<string> Members);
 internal static class TypeSchemaReader
 {
     public const string WidgetType = "TaleWorlds.GauntletUI.BaseTypes.Widget";
+
+    /// <summary>The widget base type before e1.8.0 moved it, with its subclasses, into TaleWorlds.GauntletUI.BaseTypes.</summary>
+    public const string LegacyWidgetType = "TaleWorlds.GauntletUI.Widget";
     public const string ViewModelType = "TaleWorlds.Library.ViewModel";
 
     /// <summary>How many property steps from a widget the objects go: Brush, then what Brush holds, then what that holds.</summary>
@@ -69,7 +72,7 @@ internal static class TypeSchemaReader
             if (build.OwnerOf(type) is not { } owner || !include(owner) || !type.IsClass || type.IsInterface)
                 continue;
 
-            if (build.DerivesFrom(type, WidgetType))
+            if (build.DerivesFrom(type, build.WidgetType))
             {
                 var properties = new List<WidgetProperty>();
                 // The loader sets an attribute only through a public instance property.
@@ -174,7 +177,7 @@ internal static class TypeSchemaReader
         var level = new List<ObjectNode>();
         // The assigned types are named as TypeNames writes them, which FindType does not take for a generic.
         Dictionary<string, TypeDefinition>? byDefinition = null;
-        foreach (var widget in build.Types.Where(x => x.IsClass && build.DerivesFrom(x, WidgetType)))
+        foreach (var widget in build.Types.Where(x => x.IsClass && build.DerivesFrom(x, build.WidgetType)))
         foreach (var property in ReadableProperties(widget))
         {
             if (ObjectOf(build, property.Signature!.ReturnType, 1) is { } declared)
@@ -241,7 +244,7 @@ internal static class TypeSchemaReader
     private static TypeDefinition? ObjectClass(GameAssemblies build, TypeDefinition? type) =>
         type is { IsClass: true, IsInterface: false, IsEnum: false, IsValueType: false, IsDelegate: false }
         && build.OwnerOf(type) is not null
-        && !build.DerivesFrom(type, WidgetType)
+        && !build.DerivesFrom(type, build.WidgetType)
         && !build.DerivesFrom(type, ViewModelType)
         && type.Name?.ToString().StartsWith('<') != true
             ? type

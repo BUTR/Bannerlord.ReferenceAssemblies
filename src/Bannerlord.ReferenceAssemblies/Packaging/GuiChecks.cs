@@ -26,8 +26,11 @@ internal sealed class GuiChecks
     {
         _build = build;
         _scanner = scanner;
-        _widgetTypes = build.Types.Where(x => x.IsClass && build.DerivesFrom(x, TypeSchemaReader.WidgetType))
+        _widgetTypes = build.Types.Where(x => x.IsClass && build.DerivesFrom(x, build.WidgetType))
             .GroupBy(x => x.Name!.ToString(), StringComparer.Ordinal).ToDictionary(x => x.Key, x => x.First(), StringComparer.Ordinal);
+
+        if (SpriteReader.RootFile(gameFolder) is { } rootSpriteData && XDocument.Load(rootSpriteData).Root is { } rootData)
+            AddSpriteData(rootData);
 
         foreach (var module in modules)
         foreach (var (source, target) in GuiPackager.GuiFiles(Path.Combine(gameFolder, "Modules", module.Folder), module.Folder))
@@ -37,15 +40,18 @@ internal sealed class GuiChecks
             else if (target.Contains("/GUI/Brushes/", StringComparison.Ordinal) && XDocument.Load(source).Root is { } brushes)
                 _brushes.Add(brushes);
             else if (target.EndsWith("SpriteData.xml", StringComparison.Ordinal) && XDocument.Load(source).Root is { } spriteData)
-            {
-                foreach (var name in spriteData.Element("SpriteCategories")?.Elements("SpriteCategory").Select(x => (string?) x.Element("Name")) ?? [])
-                    if (name is { Length: > 0 })
-                        _spriteCategories.Add(name.Trim());
-                foreach (var name in spriteData.Element("Sprites")?.Elements().Select(x => (string?) x.Element("Name")) ?? [])
-                    if (name is not null)
-                        _spriteDataSprites.Add(name);
-            }
+                AddSpriteData(spriteData);
         }
+    }
+
+    private void AddSpriteData(XElement spriteData)
+    {
+        foreach (var name in spriteData.Element("SpriteCategories")?.Elements("SpriteCategory").Select(x => (string?) x.Element("Name")) ?? [])
+            if (name is { Length: > 0 })
+                _spriteCategories.Add(name.Trim());
+        foreach (var name in spriteData.Element("Sprites")?.Elements().Select(x => (string?) x.Element("Name")) ?? [])
+            if (name is not null)
+                _spriteDataSprites.Add(name);
     }
 
     public void Run(SpriteCategorySchema categories, IReadOnlyCollection<string> fonts, IReadOnlyCollection<string> sounds,

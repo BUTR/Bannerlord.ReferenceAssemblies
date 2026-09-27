@@ -135,6 +135,13 @@ internal sealed class GameAssemblies
 
     public TypeDefinition? FindType(string fullName) => _types.GetValueOrDefault(fullName);
 
+    /// <summary>The widget base type as this build names it: TaleWorlds.GauntletUI.BaseTypes.Widget from e1.8.0, TaleWorlds.GauntletUI.Widget before.</summary>
+    public string WidgetType => _widgetType ??= FindType(TypeSchemaReader.WidgetType) is null && FindType(TypeSchemaReader.LegacyWidgetType) is not null
+        ? TypeSchemaReader.LegacyWidgetType
+        : TypeSchemaReader.WidgetType;
+
+    private string? _widgetType;
+
     /// <summary>The types whose base type is the given one, directly.</summary>
     public IReadOnlyList<TypeDefinition> DirectlyDerived(TypeDefinition type) =>
         _derived.TryGetValue(type.FullName, out var list) ? list : [];

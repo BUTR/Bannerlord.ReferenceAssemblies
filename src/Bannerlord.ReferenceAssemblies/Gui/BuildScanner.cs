@@ -626,7 +626,7 @@ internal sealed partial class BuildScanner
     {
         if (_build.Resolve(field) is not { DeclaringType: { } declaring })
             return "built from a runtime value";
-        var fromXml = _build.DerivesFrom(declaring, TypeSchemaReader.WidgetType)
+        var fromXml = _build.DerivesFrom(declaring, _build.WidgetType)
                       && declaring.Properties.Any(x => x.SetMethod is { IsPublic: true } setter && Accessors(setter).Setter is { } set && GameAssemblies.FieldKey(set) == fieldKey);
         return fromXml ? "set from the prefab XML" : "never assigned in the build";
     }

@@ -63,6 +63,12 @@ internal sealed record App(
     /// <summary>The prefab, brush and sprite data XML a GUI package is written from, by path relative to the game folder.</summary>
     public static readonly Regex GuiFileFilter = Filter(@"^Modules/[^/]+/GUI/((Prefabs|Brushes)/.+|[^/]+SpriteData)\.xml$");
 
+    /// <summary>
+    /// The game's own sprite data at the root of the game folder, where builds up to e1.5.3 keep what later moved into
+    /// Native's and SandBox's SpriteData.xml. Read into sprites.json as Native's.
+    /// </summary>
+    public static readonly Regex RootSpriteDataFileFilter = Filter(@"^GUI/GauntletUI/spriteData\.xml$");
+
     /// <summary>The font files, downloaded only for their names: the fonts the game loads. Not packed.</summary>
     public static readonly Regex FontFileFilter = Filter(@"^(GUI/GauntletUI|Modules/[^/]+/GUI)/Fonts/.+\.fnt$");
 
@@ -121,7 +127,7 @@ internal sealed record App(
         Filter($@"^bin/{BinFolderPattern}/[^/]*TaleWorlds[^/]*$"),
         Filter($@"^Modules/[^/]+/bin/{BinFolderPattern}/[^/]+\.dll$"),
         Filter(@"^Modules/[^/]+/SubModule\.xml$"),
-        .. (PacksGui ? new[] { GuiFileFilter, FontFileFilter, SoundEventFileFilter } : Array.Empty<Regex>()),
+        .. (PacksGui ? new[] { GuiFileFilter, RootSpriteDataFileFilter, FontFileFilter, SoundEventFileFilter } : Array.Empty<Regex>()),
     ];
 
     /// <summary>
