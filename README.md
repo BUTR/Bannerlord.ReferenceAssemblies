@@ -15,6 +15,8 @@ See the .NET documentation on [reference assemblies](https://docs.microsoft.com/
 | Dedicated server, engine only | `Bannerlord.ReferenceAssemblies.Server.Core` | `Bannerlord.ReferenceAssemblies.Server.Core.EarlyAccess` |
 | Modding Kit, everything | `Bannerlord.ReferenceAssemblies.ModdingKit` | `Bannerlord.ReferenceAssemblies.ModdingKit.EarlyAccess` |
 | Modding Kit, engine only | `Bannerlord.ReferenceAssemblies.ModdingKit.Core` | `Bannerlord.ReferenceAssemblies.ModdingKit.Core.EarlyAccess` |
+| Game GUI, without DLC | `Bannerlord.ReferenceAssemblies.GUI.v1` | `Bannerlord.ReferenceAssemblies.GUI.v1.EarlyAccess` |
+| Game GUI, one DLC module | `Bannerlord.ReferenceAssemblies.GUI.v1.NavalDLC` | `Bannerlord.ReferenceAssemblies.GUI.v1.NavalDLC.EarlyAccess` |
 
 Choose the package family for the application you target. Use the all-modules package for the game,
 or select Core and individual module packages as needed; SandBox is shown above as an example.
@@ -31,6 +33,35 @@ Match the package version to the build you target. The version combines the game
 - Older builds without a changeset use the Steam build id as the fourth version component, such as `1.0.1.4842596`.
 
 DLC packages follow the game package version. Their `moduleVersion:` tag records the DLC's own version.
+
+## GUI packages
+
+The GUI packages carry the game's UI for analyzers such as `Bannerlord.UIExtenderEx.Analyzers`, which check a
+mod's prefab patches against every game version it supports. They add nothing to compilation or output, and
+are marked as development dependencies. Each package contains:
+
+- `gui/<Module>/GUI/Prefabs/**/*.xml`, `gui/<Module>/GUI/Brushes/**/*.xml`, `gui/<Module>/GUI/*SpriteData.xml` and
+  `gui/<Module>/GUI/Fonts/*.xml`, copied byte for byte from the game;
+- `gui/manifest.json`: the modules, with their ids, versions, types and dependencies, in load order;
+- `gui/movies.json`: the movies the game loads and the ViewModel each is loaded with, traced from the
+  assemblies' method bodies;
+- `gui/spriteCategories.json`: the sprite categories each screen class loads, those loaded at start, and those
+  loaded in every mission;
+- `gui/fonts.json`: the fonts the game loads, by name;
+- `gui/uiSounds.json`: the sound names a brush can give as `Audio`;
+- `gui/types.json`: the widget classes with the events they raise, the ViewModels, and the objects widget
+  properties hold, with their members;
+- `build/<PackageId>.props`, which lists the files as `BannerlordGameGuiFile` and `BannerlordGameGuiData` items.
+
+The base package holds every module of the game itself. Each DLC module gets a package of its own, because a
+DLC is optional: an analyzer checks a patch without it, and with it when the mod references the DLC package.
+The packages are versioned exactly like the reference packages, so a mod restores the base and the DLC package
+of the same build with the same `$(GameVersion).*`. Only the game app has GUI packages.
+
+The `v1` in the id is the format of the contents, the same number as `formatVersion` in the JSON files. A published
+package cannot be changed, so a format a consumer has to read differently is published under new ids, `GUI.v2`,
+for every build, old ones included. The `v1` packages stay as they are, and a consumer references the format it
+reads.
 
 ## Supported builds
 
@@ -77,14 +108,28 @@ $TOOL generate --app server --maxBuilds 4
 Use `--buildId` to regenerate specific builds, or `--dryRun` to list pending builds without downloading.
 Pass `--checkFeed` to check NuGet for published packages before selecting builds.
 
+Pass `--gui` to pack the GUI packages of each game build as well. Their build ids are written to
+`final/generated-gui-builds.txt`. To pack only the GUI packages of builds that lack them, such as builds
+published before the GUI packages existed, use `--guiOnly`:
+
+```sh
+$TOOL generate --app game --guiOnly --maxBuilds 20
+```
+
+Each DLC is downloaded to a folder of its own, `depots/<buildId>.dlc/<dlcAppId>/`, and then copied over the
+game folder, as Steam installs it.
+
 ### Record published packages
 
 After publishing, mark the builds in the registry, or refresh their publication status from NuGet:
 
 ```sh
 $TOOL mark-published --app game --buildId 21112791
+$TOOL mark-published --app game --gui --buildId 21112791
 $TOOL mark-published --app game --fromFeed
 ```
+
+The GUI packages have a published marker of their own; `--gui` sets it. `--fromFeed` refreshes both.
 
 ### Report current versions
 

@@ -67,6 +67,15 @@ internal sealed class GenerateOptions : SteamOptions
 
     [Option("includeBeta", Default = true, HelpText = "Also generate builds that only ever appeared in the beta branch.")]
     public bool IncludeBeta { get; set; } = true;
+
+    [Option("gui", Default = false, HelpText = "Also pack the GUI packages of every build packed. Their ids go to final/generated-gui-builds.txt.")]
+    public bool Gui { get; set; }
+
+    [Option("guiOnly", Default = false, HelpText = "Pack only GUI packages, for the builds whose GUI packages the feed lacks. For backfilling builds published before the GUI packages existed.")]
+    public bool GuiOnly { get; set; }
+
+    /// <summary>Which published marker decides what is outstanding.</summary>
+    public PackageKind Kind => GuiOnly ? PackageKind.Gui : PackageKind.Reference;
 }
 
 [Verb("mark-published", HelpText = "Records in the registry which builds the feed carries, so the other verbs never have to ask NuGet.")]
@@ -77,6 +86,12 @@ internal sealed class MarkPublishedOptions : CommonOptions
 
     [Option("fromFeed", Default = false, HelpText = "Read the feed and rewrite every marker from it.")]
     public bool FromFeed { get; set; }
+
+    [Option("gui", Default = false, HelpText = "Mark the GUI packages of these build ids as published, rather than their reference packages.")]
+    public bool Gui { get; set; }
+
+    /// <summary>Which published marker the build ids set.</summary>
+    public PackageKind Kind => Gui ? PackageKind.Gui : PackageKind.Reference;
 
     [Option("feedUrl", Default = NuGetFeed.DefaultUrl)]
     public string FeedUrl { get; set; } = NuGetFeed.DefaultUrl;
@@ -91,7 +106,15 @@ internal sealed class VersionsOptions : CommonOptions
 internal sealed record Paths(string Root)
 {
     public string Depot(uint buildId) => Path.Combine(Root, "depots", buildId.ToString());
+
+    /// <summary>
+    /// Where a DLC app's depots of the build come down, apart from the game's so that the GUI packages can
+    /// tell the DLC's files from the game's. They are then copied over <see cref="Depot"/>, as Steam
+    /// installs a DLC.
+    /// </summary>
+    public string DlcDepot(uint buildId, uint dlcAppId) => Path.Combine(Root, "depots", $"{buildId}.dlc", dlcAppId.ToString());
     public string Ref(uint buildId) => Path.Combine(Root, "ref", buildId.ToString());
+    public string Gui(uint buildId) => Path.Combine(Root, "gui", buildId.ToString());
     public string Final => Path.Combine(Root, "final");
 
     public string WriteFinal(string fileName, string content)

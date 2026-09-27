@@ -15,6 +15,7 @@ internal static class MarkPublishedCommand
         if (options.FromFeed)
             await ReconcileAsync(registry, app, new NuGetFeed(options.FeedUrl), ct);
 
+        var kind = options.Kind;
         var marked = 0;
         foreach (var buildId in options.BuildId)
         {
@@ -28,24 +29,40 @@ internal static class MarkPublishedCommand
                 Log.Info($"Build {buildId} has no packageable version, so nothing could have been published for it; skipping.");
                 continue;
             }
-            if (build.IsPublished)
+            if (options.Gui && !app.PacksGui)
+            {
+                Log.Info($"The {app.Name} app has no GUI packages; skipping build {buildId}.");
+                continue;
+            }
+
+            if (build.IsPublishedAs(kind))
                 continue;
 
-            build.PublishedVersion = build.PackageVersion;
+            build.SetPublishedVersion(kind, build.PackageVersion);
             marked++;
-            Log.Info($"  {build} published as {build.PackageVersion}");
+            Log.Info($"  {build} published as {build.PackageVersion}{(options.Gui ? " (GUI)" : "")}");
         }
 
         registry.Save();
-        Log.Info($"Marked {marked} build(s) as published; {registry.Builds.Count(x => x.IsPublished)} of {registry.Builds.Count(x => x.CanBeGenerated)} packageable build(s) are on the feed.");
+        var published = registry.Builds.Count(x => x.IsPublishedAs(kind));
+        Log.Info($"Marked {marked} build(s) as published; {published} of {registry.Builds.Count(x => x.CanBeGenerated)} packageable build(s) are on the feed{(options.Gui ? " with GUI packages" : "")}.");
     }
 
     /// <summary>Rewrites every published marker from the feed and saves. Marks and clears alike.</summary>
     public static async Task ReconcileAsync(BuildRegistry registry, App app, NuGetFeed feed, CancellationToken ct)
     {
-        Log.Info("Reading the feed...");
-        var (buildIds, versions) = await feed.GetPublishedAsync(app, ct);
-        Log.Info($"The feed carries {buildIds.Count} build(s) and {versions.Count} package version(s) of {app.PackagePrefix}");
+        await ReconcileAsync(registry, app, feed, PackageKind.Reference, ct);
+        if (app.PacksGui)
+            await ReconcileAsync(registry, app, feed, PackageKind.Gui, ct);
+        registry.Save();
+    }
+
+    private static async Task ReconcileAsync(BuildRegistry registry, App app, NuGetFeed feed, PackageKind kind, CancellationToken ct)
+    {
+        var what = app.PackageId(kind == PackageKind.Gui ? GuiPackager.BaseModule : null, "");
+        Log.Info($"Reading the feed for {what}...");
+        var (buildIds, versions) = await feed.GetPublishedAsync(app, kind, ct);
+        Log.Info($"The feed carries {buildIds.Count} build(s) and {versions.Count} package version(s) of {what}");
 
         var marked = 0;
         var cleared = 0;
@@ -55,16 +72,15 @@ internal static class MarkPublishedCommand
             // existed, and builds that share a version with one already published.
             var onFeed = buildIds.Contains(build.BuildId) || versions.Contains(build.PackageVersion);
             var value = onFeed ? build.PackageVersion : null;
-            if (build.PublishedVersion == value)
+            if (build.PublishedVersionOf(kind) == value)
                 continue;
 
             if (value is null)
                 cleared++;
             else
                 marked++;
-            build.PublishedVersion = value;
+            build.SetPublishedVersion(kind, value);
         }
-        registry.Save();
-        Log.Info($"Reconciled with the feed: {marked} marked, {cleared} cleared");
+        Log.Info($"Reconciled {what} with the feed: {marked} marked, {cleared} cleared");
     }
 }

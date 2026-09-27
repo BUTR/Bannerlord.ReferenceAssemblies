@@ -79,4 +79,45 @@ public sealed class PackageNamingTests
         Assert.Same(App.Server, App.Parse("Server"));
         Assert.Throws<ArgumentException>(() => App.Parse("launcher"));
     }
+
+    [Theory]
+    [InlineData("", "Bannerlord.ReferenceAssemblies.GUI.v1", "Bannerlord.ReferenceAssemblies.GUI.v1.NavalDLC")]
+    [InlineData(".EarlyAccess", "Bannerlord.ReferenceAssemblies.GUI.v1.EarlyAccess", "Bannerlord.ReferenceAssemblies.GUI.v1.NavalDLC.EarlyAccess")]
+    public void GUI_package_ids_carry_the_format_version_and_put_a_DLC_module_after_it(string suffix, string expectedBase, string expectedDlc)
+    {
+        Assert.Equal(expectedBase, App.Game.PackageId(GuiPackager.BaseModule, suffix));
+        Assert.Equal(expectedDlc, App.Game.PackageId($"{GuiPackager.BaseModule}.NavalDLC", suffix));
+    }
+
+    [Fact]
+    public void Only_the_game_packs_GUI_packages()
+    {
+        Assert.True(App.Game.PacksGui);
+        Assert.False(App.Server.PacksGui);
+        Assert.False(App.ModdingKit.PacksGui);
+        Assert.Contains(App.Game.PackageFileFilters, x => x.IsMatch("Modules/NavalDLC/GUI/Prefabs/Clan/ClanScreen.xml"));
+        Assert.DoesNotContain(App.Server.PackageFileFilters, x => x.IsMatch("Modules/Native/GUI/Prefabs/Clan/ClanScreen.xml"));
+    }
+
+    [Theory]
+    [InlineData("Modules/Native/GUI/Prefabs/Options/ExposureOptionsList.xml", true)]
+    [InlineData("Modules/Native/GUI/Brushes/Native.xml", true)]
+    [InlineData("Modules/Native/GUI/NativeSpriteData.xml", true)]
+    [InlineData("Modules/Native/GUI/Prefabs/NativeSpriteData.xml", true)]
+    [InlineData("Modules/Native/GUI/Fonts/NativeLanguages.xml", true)]
+    [InlineData("Modules/Native/GUI/Fonts/Galahad/Galahad.xml", false)]
+    [InlineData("Modules/Native/ModuleData/items.xml", false)]
+    public void The_GUI_packages_take_prefab_brush_sprite_data_and_font_language_XML_only(string path, bool packed) =>
+        Assert.Equal(packed, App.GuiFileFilter.IsMatch(path));
+
+    [Fact]
+    public void The_GUI_marker_is_kept_apart_from_the_reference_one()
+    {
+        var build = new BuildEntry { Version = "v1.4.8", ChangeSet = 119303, Branches = ["public"], PublishedVersion = "1.4.8.119303" };
+        Assert.True(build.IsPublishedAs(PackageKind.Reference));
+        Assert.False(build.IsPublishedAs(PackageKind.Gui));
+
+        build.PublishedGuiVersion = "1.4.8.119303";
+        Assert.True(build.IsPublishedAs(PackageKind.Gui));
+    }
 }

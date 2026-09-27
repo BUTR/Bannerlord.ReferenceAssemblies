@@ -98,7 +98,7 @@ internal static class UpdateCommand
             try
             {
                 // Every depot, so that a DLC's manifest comes down with the game's version files.
-                await steam.DownloadAsync(build, folder, app.VersionFileFilters, primaryDepotOnly: false, ct);
+                await steam.DownloadAsync(build, folder, dlc => options.Paths.DlcDepot(build.BuildId, dlc), app.VersionFileFilters, primaryDepotOnly: false, ct);
                 build.ContentUnavailable = false;
 
                 if (VersionReader.Read(folder) is { } read)

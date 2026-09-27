@@ -23,17 +23,21 @@ internal sealed class NuGetFeed(string url)
     ///
     /// Only packages tagged with this app count. The game and the dedicated server can report the same
     /// version, and the tag is what keeps one from marking the other's builds as published.
+    ///
+    /// The GUI packages are read apart, from the base GUI package: they are published on a schedule of
+    /// their own, so one kind being on the feed says nothing about the other.
     /// </summary>
-    public async Task<(IReadOnlySet<uint> BuildIds, IReadOnlySet<string> Versions)> GetPublishedAsync(App app, CancellationToken ct)
+    public async Task<(IReadOnlySet<uint> BuildIds, IReadOnlySet<string> Versions)> GetPublishedAsync(App app, PackageKind kind, CancellationToken ct)
     {
         var repository = Repository.Factory.GetCoreV3(url);
         var metadataResource = await repository.GetResourceAsync<PackageMetadataResource>(ct)
                                ?? throw new InvalidOperationException($"{url} offers no package metadata resource.");
         using var cache = new SourceCacheContext();
 
+        var modules = kind == PackageKind.Gui ? new string?[] { GuiPackager.BaseModule } : new string?[] { null, "Core" };
         var packageIds =
             from suffix in new[] { "", ".EarlyAccess" }
-            from module in new string?[] { null, "Core" }
+            from module in modules
             select app.PackageId(module, suffix);
 
         var buildIds = new HashSet<uint>();

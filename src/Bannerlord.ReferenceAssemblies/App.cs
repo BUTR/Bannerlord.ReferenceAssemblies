@@ -24,7 +24,10 @@ internal sealed record App(
         PackagePrefix: "Bannerlord.ReferenceAssemblies",
         Title: "Bannerlord Game Reference Assemblies",
         Description: "Contains stripped metadata-only libraries for building against Mount & Blade II: Bannerlord.",
-        Tags: "bannerlord game reference assemblies");
+        Tags: "bannerlord game reference assemblies")
+    {
+        PacksGui = true,
+    };
 
     public static readonly App Server = new(
         Name: "server",
@@ -50,6 +53,22 @@ internal sealed record App(
 
     public static readonly IReadOnlyList<App> All = [Game, Server, ModdingKit];
 
+    /// <summary>
+    /// Whether builds of this app also become GUI packages: the prefab and brush XML, and what the
+    /// assemblies say about the movies and types it binds to. The dedicated server has no UI, and the
+    /// Modding Kit's GUI files have no consumer yet.
+    /// </summary>
+    public bool PacksGui { get; init; }
+
+    /// <summary>The prefab, brush, sprite data and font language XML a GUI package carries, by path relative to the game folder.</summary>
+    public static readonly Regex GuiFileFilter = Filter(@"^Modules/[^/]+/GUI/((Prefabs|Brushes)/.+|Fonts/[^/]+|[^/]+SpriteData)\.xml$");
+
+    /// <summary>The font files, downloaded only for their names: the fonts the game loads. Not packed.</summary>
+    public static readonly Regex FontFileFilter = Filter(@"^(GUI/GauntletUI|Modules/[^/]+/GUI)/Fonts/.+\.fnt$");
+
+    /// <summary>The sound event data, downloaded only for the UI sound names in it. Not packed.</summary>
+    public static readonly Regex SoundEventFileFilter = Filter(@"^Modules/[^/]+/ModuleData/sound_event_data[^/]*\.xml$");
+
     /// <summary>The depot that holds the binaries; the game version is read from it.</summary>
     public uint PrimaryDepotId => DepotIds[0];
 
@@ -69,21 +88,32 @@ internal sealed record App(
         module is null ? $"{PackagePrefix}{suffix}" : $"{PackagePrefix}.{module}{suffix}";
 
     /// <summary>The packages a Steam build of this app becomes.</summary>
-    public PackageSpec ForBuild(BuildEntry build) => new(
-        PackagePrefix,
-        build.PackageSuffix ?? throw new InvalidOperationException($"Build {build.BuildId} cannot be packaged: {build.Version ?? "no version"}"),
-        build.PackageVersion,
-        Title,
-        Description,
-        [.. Tags.Split(' '), $"buildId:{build.BuildId}", $"appId:{AppId}"],
-        BinFolders,
-        build.Version!,
-        build.ModuleVersions ?? new Dictionary<string, string>());
+    public PackageSpec ForBuild(BuildEntry build)
+    {
+        string[] feedTags = [$"buildId:{build.BuildId}", $"appId:{AppId}"];
+        return new PackageSpec(
+            PackagePrefix,
+            build.PackageSuffix ?? throw new InvalidOperationException($"Build {build.BuildId} cannot be packaged: {build.Version ?? "no version"}"),
+            build.PackageVersion,
+            Title,
+            Description,
+            [.. Tags.Split(' '), .. feedTags],
+            BinFolders,
+            build.Version!,
+            build.ModuleVersions ?? new Dictionary<string, string>())
+        {
+            BuildId = build.BuildId,
+            ChangeSet = build.ChangeSet,
+            FeedTags = feedTags,
+        };
+    }
 
     /// <summary>
-    /// What to download for packaging: the engine assemblies, every module's assemblies, and the files
-    /// that name the build. The dedicated server keeps all of its assemblies in the engine folder and has
-    /// no Version.xml, so for it the module manifests are the only place the version can be read from.
+    /// What to download for packaging: the engine assemblies, every module's assemblies, the files that
+    /// name the build, and for an app that packs GUI packages, the GUI XML with the font and sound event
+    /// files the GUI packages read names from. The dedicated server keeps all of its assemblies in the
+    /// engine folder and has no Version.xml, so for it the module manifests are the only place the version
+    /// can be read from.
     /// </summary>
     public IReadOnlyList<Regex> PackageFileFilters =>
     [
@@ -91,6 +121,7 @@ internal sealed record App(
         Filter($@"^bin/{BinFolderPattern}/[^/]*TaleWorlds[^/]*$"),
         Filter($@"^Modules/[^/]+/bin/{BinFolderPattern}/[^/]+\.dll$"),
         Filter(@"^Modules/[^/]+/SubModule\.xml$"),
+        .. (PacksGui ? new[] { GuiFileFilter, FontFileFilter, SoundEventFileFilter } : Array.Empty<Regex>()),
     ];
 
     /// <summary>

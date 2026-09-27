@@ -7,7 +7,7 @@ public sealed class GenerateSelectionTests
 {
     private static readonly DateTimeOffset Now = new(2026, 9, 13, 12, 0, 0, TimeSpan.Zero);
 
-    private static BuildEntry Build(uint id, string version, int changeSet, DateTimeOffset date, string[]? branches = null, string? dlcManifest = null, string? published = null, bool unavailable = false) => new()
+    private static BuildEntry Build(uint id, string version, int changeSet, DateTimeOffset date, string[]? branches = null, string? dlcManifest = null, string? published = null, bool unavailable = false, string? publishedGui = null) => new()
     {
         BuildId = id,
         Version = version,
@@ -15,14 +15,15 @@ public sealed class GenerateSelectionTests
         Date = date,
         Branches = [.. branches ?? ["public"]],
         PublishedVersion = published,
+        PublishedGuiVersion = publishedGui,
         ContentUnavailable = unavailable,
         Manifests = dlcManifest is null
             ? new Dictionary<string, string> { ["261551"] = $"m{id}" }
             : new Dictionary<string, string> { ["261551"] = $"m{id}", ["2927200"] = dlcManifest },
     };
 
-    private static List<uint> Choose(App app, IEnumerable<BuildEntry> builds, IEnumerable<uint>? live = null, int maxBuilds = 4, bool includeBeta = true) =>
-        GenerateCommand.Choose(builds.ToList(), app, (live ?? []).ToHashSet(), includeBeta, maxBuilds, Now).Select(x => x.BuildId).ToList();
+    private static List<uint> Choose(App app, IEnumerable<BuildEntry> builds, IEnumerable<uint>? live = null, int maxBuilds = 4, bool includeBeta = true, PackageKind kind = PackageKind.Reference) =>
+        GenerateCommand.Choose(builds.ToList(), app, (live ?? []).ToHashSet(), includeBeta, maxBuilds, Now, kind).Select(x => x.BuildId).ToList();
 
     [Fact]
     public void Published_builds_and_builds_sharing_a_published_package_version_are_left_out()
@@ -119,4 +120,23 @@ public sealed class GenerateSelectionTests
         var serverFresh = Build(4, "v1.2.12", 201, Now.AddMinutes(-5), dlcManifest: "same");
         Assert.False(GenerateCommand.DlcMayBeTrailing(serverFresh, [serverOld, serverFresh], App.Server, Now));
     }
+
+    [Fact]
+    public void The_GUI_backfill_picks_builds_by_the_GUI_marker_under_the_same_rules()
+    {
+        var builds = new[]
+        {
+            Build(1, "v1.4.7", 117484, Now.AddDays(-30), published: "1.4.7.117484"),
+            Build(2, "v1.4.8", 119303, Now.AddDays(-10), published: "1.4.8.119303", publishedGui: "1.4.8.119303"),
+            Build(3, "v1.5.0", 120240, Now.AddDays(-5), published: "1.5.0.120240", unavailable: true),
+            Build(4, "v1.4.7", 117484, Now.AddDays(-29), published: "1.4.7.117484"), // the same package version as build 1
+            Build(5, "v1.4.6", 117000, Now.AddDays(-40), branches: ["perf_test"], published: "1.4.6.117000"),
+        };
+        Assert.Equal([1u], Choose(App.Game, builds, kind: PackageKind.Gui));
+        Assert.Empty(Choose(App.Game, builds));
+    }
+
+    [Fact]
+    public void Apps_without_GUI_packages_have_no_GUI_backfill() =>
+        Assert.Empty(Choose(App.Server, [Build(1, "v1.4.8", 119303, Now.AddDays(-10), published: "1.4.8.119303")], kind: PackageKind.Gui));
 }

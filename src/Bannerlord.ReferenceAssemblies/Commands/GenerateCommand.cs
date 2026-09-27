@@ -13,6 +13,16 @@ internal static class GenerateCommand
     {
         var app = options.App;
         var paths = options.Paths;
+        var kind = options.Kind;
+        if (options.GuiOnly && !app.PacksGui)
+        {
+            Log.Info($"The {app.Name} app has no GUI packages; nothing to do.");
+            return;
+        }
+        if (options.Gui && !app.PacksGui)
+            Log.Info($"The {app.Name} app has no GUI packages; packing the reference packages only.");
+        var packGui = app.PacksGui && (options.Gui || options.GuiOnly);
+
         var registry = BuildRegistry.Load(options.RegistryPath, app);
 
         var candidates = registry.Builds.Where(x => x.CanBeGenerated).ToList();
@@ -38,7 +48,7 @@ internal static class GenerateCommand
                 if (options.CheckFeed)
                     await MarkPublishedCommand.ReconcileAsync(registry, app, new NuGetFeed(options.FeedUrl), ct);
 
-                Log.Info($"{candidates.Count(x => x.IsPublished)} build(s) already published according to the registry");
+                Log.Info($"{candidates.Count(x => x.IsPublishedAs(kind))} build(s) already published{(kind == PackageKind.Gui ? " with GUI packages" : "")} according to the registry");
 
                 // The current tip of a branch is perishable: once the branch moves on, Steam stops serving
                 // it unless it was public. Public history can be fetched any time, so tips go first and
@@ -53,12 +63,12 @@ internal static class GenerateCommand
                 }
 
                 var now = DateTimeOffset.UtcNow;
-                foreach (var held in candidates.Where(x => !x.IsPublished && DlcMayBeTrailing(x, registry.Builds, app, now)))
+                foreach (var held in candidates.Where(x => !x.IsPublishedAs(kind) && DlcMayBeTrailing(x, registry.Builds, app, now)))
                     Log.Info($"Build {held} is {(now - held.Date).TotalMinutes:F0} minutes old and still carries the previous build's DLC manifest; left for a later run.");
-                if (candidates.Count(x => !x.IsPublished && x.IsReleaseLike && x.ContentUnavailable) is > 0 and var refused)
+                if (candidates.Count(x => !x.IsPublishedAs(kind) && x.IsReleaseLike && x.ContentUnavailable) is > 0 and var refused)
                     Log.Info($"{refused} build(s) Steam refused before are left out; update --retryUnavailable or generate --buildId asks again.");
 
-                toGenerate = Choose(registry.Builds, app, live, options.IncludeBeta, options.MaxBuilds, now);
+                toGenerate = Choose(registry.Builds, app, live, options.IncludeBeta, options.MaxBuilds, now, kind);
             }
 
             if (options.DryRun)
@@ -82,7 +92,9 @@ internal static class GenerateCommand
 
             steam ??= options.CreateSteam();
             var packager = new ReferencePackager(paths);
+            var guiPackager = new GuiPackager(paths);
             var generated = new List<BuildEntry>();
+            var generatedGui = new List<BuildEntry>();
             var failed = 0;
             foreach (var build in toGenerate)
             {
@@ -93,7 +105,7 @@ internal static class GenerateCommand
                 {
                     var depot = paths.Depot(build.BuildId);
                     Log.Info($"Downloading {build}...");
-                    await steam.DownloadAsync(build, depot, app.PackageFileFilters, primaryDepotOnly: false, ct);
+                    await steam.DownloadAsync(build, depot, dlc => paths.DlcDepot(build.BuildId, dlc), app.PackageFileFilters, primaryDepotOnly: false, ct);
                     build.ContentUnavailable = false;
 
                     // The binaries are authoritative: a registry version that disagrees would mislabel the package.
@@ -110,9 +122,30 @@ internal static class GenerateCommand
                     build.ModuleVersions = VersionReader.ReadModuleVersions(depot);
                     registry.Save();
 
-                    Log.Info($"Packing {build} as {build.PackageVersion}...");
-                    packager.Pack(depot, paths.Ref(build.BuildId), app.ForBuild(build));
-                    generated.Add(build);
+                    if (!options.GuiOnly)
+                    {
+                        Log.Info($"Packing {build} as {build.PackageVersion}...");
+                        packager.Pack(depot, paths.Ref(build.BuildId), app.ForBuild(build));
+                        generated.Add(build);
+                    }
+
+                    // Apart, because the reference packages are in final/ by now and will be pushed; a
+                    // GUI failure must not keep them from being recorded.
+                    if (packGui)
+                    {
+                        try
+                        {
+                            Log.Info($"Packing the GUI packages of {build} as {build.PackageVersion}...");
+                            var dlcFolders = app.DlcAppIds.Select(dlc => paths.DlcDepot(build.BuildId, dlc)).Where(Directory.Exists).ToList();
+                            guiPackager.Pack(depot, dlcFolders, app.ForBuild(build));
+                            generatedGui.Add(build);
+                        }
+                        catch (Exception ex) when (ex is not OperationCanceledException)
+                        {
+                            failed++;
+                            Log.Info($"The GUI packages of build {build.BuildId} failed: {ex.Message}");
+                        }
+                    }
                 }
                 catch (SteamContentException ex)
                 {
@@ -133,8 +166,16 @@ internal static class GenerateCommand
 
             // The workflow feeds these ids to mark-published once the push has actually succeeded, so
             // nothing is recorded as published that never reached the feed.
-            var list = paths.WriteBuildList("generated-builds.txt", generated);
-            Log.Info($"Generated {generated.Count} build(s); ids written to {list}");
+            if (!options.GuiOnly)
+            {
+                var list = paths.WriteBuildList("generated-builds.txt", generated);
+                Log.Info($"Generated {generated.Count} build(s); ids written to {list}");
+            }
+            if (packGui)
+            {
+                var list = paths.WriteBuildList("generated-gui-builds.txt", generatedGui);
+                Log.Info($"Generated the GUI packages of {generatedGui.Count} build(s); ids written to {list}");
+            }
         }
         finally
         {
@@ -144,15 +185,19 @@ internal static class GenerateCommand
 
     /// <summary>
     /// The builds a scheduled run packs, in order: what the feed lacks, of the builds modders build against,
-    /// one per package version, the current branch tips first and then the backlog newest first.
+    /// one per package version, the current branch tips first and then the backlog newest first. The kind
+    /// says which published marker counts, so the GUI backfill follows the same rules.
     /// </summary>
-    internal static List<BuildEntry> Choose(IReadOnlyList<BuildEntry> builds, App app, IReadOnlySet<uint> live, bool includeBeta, int maxBuilds, DateTimeOffset now)
+    internal static List<BuildEntry> Choose(IReadOnlyList<BuildEntry> builds, App app, IReadOnlySet<uint> live, bool includeBeta, int maxBuilds, DateTimeOffset now, PackageKind kind = PackageKind.Reference)
     {
+        if (kind == PackageKind.Gui && !app.PacksGui)
+            return [];
+
         var candidates = builds.Where(x => x.CanBeGenerated).ToList();
-        var published = candidates.Where(x => x.IsPublished).Select(x => x.PackageVersion).ToHashSet(StringComparer.OrdinalIgnoreCase);
+        var published = candidates.Where(x => x.IsPublishedAs(kind)).Select(x => x.PackageVersion).ToHashSet(StringComparer.OrdinalIgnoreCase);
 
         return candidates
-            .Where(x => !x.IsPublished && !published.Contains(x.PackageVersion))
+            .Where(x => !x.IsPublishedAs(kind) && !published.Contains(x.PackageVersion))
             .Where(x => x.IsReleaseLike)
             .Where(x => includeBeta || !x.IsBeta)
             // A build Steam refused last time would fail again and take the slot of one it would serve.

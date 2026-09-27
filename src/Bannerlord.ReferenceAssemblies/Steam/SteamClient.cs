@@ -88,16 +88,18 @@ internal sealed class SteamClient(App app, string login, string password) : IDis
 
     /// <summary>
     /// Downloads the files of a build that match the filters, by the manifest ids the registry recorded.
+    /// The game's depots go to <paramref name="directory"/>, each DLC app's to a folder of its own, which is
+    /// then copied over the game folder the way Steam installs a DLC. So the game folder holds the whole
+    /// build, and the DLC folder still says which of its files the DLC brought.
     /// Throws <see cref="SteamContentException"/> when Steam refuses to serve a manifest.
     /// </summary>
-    public async Task DownloadAsync(BuildEntry build, string directory, IReadOnlyList<Regex> files, bool primaryDepotOnly, CancellationToken ct)
+    public async Task DownloadAsync(BuildEntry build, string directory, Func<uint, string> dlcDirectory, IReadOnlyList<Regex> files, bool primaryDepotOnly, CancellationToken ct)
     {
         await ConnectAsync();
         Directory.CreateDirectory(directory);
 
         var config = ContentDownloader.Config;
         config.MaxDownloads = 4;
-        config.InstallDirectory = directory;
         config.UsingFileList = true;
         config.FilesToDownload = [];
         config.FilesToDownloadRegex = files.ToList();
@@ -108,9 +110,15 @@ internal sealed class SteamClient(App app, string login, string password) : IDis
             .Where(x => !primaryDepotOnly || x.DepotId == app.PrimaryDepotId)
             .GroupBy(x => OwningApp(x.DepotId));
 
+        var dlcFolders = new List<string>();
         foreach (var group in byApp)
         {
             var manifests = group.Select(x => (x.DepotId, x.ManifestId)).ToList();
+            var folder = group.Key == app.AppId ? directory : dlcDirectory(group.Key);
+            if (group.Key != app.AppId)
+                dlcFolders.Add(folder);
+            Directory.CreateDirectory(folder);
+            config.InstallDirectory = folder;
 
             // A manifest must be requested under the branch that points at it now; a retired manifest is
             // served under public only if it was public once. Ask for the request code first so a refusal
@@ -135,7 +143,31 @@ internal sealed class SteamClient(App app, string login, string password) : IDis
                 if (!DepotConfigStore.Instance.InstalledManifestIDs.TryGetValue(depotId, out var installed) || installed != manifestId)
                     throw new IOException($"Depot {depotId}, manifest {manifestId} did not finish downloading.");
         }
+
+        foreach (var folder in dlcFolders)
+            InstallDlc(folder, directory);
     }
+
+    /// <summary>
+    /// Copies a DLC's downloaded files over the game folder, overwriting as Steam does, so that everything
+    /// reading a build keeps reading one folder. DepotDownloader's own bookkeeping stays behind.
+    /// </summary>
+    internal static void InstallDlc(string dlcFolder, string gameFolder)
+    {
+        foreach (var file in Directory.EnumerateFiles(dlcFolder, "*", SearchOption.AllDirectories))
+        {
+            var relative = Path.GetRelativePath(dlcFolder, file);
+            if (relative.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)[0] == ContentDownloaderConfigDir)
+                continue;
+
+            var target = Path.Combine(gameFolder, relative);
+            Directory.CreateDirectory(Path.GetDirectoryName(target)!);
+            File.Copy(file, target, true);
+        }
+    }
+
+    /// <summary>The folder DepotDownloader keeps its state in, inside every install directory.</summary>
+    internal const string ContentDownloaderConfigDir = ".DepotDownloader";
 
     private static KeyValue? Depots(uint appId) => ContentDownloader.GetSteam3AppSection(appId, EAppInfoSection.Depots);
 

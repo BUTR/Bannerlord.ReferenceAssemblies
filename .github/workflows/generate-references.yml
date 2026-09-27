@@ -31,6 +31,14 @@ on:
         description: "Read NuGet first and reconcile the registry's published markers"
         type: boolean
         default: false
+      gui:
+        description: "Also pack the game's GUI packages for every build packed"
+        type: boolean
+        default: true
+      guiOnly:
+        description: "Backfill: pack and publish only the game's GUI packages of builds whose GUI packages the feed lacks"
+        type: boolean
+        default: false
 
 # One Steam session at a time: a second login with the same account replaces the first.
 concurrency:
@@ -53,7 +61,8 @@ jobs:
       max-parallel: 1
       fail-fast: false
       matrix:
-        app: ${{ github.event.inputs.app == 'game' && fromJSON('["game"]') || github.event.inputs.app == 'server' && fromJSON('["server"]') || github.event.inputs.app == 'moddingkit' && fromJSON('["moddingkit"]') || fromJSON('["game", "server", "moddingkit"]') }}
+        # A GUI backfill is the game's alone: no other app has GUI packages.
+        app: ${{ github.event.inputs.guiOnly == 'true' && fromJSON('["game"]') || github.event.inputs.app == 'game' && fromJSON('["game"]') || github.event.inputs.app == 'server' && fromJSON('["server"]') || github.event.inputs.app == 'moddingkit' && fromJSON('["moddingkit"]') || fromJSON('["game", "server", "moddingkit"]') }}
     permissions:
       id-token: write
       contents: write
@@ -79,11 +88,13 @@ jobs:
     - name: Build
       run: dotnet build src/Bannerlord.ReferenceAssemblies/Bannerlord.ReferenceAssemblies.csproj --configuration Release
 
-    - name: Generate ${{matrix.app}} reference assemblies
+    - name: Generate ${{matrix.app}} ${{github.event.inputs.guiOnly == 'true' && 'GUI packages' || 'reference assemblies'}}
       run: >-
         $TOOL generate --app ${{matrix.app}}
         --maxBuilds ${{github.event.inputs.maxBuilds || 4}}
         ${{github.event.inputs.checkFeed == 'true' && '--checkFeed' || ''}}
+        ${{github.event.inputs.gui != 'false' && '--gui' || ''}}
+        ${{github.event.inputs.guiOnly == 'true' && '--guiOnly' || ''}}
         ${{github.event.inputs.buildId && format('--buildId {0}', github.event.inputs.buildId) || ''}}
 
     - name: Check for packages
@@ -114,8 +125,17 @@ jobs:
 
     # Only after the push, so nothing is recorded as published that never reached the feed.
     - name: Record what was published
-      if: steps.packages.outputs.exists == 'true'
+      if: steps.packages.outputs.exists == 'true' && github.event.inputs.guiOnly != 'true'
       run: $TOOL mark-published --app ${{matrix.app}} --buildId $(cat $FINAL/generated-builds.txt)
+
+    # The GUI packages have a marker of their own, fed only the builds whose GUI packages were all packed.
+    - name: Record the GUI packages published
+      if: steps.packages.outputs.exists == 'true' && hashFiles(format('{0}/generated-gui-builds.txt', env.FINAL)) != ''
+      run: |
+        ids=$(cat $FINAL/generated-gui-builds.txt)
+        if [ -n "$ids" ]; then
+          $TOOL mark-published --app ${{matrix.app}} --gui --buildId $ids
+        fi
 
     - name: Commit the registry
       if: steps.packages.outputs.exists == 'true'
@@ -127,14 +147,15 @@ jobs:
         git config user.name "butr-registry-bot[bot]"
         git config user.email "328763592+butr-registry-bot[bot]@users.noreply.github.com"
         git add builds
-        git commit -m "chore: record published ${{matrix.app}} reference assemblies"
+        git commit -m "chore: record published ${{matrix.app}} ${{github.event.inputs.guiOnly == 'true' && 'GUI packages' || 'reference assemblies'}}"
         git pull --rebase
         git push
 
     # The game's current stable and beta versions, now that their packages are on the feed. BUTR/.github
-    # sets the org variables from them, waits for NuGet to index, and tells the mod repositories.
+    # sets the org variables from them, waits for NuGet to index, and tells the mod repositories. A GUI
+    # backfill publishes no new game version, so it tells nobody anything.
     - name: Current game versions
-      if: steps.packages.outputs.exists == 'true' && matrix.app == 'game'
+      if: steps.packages.outputs.exists == 'true' && matrix.app == 'game' && github.event.inputs.guiOnly != 'true'
       id: versions
       run: $TOOL versions --app game
 

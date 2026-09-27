@@ -3,7 +3,6 @@ using BepInEx.AssemblyPublicizer;
 using NuGet.Frameworks;
 using NuGet.Packaging;
 using NuGet.Packaging.Core;
-using NuGet.Packaging.Licenses;
 using NuGet.Versioning;
 
 using System.Reflection.Metadata;
@@ -24,6 +23,15 @@ internal sealed record PackageSpec(
     string GameVersion,
     IReadOnlyDictionary<string, string> ModuleVersions)
 {
+    /// <summary>The Steam build the packages are made from; the GUI manifest records it.</summary>
+    public uint BuildId { get; init; }
+
+    /// <summary>The build's changeset, or null for the launch-era builds that record none.</summary>
+    public int? ChangeSet { get; init; }
+
+    /// <summary>The buildId and appId tags among <see cref="Tags"/>, which the feed check reads back; see NuGetFeed.</summary>
+    public IReadOnlyList<string> FeedTags { get; init; } = [];
+
     /// <summary>Package id of the meta package (module null), of Core, or of a module.</summary>
     public string PackageId(string? module) => module is null ? $"{Prefix}{Suffix}" : $"{Prefix}.{module}{Suffix}";
 
@@ -45,8 +53,6 @@ internal sealed record PackageSpec(
 /// </summary>
 internal sealed class ReferencePackager(Paths paths)
 {
-    private const string RepositoryUrl = "https://github.com/BUTR/Bannerlord.ReferenceAssemblies.git";
-
     /// <summary>The same as assembly-publicizer --strip-only.</summary>
     private static readonly AssemblyPublicizerOptions StripOnly = new()
     {
@@ -243,31 +249,13 @@ internal sealed class ReferencePackager(Paths paths)
         return Save(builder);
     }
 
-    private static PackageBuilder NewPackage(PackageSpec spec, string id, string moduleVersionTag)
-    {
-        var builder = new PackageBuilder
-        {
-            Id = id,
-            Version = NuGetVersion.Parse(spec.Version),
-            Title = spec.Title,
-            Description = spec.Description,
-            Repository = new RepositoryMetadata("git", RepositoryUrl, branch: null!, commit: null!),
-            LicenseMetadata = new LicenseMetadata(LicenseType.Expression, "MIT", NuGetLicenseExpression.Parse("MIT"), [], LicenseMetadata.CurrentVersion),
-            MinClientVersion = new Version(3, 3),
-        };
-        builder.Authors.Add("BUTR");
-        builder.Owners.Add("BUTR");
-        // The feed check reads the buildId and appId tags back; see NuGetFeed.
-        foreach (var tag in spec.Tags.Append(moduleVersionTag))
-            builder.Tags.Add(tag);
-        return builder;
-    }
+    // The feed check reads the buildId and appId tags back; see NuGetFeed.
+    private static PackageBuilder NewPackage(PackageSpec spec, string id, string moduleVersionTag) =>
+        NuGetPackages.New(id, spec.Version, spec.Title, spec.Description, spec.Tags.Append(moduleVersionTag));
 
     private string Save(PackageBuilder builder)
     {
-        var path = Path.Combine(paths.Final, $"{builder.Id}.{builder.Version!.ToNormalizedString()}.nupkg");
-        using var stream = File.Create(path);
-        builder.Save(stream);
+        var path = NuGetPackages.Save(builder, paths.Final);
         Log.Info($"  {Path.GetFileName(path)}");
         return path;
     }

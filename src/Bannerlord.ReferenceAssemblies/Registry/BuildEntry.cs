@@ -2,6 +2,13 @@ using System.Text.Json.Serialization;
 
 namespace Bannerlord.ReferenceAssemblies;
 
+/// <summary>The two kinds of package a build becomes, each with a published marker of its own.</summary>
+internal enum PackageKind
+{
+    Reference,
+    Gui,
+}
+
 /// <summary>
 /// One Steam build of the app. Manifest ids are strings so that JSON readers without 64-bit integers
 /// keep them intact.
@@ -40,6 +47,15 @@ internal sealed class BuildEntry
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? PublishedVersion { get; set; }
+
+    /// <summary>
+    /// The package version of this build's GUI packages last pushed to the feed, of the current format's ids
+    /// (GUI.v1). Kept apart from <see cref="PublishedVersion"/> because the GUI packages started long after
+    /// the reference packages, and every build published before then still lacks them. A new format, with
+    /// ids of its own, starts every build over again, so it needs a marker of its own.
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? PublishedGuiVersion { get; set; }
 
     /// <summary>The files came down but carried no version. Not retried.</summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
@@ -80,6 +96,20 @@ internal sealed class BuildEntry
     /// <summary>Whether the feed already carries this build at the version it currently reports.</summary>
     [JsonIgnore]
     public bool IsPublished => CanBeGenerated && PublishedVersion == PackageVersion;
+
+    /// <summary>The published marker of the reference packages or of the GUI packages.</summary>
+    public string? PublishedVersionOf(PackageKind kind) => kind == PackageKind.Gui ? PublishedGuiVersion : PublishedVersion;
+
+    public void SetPublishedVersion(PackageKind kind, string? value)
+    {
+        if (kind == PackageKind.Gui)
+            PublishedGuiVersion = value;
+        else
+            PublishedVersion = value;
+    }
+
+    /// <summary>Whether the feed already carries this build's packages of the kind at the version it currently reports.</summary>
+    public bool IsPublishedAs(PackageKind kind) => CanBeGenerated && PublishedVersionOf(kind) == PackageVersion;
 
     /// <summary>
     /// Whether the build is one modders build against. Branches like perf_test or a one-off launcher
