@@ -219,6 +219,27 @@ public sealed class GuiBundleTests
     }
 
     [Fact]
+    public void A_package_shared_by_two_builds_is_bundled_as_the_build_it_was_packed_from()
+    {
+        // mark-published --fromFeed marks both v1.2.6 builds, so the newer is chosen; the package came from the older.
+        var older = Build(12771784, "v1.2.6", 30619, ["v1.2.0"], date: new DateTimeOffset(2023, 11, 22, 0, 0, 0, TimeSpan.Zero));
+        var newer = Build(12829474, "v1.2.6", 30619, ["v1.2.0"], date: new DateTimeOffset(2023, 11, 30, 0, 0, 0, TimeSpan.Zero));
+        List<BuildEntry> builds = [older, newer];
+
+        Assert.Same(newer, BundleGuiCommand.Choose(builds).Single());
+        Assert.Same(older, BundleGuiCommand.PackedFrom(builds, newer, 12771784, BaseId, "1.2.6.30619"));
+        Assert.Same(newer, BundleGuiCommand.PackedFrom(builds, newer, 12829474, BaseId, "1.2.6.30619"));
+    }
+
+    [Fact]
+    public void A_package_packed_from_a_build_of_another_package_version_is_refused()
+    {
+        List<BuildEntry> builds = [Build(1, "v1.2.6", 30619, ["public"]), Build(2, "v1.2.7", 31207, ["public"])];
+        Assert.Throws<InvalidDataException>(() => BundleGuiCommand.PackedFrom(builds, builds[0], 2, BaseId, "1.2.6.30619"));
+        Assert.Throws<InvalidDataException>(() => BundleGuiCommand.PackedFrom(builds, builds[0], 99, BaseId, "1.2.6.30619"));
+    }
+
+    [Fact]
     public void A_version_no_build_of_has_a_GUI_package_is_left_out()
     {
         List<BuildEntry> builds = [Build(1, "v1.5.0", 100, ["beta"], gui: false, unavailable: true)];

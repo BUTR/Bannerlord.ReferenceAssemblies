@@ -19,28 +19,21 @@ on:
         type: choice
         options: [all, game, server, moddingkit]
         default: all
-      buildId:
-        description: "Specific build ids to generate, space separated. Leave empty to take whatever the feed is missing."
+      pack:
+        description: "all: reference and GUI packages, then GUI.v2.All. references: reference packages only. gui: only the GUI packages the feed lacks, then GUI.v2.All. bundle: only GUI.v2.All."
+        type: choice
+        options: [all, references, gui, bundle]
+        default: all
+      builds:
+        description: "Build ids to generate, space separated. Empty takes whatever the feed is missing."
         required: false
         default: ""
-      maxBuilds:
-        description: "Maximum number of builds to generate per app in this run"
+      limit:
+        description: "Most builds to generate per app"
         required: false
         default: "4"
-      checkFeed:
-        description: "Read NuGet first and reconcile the registry's published markers"
-        type: boolean
-        default: false
-      gui:
-        description: "Also pack the game's GUI packages for every build packed"
-        type: boolean
-        default: true
-      guiOnly:
-        description: "Backfill: pack and publish only the game's GUI packages of builds whose GUI packages the feed lacks"
-        type: boolean
-        default: false
-      bundleOnly:
-        description: "Only pack and publish GUI.v2.All, the GUI packages of every release version in one, from what the feed already has"
+      reconcile:
+        description: "Read NuGet first and correct the registry's published markers"
         type: boolean
         default: false
 
@@ -66,8 +59,8 @@ jobs:
       max-parallel: 1
       fail-fast: false
       matrix:
-        # A GUI backfill and the GUI bundle are the game's alone: no other app has GUI packages.
-        app: ${{ (github.event.inputs.guiOnly == 'true' || github.event.inputs.bundleOnly == 'true') && fromJSON('["game"]') || github.event.inputs.app == 'game' && fromJSON('["game"]') || github.event.inputs.app == 'server' && fromJSON('["server"]') || github.event.inputs.app == 'moddingkit' && fromJSON('["moddingkit"]') || fromJSON('["game", "server", "moddingkit"]') }}
+        # GUI-only and bundle-only runs are the game's alone: no other app has GUI packages.
+        app: ${{ (github.event.inputs.pack == 'gui' || github.event.inputs.pack == 'bundle') && fromJSON('["game"]') || github.event.inputs.app == 'game' && fromJSON('["game"]') || github.event.inputs.app == 'server' && fromJSON('["server"]') || github.event.inputs.app == 'moddingkit' && fromJSON('["moddingkit"]') || fromJSON('["game", "server", "moddingkit"]') }}
     permissions:
       id-token: write
       contents: write
@@ -93,15 +86,15 @@ jobs:
     - name: Build
       run: dotnet build src/Bannerlord.ReferenceAssemblies/Bannerlord.ReferenceAssemblies.csproj --configuration Release
 
-    - name: Generate ${{matrix.app}} ${{github.event.inputs.guiOnly == 'true' && 'GUI packages' || 'reference assemblies'}}
-      if: github.event.inputs.bundleOnly != 'true'
+    # A dispatch without inputs, as Update Build Registry and repository_dispatch send, packs everything.
+    - name: Generate ${{matrix.app}} ${{github.event.inputs.pack == 'gui' && 'GUI packages' || 'reference assemblies'}}
+      if: github.event.inputs.pack != 'bundle'
       run: >-
         $TOOL generate --app ${{matrix.app}}
-        --maxBuilds ${{github.event.inputs.maxBuilds || 4}}
-        ${{github.event.inputs.checkFeed == 'true' && '--checkFeed' || ''}}
-        ${{github.event.inputs.gui != 'false' && '--gui' || ''}}
-        ${{github.event.inputs.guiOnly == 'true' && '--guiOnly' || ''}}
-        ${{github.event.inputs.buildId && format('--buildId {0}', github.event.inputs.buildId) || ''}}
+        --maxBuilds ${{github.event.inputs.limit || 4}}
+        ${{github.event.inputs.reconcile == 'true' && '--checkFeed' || ''}}
+        ${{github.event.inputs.pack == 'gui' && '--guiOnly' || github.event.inputs.pack != 'references' && '--gui' || ''}}
+        ${{github.event.inputs.builds && format('--buildId {0}', github.event.inputs.builds) || ''}}
 
     - name: Check for packages
       id: packages
@@ -131,7 +124,7 @@ jobs:
 
     # Only after the push, so nothing is recorded as published that never reached the feed.
     - name: Record what was published
-      if: steps.packages.outputs.exists == 'true' && github.event.inputs.guiOnly != 'true'
+      if: steps.packages.outputs.exists == 'true' && github.event.inputs.pack != 'gui'
       run: $TOOL mark-published --app ${{matrix.app}} --buildId $(cat $FINAL/generated-builds.txt)
 
     # The GUI packages have a marker of their own, fed only the builds whose GUI packages were all packed.
@@ -153,15 +146,15 @@ jobs:
         git config user.name "butr-registry-bot[bot]"
         git config user.email "328763592+butr-registry-bot[bot]@users.noreply.github.com"
         git add builds
-        git commit -m "chore: record published ${{matrix.app}} ${{github.event.inputs.guiOnly == 'true' && 'GUI packages' || 'reference assemblies'}}"
+        git commit -m "chore: record published ${{matrix.app}} ${{github.event.inputs.pack == 'gui' && 'GUI packages' || 'reference assemblies'}}"
         git pull --rebase
         git push
 
     # The game's current stable and beta versions, now that their packages are on the feed. BUTR/.github
-    # sets the org variables from them, waits for NuGet to index, and tells the mod repositories. A GUI
-    # backfill publishes no new game version, so it tells nobody anything.
+    # sets the org variables from them, waits for NuGet to index, and tells the mod repositories. A GUI-only
+    # run publishes no new game version, so it tells nobody anything.
     - name: Current game versions
-      if: steps.packages.outputs.exists == 'true' && matrix.app == 'game' && github.event.inputs.guiOnly != 'true'
+      if: steps.packages.outputs.exists == 'true' && matrix.app == 'game' && github.event.inputs.pack != 'gui'
       id: versions
       run: $TOOL versions --app game
 
@@ -181,10 +174,10 @@ jobs:
     # the feed must fail the push rather than be dropped without a word. A re-run with nothing new stops earlier,
     # at bundle-gui's comparison with the feed.
     - name: Bundle the GUI packages
-      if: matrix.app == 'game' && (github.event.inputs.bundleOnly == 'true' || hashFiles(format('{0}/generated-gui-builds.txt', env.FINAL)) != '')
+      if: matrix.app == 'game' && (github.event.inputs.pack == 'bundle' || hashFiles(format('{0}/generated-gui-builds.txt', env.FINAL)) != '')
       id: bundle
       run: |
-        if [ "${{github.event.inputs.bundleOnly}}" != "true" ] && [ -z "$(cat $FINAL/generated-gui-builds.txt)" ]; then
+        if [ "${{github.event.inputs.pack}}" != "bundle" ] && [ -z "$(cat $FINAL/generated-gui-builds.txt)" ]; then
           echo "No GUI packages were published in this run; nothing to bundle."
           exit 0
         fi

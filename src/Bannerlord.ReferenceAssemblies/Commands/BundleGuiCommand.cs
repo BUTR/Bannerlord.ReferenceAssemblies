@@ -40,11 +40,14 @@ internal static class BundleGuiCommand
         var basePackageId = app.PackageId(GuiPackager.BaseModule, "");
         var sources = new List<GuiBundleSource>();
         var known = new Dictionary<string, IReadOnlySet<string>>(StringComparer.OrdinalIgnoreCase);
-        foreach (var build in chosen)
+        foreach (var chosenBuild in chosen)
         {
             ct.ThrowIfCancellationRequested();
-            var version = build.PublishedGuiVersion!;
-            sources.Add(await SourceAsync(build, basePackageId, version));
+            var version = chosenBuild.PublishedGuiVersion!;
+            var baseSource = await SourceAsync(chosenBuild, basePackageId, version);
+            sources.Add(baseSource);
+            // The build the package was packed from, which its DLC packages were packed from too.
+            var build = baseSource.Build;
 
             // A DLC package is the base id and the module; the registry names the modules but not which are DLC.
             var dlc = 0;
@@ -116,9 +119,27 @@ internal static class BundleGuiCommand
                 }
             }
             var source = new GuiBundleSource(build, id, version, () => ReadGuiFiles(path));
-            CheckManifest(source);
-            return source;
+            var packedFrom = PackedFrom(registry.Builds, build, CheckManifest(source), id, version);
+            if (packedFrom == build)
+                return source;
+            Log.Info($"  {id} {version} was packed from build {packedFrom.BuildId}, which shares its package version with {build.BuildId}; bundled as {packedFrom.BuildId}");
+            return source with { Build = packedFrom };
         }
+    }
+
+    /// <summary>
+    /// The registry's entry for the build a package was packed from. Builds with one version and changeset share one
+    /// package, packed from one of them, and mark-published --fromFeed marks every one of them published, so the
+    /// build chosen can be another of them. The package's manifest says which one it was; any build outside that
+    /// package version fails.
+    /// </summary>
+    internal static BuildEntry PackedFrom(IReadOnlyList<BuildEntry> builds, BuildEntry chosen, uint packedFrom, string id, string version)
+    {
+        if (packedFrom == chosen.BuildId)
+            return chosen;
+        return builds.FirstOrDefault(x => x.BuildId == packedFrom) is { } actual && string.Equals(actual.PackageVersion, chosen.PackageVersion, StringComparison.OrdinalIgnoreCase)
+            ? actual
+            : throw new InvalidDataException($"{id} {version} was packed from build {packedFrom}, which is not a build of package version {chosen.PackageVersion} in the registry; expected build {chosen.BuildId}.");
     }
 
     /// <summary>
@@ -176,18 +197,21 @@ internal static class BundleGuiCommand
         return files;
     }
 
-    /// <summary>The package is the one asked for: format 2, of the registry's build, under its own id.</summary>
-    private static void CheckManifest(GuiBundleSource source)
+    /// <summary>
+    /// The package is the one asked for: format 2, under its own id. Returns the build its manifest says it was
+    /// packed from, which the caller matches against the registry.
+    /// </summary>
+    private static uint CheckManifest(GuiBundleSource source)
     {
         var files = source.ReadFiles();
         if (!files.TryGetValue("manifest.json", out var bytes))
             throw new InvalidDataException($"{source.PackageId} {source.PackageVersion} has no gui/manifest.json.");
         var manifest = JsonDocument.Parse(bytes).RootElement;
         var format = manifest.GetProperty("formatVersion").GetInt32();
-        var buildId = manifest.GetProperty("buildId").GetUInt32();
         var package = manifest.GetProperty("package").GetString();
-        if (format != GuiPackager.FormatVersion || buildId != source.Build.BuildId || !string.Equals(package, source.PackageId, StringComparison.OrdinalIgnoreCase))
-            throw new InvalidDataException($"{source.PackageId} {source.PackageVersion} says it is {package}, format {format}, of build {buildId}; expected {source.PackageId}, format {GuiPackager.FormatVersion}, of build {source.Build.BuildId}.");
+        if (format != GuiPackager.FormatVersion || !string.Equals(package, source.PackageId, StringComparison.OrdinalIgnoreCase))
+            throw new InvalidDataException($"{source.PackageId} {source.PackageVersion} says it is {package}, format {format}; expected {source.PackageId}, format {GuiPackager.FormatVersion}.");
+        return manifest.GetProperty("buildId").GetUInt32();
     }
 
     private static string Pack(Paths paths, App app, string bundleId, string version, GuiBundleContent content)
