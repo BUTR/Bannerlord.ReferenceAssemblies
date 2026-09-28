@@ -1538,6 +1538,7 @@
       "version": "e1.4.2",
       "changeSet": 235840,
       "publishedVersion": "1.4.2.235840",
+      "publishedGuiV2Version": "1.4.2.235840",
       "moduleVersions": {
         "CustomBattle": "e1.4.2",
         "Native": "e1.4.2",
@@ -5723,6 +5724,7 @@
       "version": "e1.8.1",
       "changeSet": 2778,
       "publishedVersion": "1.8.1.2778",
+      "publishedGuiV2Version": "1.8.1.2778",
       "moduleVersions": {
         "BirthAndDeath": "e1.8.0",
         "CustomBattle": "e1.8.1",
@@ -5748,6 +5750,7 @@
       "version": "e1.9.0",
       "changeSet": 3526,
       "publishedVersion": "1.9.0.3526",
+      "publishedGuiV2Version": "1.9.0.3526",
       "moduleVersions": {
         "BirthAndDeath": "e1.9.0",
         "CustomBattle": "e1.9.0",
@@ -5824,6 +5827,7 @@
       "version": "e1.7.2",
       "changeSet": 316994,
       "publishedVersion": "1.7.2.316994",
+      "publishedGuiV2Version": "1.7.2.316994",
       "moduleVersions": {
         "CustomBattle": "v1.0.0",
         "Native": "e1.7.2",
@@ -5846,6 +5850,7 @@
       "version": "e1.7.1",
       "changeSet": 310948,
       "publishedVersion": "1.7.1.310948",
+      "publishedGuiV2Version": "1.7.1.310948",
       "moduleVersions": {
         "CustomBattle": "v1.0.0",
         "Native": "e1.7.1",
@@ -6544,6 +6549,7 @@
       "version": "e1.7.0",
       "changeSet": 304003,
       "publishedVersion": "1.7.0.304003",
+      "publishedGuiV2Version": "1.7.0.304003",
       "moduleVersions": {
         "CustomBattle": "e1.7.0",
         "Native": "e1.7.0",
@@ -6566,6 +6572,7 @@
       "version": "e1.7.0",
       "changeSet": 304003,
       "publishedVersion": "1.7.0.304003",
+      "publishedGuiV2Version": "1.7.0.304003",
       "moduleVersions": {
         "CustomBattle": "e1.7.0",
         "Native": "e1.7.0",
@@ -6818,6 +6825,7 @@
       "version": "v1.2.6",
       "changeSet": 30619,
       "publishedVersion": "1.2.6.30619",
+      "publishedGuiV2Version": "1.2.6.30619",
       "moduleVersions": {
         "BirthAndDeath": "v1.2.6",
         "CustomBattle": "v1.2.6",
@@ -7230,6 +7238,7 @@
       "version": "v1.2.12",
       "changeSet": 77991,
       "publishedVersion": "1.2.12.77991",
+      "publishedGuiV2Version": "1.2.12.77991",
       "moduleVersions": {
         "BirthAndDeath": "v1.2.12",
         "CustomBattle": "v1.2.12",
@@ -8334,6 +8343,7 @@
       "version": "v1.4.7",
       "changeSet": 117484,
       "publishedVersion": "1.4.7.117484",
+      "publishedGuiV2Version": "1.4.7.117484",
       "moduleVersions": {
         "BirthAndDeath": "v1.4.7",
         "CustomBattle": "v1.4.7",
