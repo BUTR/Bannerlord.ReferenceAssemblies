@@ -102,6 +102,19 @@ internal sealed class VersionsOptions : CommonOptions
 {
 }
 
+[Verb("bundle-gui", HelpText = "Packs GUI.v2.All: the published GUI packages of the newest build of each release version, in one package. Needs no Steam login and writes nothing to the registry.")]
+internal sealed class BundleGuiOptions : CommonOptions
+{
+    [Option("feedUrl", Default = NuGetFeed.DefaultUrl)]
+    public string FeedUrl { get; set; } = NuGetFeed.DefaultUrl;
+
+    [Option("revision", HelpText = "The last part of the version: the workflow's run number. Without it the package gets 0, for inspection only; never push that.")]
+    public int? Revision { get; set; }
+
+    [Option("prerelease", HelpText = "A prerelease label for a package made to test with locally, such as beta. The workflow never passes one.")]
+    public string? Prerelease { get; set; }
+}
+
 /// <summary>Where the work lands. Only <c>final</c> is read by anything else: the workflows pick the packages up there.</summary>
 internal sealed record Paths(string Root)
 {
@@ -116,6 +129,12 @@ internal sealed record Paths(string Root)
     public string Ref(uint buildId) => Path.Combine(Root, "ref", buildId.ToString());
     public string Gui(uint buildId) => Path.Combine(Root, "gui", buildId.ToString());
     public string Final => Path.Combine(Root, "final");
+
+    /// <summary>Where GUI.v2.All is packed, apart from <see cref="Final"/> so that the push of the per-build packages never picks it up.</summary>
+    public string FinalBundle => Path.Combine(Root, "final-bundle");
+
+    /// <summary>The per-build GUI packages bundle-gui downloaded, and the files it stages.</summary>
+    public string GuiBundle => Path.Combine(Root, "gui-bundle");
 
     public string WriteFinal(string fileName, string content)
     {

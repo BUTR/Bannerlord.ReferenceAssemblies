@@ -12,6 +12,7 @@ namespace Bannerlord.ReferenceAssemblies;
 /// mark-published - records which builds the feed carries, so the other two never have to ask NuGet.
 /// versions       - reports the current stable and beta versions from the registry, for the org variables
 ///                  the mod repositories build against.
+/// bundle-gui     - packs the published GUI packages of every release version into one package, GUI.v2.All.
 /// </summary>
 public static class Program
 {
@@ -29,11 +30,12 @@ public static class Program
         var exitCode = 0;
         try
         {
-            await Parser.Default.ParseArguments<UpdateOptions, GenerateOptions, MarkPublishedOptions, VersionsOptions>(args).MapResult(
+            await Parser.Default.ParseArguments<UpdateOptions, GenerateOptions, MarkPublishedOptions, VersionsOptions, BundleGuiOptions>(args).MapResult(
                 (UpdateOptions o) => UpdateCommand.RunAsync(o, ctrlC.Token),
                 (GenerateOptions o) => GenerateCommand.RunAsync(o, ctrlC.Token),
                 (MarkPublishedOptions o) => MarkPublishedCommand.RunAsync(o, ctrlC.Token),
                 (VersionsOptions o) => VersionsCommand.RunAsync(o),
+                (BundleGuiOptions o) => BundleGuiCommand.RunAsync(o, ctrlC.Token),
                 _ =>
                 {
                     exitCode = 1;

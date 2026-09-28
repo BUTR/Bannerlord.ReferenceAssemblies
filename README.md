@@ -17,6 +17,7 @@ See the .NET documentation on [reference assemblies](https://docs.microsoft.com/
 | Modding Kit, engine only | `Bannerlord.ReferenceAssemblies.ModdingKit.Core` | `Bannerlord.ReferenceAssemblies.ModdingKit.Core.EarlyAccess` |
 | Game GUI, without DLC | `Bannerlord.ReferenceAssemblies.GUI.v2` | `Bannerlord.ReferenceAssemblies.GUI.v2.EarlyAccess` |
 | Game GUI, one DLC module | `Bannerlord.ReferenceAssemblies.GUI.v2.NavalDLC` | `Bannerlord.ReferenceAssemblies.GUI.v2.NavalDLC.EarlyAccess` |
+| Game GUI, every version with its DLC | `Bannerlord.ReferenceAssemblies.GUI.v2.All` | — |
 
 Choose the package family for the application you target. Use the all-modules package for the game,
 or select Core and individual module packages as needed; SandBox is shown above as an example.
@@ -70,6 +71,28 @@ The `v2` in the id is the format of the contents, the same number as `formatVers
 package cannot be changed, so a format a consumer has to read differently is published under new ids for every
 build, old ones included, and a consumer references the format it reads. Format 1, `GUI.v1`, carried the game's
 prefab, brush and sprite data XML byte for byte; its packages are unlisted.
+
+## GUI package for every version
+
+A project restores one version of a package id, so the per-build GUI packages show an analyzer only the game
+version the project compiles against. `Bannerlord.ReferenceAssemblies.GUI.v2.All` holds every release version at
+once, so an analyzer can check a mod against all the versions it supports in one build.
+
+It holds the `GUI.v2` package of the newest build of each release version (`v…`), with that build's DLC packages;
+a version still in beta is there as its beta. Early access versions are not. The data is format 2, value for value
+as the per-build packages carry it, with every distinct record stored once:
+
+- `gui/bundle.json`: every game version and its packages with their builds, and which table lines each of
+  their files is made of;
+- `gui/records.<file>.<property>.jsonl`: the records of one array of one format 2 file, such as
+  `records.types.widgets.jsonl`, one per line;
+- `gui/nodes.jsonl`: every prefab node, one per line, with its child elements as line numbers;
+- `build/Bannerlord.ReferenceAssemblies.GUI.v2.All.props`, which lists `gui/*.json` and `gui/*.jsonl` as
+  `BannerlordGameGuiData` items, with `Package="Bannerlord.ReferenceAssemblies.GUI.v2.All"`.
+
+A consumer rebuilds a version's format 2 files from these, and reads them as it reads a per-build package. The
+package holds every game version, so its version is the date it was packed and a run number: `YYYY.M.D.R`, such
+as `2026.9.28.57`. Take the newest with `Version="*"`. Its `contentHash:` tag changes only when its content does.
 
 ## Supported builds
 
@@ -127,6 +150,21 @@ $TOOL generate --app game --guiOnly --maxBuilds 20
 Each DLC is downloaded to a folder of its own, `depots/<buildId>.dlc/<dlcAppId>/`, and then copied over the
 game folder, as Steam installs it.
 
+### Bundle the GUI packages
+
+Pack `GUI.v2.All` from the GUI packages the feed already has, for the builds the registry marks published:
+
+```sh
+$TOOL bundle-gui --app game --revision 57
+$TOOL bundle-gui --app game --revision 1 --prerelease beta
+```
+
+It needs no Steam login and writes nothing to the registry. A package packed in the same run is taken from
+`final/`, and the others are downloaded. Every file of every package must rebuild from the bundle as it was, or
+nothing is packed. It is packed into `final-bundle/` only when its content differs from the newest one on the
+feed. Without `--revision` its version ends in 0, for inspection only. `--prerelease` makes a package to test
+with locally, and skips the comparison with the feed.
+
 ### Record published packages
 
 After publishing, mark the builds in the registry, or refresh their publication status from NuGet:
@@ -155,6 +193,8 @@ is none. The result is also written to `final/versions.json` and, in a workflow,
 [Update Build Registry](.github/workflows/update-builds.yml) checks for builds every three hours and
 requests [generation](.github/workflows/generate-references.yml) when packages are missing.
 [Verify Feed](.github/workflows/verify-feed.yml) checks the registries against NuGet nightly.
+Whenever the generate workflow publishes GUI packages, it packs and publishes `GUI.v2.All` as well. Its
+`bundleOnly` input does only that.
 
 Once the packages for both the stable and the beta build are published, the update and generate
 workflows send the current versions to [BUTR/.github](https://github.com/BUTR/.github) as a

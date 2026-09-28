@@ -39,6 +39,10 @@ on:
         description: "Backfill: pack and publish only the game's GUI packages of builds whose GUI packages the feed lacks"
         type: boolean
         default: false
+      bundleOnly:
+        description: "Only pack and publish GUI.v2.All, the GUI packages of every release version in one, from what the feed already has"
+        type: boolean
+        default: false
 
 # One Steam session at a time: a second login with the same account replaces the first.
 concurrency:
@@ -53,6 +57,7 @@ env:
   STEAM_PASSWORD: ${{secrets.STEAM_PASSWORD}}
   TOOL: src/Bannerlord.ReferenceAssemblies/bin/Release/net10.0/Bannerlord.ReferenceAssemblies
   FINAL: src/Bannerlord.ReferenceAssemblies/bin/Release/net10.0/final
+  FINAL_BUNDLE: src/Bannerlord.ReferenceAssemblies/bin/Release/net10.0/final-bundle
 
 jobs:
   generate:
@@ -61,8 +66,8 @@ jobs:
       max-parallel: 1
       fail-fast: false
       matrix:
-        # A GUI backfill is the game's alone: no other app has GUI packages.
-        app: ${{ github.event.inputs.guiOnly == 'true' && fromJSON('["game"]') || github.event.inputs.app == 'game' && fromJSON('["game"]') || github.event.inputs.app == 'server' && fromJSON('["server"]') || github.event.inputs.app == 'moddingkit' && fromJSON('["moddingkit"]') || fromJSON('["game", "server", "moddingkit"]') }}
+        # A GUI backfill and the GUI bundle are the game's alone: no other app has GUI packages.
+        app: ${{ (github.event.inputs.guiOnly == 'true' || github.event.inputs.bundleOnly == 'true') && fromJSON('["game"]') || github.event.inputs.app == 'game' && fromJSON('["game"]') || github.event.inputs.app == 'server' && fromJSON('["server"]') || github.event.inputs.app == 'moddingkit' && fromJSON('["moddingkit"]') || fromJSON('["game", "server", "moddingkit"]') }}
     permissions:
       id-token: write
       contents: write
@@ -89,6 +94,7 @@ jobs:
       run: dotnet build src/Bannerlord.ReferenceAssemblies/Bannerlord.ReferenceAssemblies.csproj --configuration Release
 
     - name: Generate ${{matrix.app}} ${{github.event.inputs.guiOnly == 'true' && 'GUI packages' || 'reference assemblies'}}
+      if: github.event.inputs.bundleOnly != 'true'
       run: >-
         $TOOL generate --app ${{matrix.app}}
         --maxBuilds ${{github.event.inputs.maxBuilds || 4}}
@@ -167,3 +173,41 @@ jobs:
         jq -n --arg stable "${{steps.versions.outputs.stable}}" --arg beta "${{steps.versions.outputs.beta}}"
         '{event_type: "game_versions", client_payload: {stable: $stable, beta: $beta}}'
         | gh api repos/BUTR/.github/dispatches --input -
+
+    # GUI.v2.All: the GUI packages of every release version in one package, rebuilt whole from the feed and the
+    # registry, which mark-published has just brought up to date. Last, so that a failure here never keeps the
+    # registry from being committed. Its version ends in this workflow's run number, so it is published from this
+    # workflow only. It is pushed without --skip-duplicate: a re-run keeps its run number, and a version already on
+    # the feed must fail the push rather than be dropped without a word. A re-run with nothing new stops earlier,
+    # at bundle-gui's comparison with the feed.
+    - name: Bundle the GUI packages
+      if: matrix.app == 'game' && (github.event.inputs.bundleOnly == 'true' || hashFiles(format('{0}/generated-gui-builds.txt', env.FINAL)) != '')
+      id: bundle
+      run: |
+        if [ "${{github.event.inputs.bundleOnly}}" != "true" ] && [ -z "$(cat $FINAL/generated-gui-builds.txt)" ]; then
+          echo "No GUI packages were published in this run; nothing to bundle."
+          exit 0
+        fi
+        $TOOL bundle-gui --app game --revision ${{github.run_number}}
+
+    - name: Upload the GUI bundle
+      if: steps.bundle.outputs.packed == 'true'
+      uses: actions/upload-artifact@v4
+      with:
+        name: nuget-packages-gui-bundle
+        path: ${{env.FINAL_BUNDLE}}/*.nupkg
+
+    - name: NuGet login for the GUI bundle (trusted publishing)
+      if: steps.bundle.outputs.packed == 'true'
+      uses: NuGet/login@v1
+      id: nuget-login-bundle
+      with:
+        user: Aragas
+
+    - name: Push the GUI bundle to NuGet
+      if: steps.bundle.outputs.packed == 'true'
+      run: dotnet nuget push "$FINAL_BUNDLE/*.nupkg" --api-key "${{ steps.nuget-login-bundle.outputs.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json
+
+    - name: Push the GUI bundle to GPR
+      if: steps.bundle.outputs.packed == 'true'
+      run: dotnet nuget push "$FINAL_BUNDLE/*.nupkg" --api-key ${{ secrets.REPO_ACCESS_TOKEN }} --source https://nuget.pkg.github.com/BUTR/index.json

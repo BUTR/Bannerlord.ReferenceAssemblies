@@ -1,6 +1,7 @@
 using NuGet.Common;
 using NuGet.Protocol;
 using NuGet.Protocol.Core.Types;
+using NuGet.Versioning;
 
 namespace Bannerlord.ReferenceAssemblies;
 
@@ -62,4 +63,45 @@ internal sealed class NuGetFeed(string url)
         }
         return (buildIds, versions);
     }
+
+    /// <summary>Every version the feed has of a package id, listed or not, normalized; empty when it has none.</summary>
+    public async Task<IReadOnlySet<string>> GetVersionsAsync(string packageId, CancellationToken ct)
+    {
+        var find = await FindResourceAsync(ct);
+        using var cache = new SourceCacheContext();
+        var versions = await find.GetAllVersionsAsync(packageId, cache, NullLogger.Instance, ct);
+        return versions.Select(x => x.ToNormalizedString()).ToHashSet(StringComparer.OrdinalIgnoreCase);
+    }
+
+    /// <summary>Downloads the .nupkg of one version of a package id to the path.</summary>
+    public async Task DownloadAsync(string packageId, string version, string path, CancellationToken ct)
+    {
+        var find = await FindResourceAsync(ct);
+        using var cache = new SourceCacheContext();
+        Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+        var partial = path + ".partial";
+        await using (var stream = File.Create(partial))
+        {
+            if (!await find.CopyNupkgToStreamAsync(packageId, NuGetVersion.Parse(version), stream, cache, NullLogger.Instance, ct))
+                throw new InvalidOperationException($"{url} has no {packageId} {version}.");
+        }
+        File.Move(partial, path, overwrite: true);
+    }
+
+    /// <summary>The tags of the newest stable, listed version of a package id, or null when it has none.</summary>
+    public async Task<(string Version, string Tags)?> GetNewestAsync(string packageId, CancellationToken ct)
+    {
+        var repository = Repository.Factory.GetCoreV3(url);
+        var metadataResource = await repository.GetResourceAsync<PackageMetadataResource>(ct)
+                               ?? throw new InvalidOperationException($"{url} offers no package metadata resource.");
+        using var cache = new SourceCacheContext();
+        var newest = (await metadataResource.GetMetadataAsync(packageId, false, false, cache, NullLogger.Instance, ct))
+            .Where(x => x.Identity is { } identity && string.Equals(identity.Id, packageId, StringComparison.OrdinalIgnoreCase))
+            .MaxBy(x => x.Identity.Version);
+        return newest is null ? null : (newest.Identity.Version.ToNormalizedString(), newest.Tags ?? "");
+    }
+
+    private async Task<FindPackageByIdResource> FindResourceAsync(CancellationToken ct) =>
+        await Repository.Factory.GetCoreV3(url).GetResourceAsync<FindPackageByIdResource>(ct)
+        ?? throw new InvalidOperationException($"{url} offers no package download resource.");
 }
