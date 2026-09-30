@@ -30,11 +30,32 @@ namespace TaleWorlds.GauntletUI
         Center,
         Right,
     }
+
+    // The overloads a widget announces a change through: a typed one, the generic one of the later builds, and
+    // the object one of v1.0.x, which no build has alongside the generic one.
+    public class PropertyOwnerObject
+    {
+        protected void OnPropertyChanged<T>(T value, [System.Runtime.CompilerServices.CallerMemberName] string propertyName = null) where T : class
+        {
+        }
+
+        protected void OnPropertyChanged(object value, [System.Runtime.CompilerServices.CallerMemberName] string propertyName = null)
+        {
+        }
+
+        protected void OnPropertyChanged(bool value, [System.Runtime.CompilerServices.CallerMemberName] string propertyName = null)
+        {
+        }
+
+        protected void OnPropertyChanged(int value, [System.Runtime.CompilerServices.CallerMemberName] string propertyName = null)
+        {
+        }
+    }
 }
 
 namespace TaleWorlds.GauntletUI.BaseTypes
 {
-    public class Widget
+    public class Widget : PropertyOwnerObject
     {
         public float SuggestedWidth { get; set; }
 

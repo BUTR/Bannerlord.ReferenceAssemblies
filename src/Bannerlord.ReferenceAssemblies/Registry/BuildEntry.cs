@@ -50,7 +50,7 @@ internal sealed class BuildEntry
 
     /// <summary>
     /// The package version of this build's GUI packages last pushed to the feed, of the current format's ids
-    /// (GUI.v2). Kept apart from <see cref="PublishedVersion"/> because the GUI packages started long after
+    /// (GUI.v3). Kept apart from <see cref="PublishedVersion"/> because the GUI packages started long after
     /// the reference packages, and every build published before then still lacks them. A new format, with
     /// ids of its own, starts every build over again, so its marker is stored under a name of its own: the
     /// old format's publishedGuiVersion is ignored on load and dropped on the next save.
@@ -60,7 +60,7 @@ internal sealed class BuildEntry
     public string? PublishedGuiVersion { get; set; }
 
     /// <summary>The registry's name for <see cref="PublishedGuiVersion"/>, which carries <see cref="GuiPackager.FormatVersion"/>.</summary>
-    public const string PublishedGuiVersionName = "publishedGuiV2Version";
+    public const string PublishedGuiVersionName = "publishedGuiV3Version";
 
     /// <summary>The files came down but carried no version. Not retried.</summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]

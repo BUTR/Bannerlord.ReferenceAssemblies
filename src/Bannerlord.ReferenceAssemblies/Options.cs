@@ -102,7 +102,7 @@ internal sealed class VersionsOptions : CommonOptions
 {
 }
 
-[Verb("bundle-gui", HelpText = "Packs GUI.v2.All: the published GUI packages of the newest build of each release version, in one package. Needs no Steam login and writes nothing to the registry.")]
+[Verb("bundle-gui", HelpText = "Packs GUI.v3.All: the published GUI packages of the newest build of each release version, in one package. Needs no Steam login and writes nothing to the registry.")]
 internal sealed class BundleGuiOptions : CommonOptions
 {
     [Option("feedUrl", Default = NuGetFeed.DefaultUrl)]
@@ -130,7 +130,7 @@ internal sealed record Paths(string Root)
     public string Gui(uint buildId) => Path.Combine(Root, "gui", buildId.ToString());
     public string Final => Path.Combine(Root, "final");
 
-    /// <summary>Where GUI.v2.All is packed, apart from <see cref="Final"/> so that the push of the per-build packages never picks it up.</summary>
+    /// <summary>Where GUI.v3.All is packed, apart from <see cref="Final"/> so that the push of the per-build packages never picks it up.</summary>
     public string FinalBundle => Path.Combine(Root, "final-bundle");
 
     /// <summary>The per-build GUI packages bundle-gui downloaded, and the files it stages.</summary>

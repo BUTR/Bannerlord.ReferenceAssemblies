@@ -58,6 +58,7 @@ internal sealed class GuiChecks
         IReadOnlyCollection<BrushEntry> brushes, IReadOnlyCollection<SpriteEntry> sprites)
     {
         CheckCommands();
+        CheckAnnouncements();
         CheckDottedAttributes();
         CheckCategoriesDefined(categories);
         CheckFonts(fonts);
@@ -141,6 +142,29 @@ internal sealed class GuiChecks
                 Count(exceptions, $"{widget.Name} Command.{name}");
         }
         Report("Command check", $"{checkedCount} Command.* attribute(s) checked, {unknownElement} on elements naming no widget or prefab, {exceptions.Values.Sum()} naming an event the widget does not raise", exceptions);
+    }
+
+    /// <summary>
+    /// What the widgets announce. Widget announces its alignments, SuggestedWidth and IsVisible in every build,
+    /// the alignments as the enum before v1.1.0 and as a string since: none there means the scan broke. The
+    /// unresolved ones are listed, and should stay few.
+    /// </summary>
+    private void CheckAnnouncements()
+    {
+        var widgets = _build.Types.Where(x => x.IsClass && _build.DerivesFrom(x, _build.WidgetType)).Select(_scanner.AnnouncementsOf).ToList();
+        var exceptions = new SortedDictionary<string, int>(StringComparer.Ordinal);
+        foreach (var unresolved in widgets.SelectMany(x => x.Unresolved))
+            Count(exceptions, $"unresolved: {unresolved.Caller}: {unresolved.Reason} ({unresolved.Via})");
+        if (_build.FindType(_build.WidgetType) is { } root)
+        {
+            var own = _scanner.AnnouncementsOf(root).Announcements;
+            foreach (var name in new[] { "HorizontalAlignment", "VerticalAlignment", "SuggestedWidth", "IsVisible" })
+                if (own.TryGetValue(name, out var types))
+                    Log.Info($"    {root.Name}.{name} announces {string.Join(", ", types)}");
+                else
+                    Count(exceptions, $"WARNING: {root.Name} announces no {name}; the scan of OnPropertyChanged found nothing there");
+        }
+        Report("Announcement check", $"{widgets.Sum(x => x.Announcements.Count)} name(s) announced by {widgets.Count(x => x.Announcements.Count > 0)} widget(s), {widgets.Sum(x => x.Unresolved.Count)} unresolved", exceptions);
     }
 
     /// <summary>

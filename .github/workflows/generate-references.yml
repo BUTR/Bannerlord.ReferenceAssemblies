@@ -20,7 +20,7 @@ on:
         options: [all, game, server, moddingkit]
         default: all
       pack:
-        description: "all: reference and GUI packages, then GUI.v2.All. references: reference packages only. gui: only the GUI packages the feed lacks, then GUI.v2.All. bundle: only GUI.v2.All."
+        description: "all: reference and GUI packages, then GUI.v3.All. references: reference packages only. gui: only the GUI packages the feed lacks, then GUI.v3.All. bundle: only GUI.v3.All."
         type: choice
         options: [all, references, gui, bundle]
         default: all
@@ -167,7 +167,7 @@ jobs:
         '{event_type: "game_versions", client_payload: {stable: $stable, beta: $beta}}'
         | gh api repos/BUTR/.github/dispatches --input -
 
-    # GUI.v2.All: the GUI packages of every release version in one package, rebuilt whole from the feed and the
+    # GUI.v3.All: the GUI packages of every release version in one package, rebuilt whole from the feed and the
     # registry, which mark-published has just brought up to date. Last, so that a failure here never keeps the
     # registry from being committed. Its version ends in this workflow's run number, so it is published from this
     # workflow only. It is pushed without --skip-duplicate: a re-run keeps its run number, and a version already on

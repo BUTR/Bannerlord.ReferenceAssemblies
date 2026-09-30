@@ -17,18 +17,18 @@ internal sealed record GuiBundleSource(BuildEntry Build, string PackageId, strin
 internal sealed record GuiBundleContent(IReadOnlyDictionary<string, byte[]> Files, string ContentHash);
 
 /// <summary>
-/// The GUI.v2.All package: every format 2 GUI package of the newest build of each game version, with each
+/// The GUI.v3.All package: every format 3 GUI package of the newest build of each game version, with each
 /// distinct record stored once. See gui-packages-v2-all.md.
 ///
 /// gui/bundle.json lists every game version and its packages, and says what each of their files is made of.
-/// Every top-level array of a format 2 file becomes a table, gui/records.&lt;file&gt;.&lt;property&gt;.jsonl, one
+/// Every top-level array of a format 3 file becomes a table, gui/records.&lt;file&gt;.&lt;property&gt;.jsonl, one
 /// record per line, and every other top-level value is written inline. Every prefab node becomes a line of
-/// gui/nodes.jsonl, with its child elements as line indexes. Nothing here names a format 2 file or property
+/// gui/nodes.jsonl, with its child elements as line indexes. Nothing here names a format 3 file or property
 /// except prefabs.json's entries, which say where each tree is and what it is called.
 /// </summary>
 internal static class GuiBundle
 {
-    /// <summary>The data format of the records, which the id names: GUI.v2.All.</summary>
+    /// <summary>The data format of the records, which the id names: GUI.v3.All.</summary>
     public const int FormatVersion = GuiPackager.FormatVersion;
 
     /// <summary>The layout of the bundle itself. Raised when the layout changes and the data does not.</summary>
@@ -39,12 +39,12 @@ internal static class GuiBundle
     public const string IndexFile = "bundle.json";
     public const string NodesFile = "nodes.jsonl";
 
-    /// <summary>The index of prefab trees, and its list: the one format 2 file the bundle has to understand.</summary>
+    /// <summary>The index of prefab trees, and its list: the one format 3 file the bundle has to understand.</summary>
     public const string PrefabIndexFile = "prefabs.json";
     public const string PrefabIndexList = "prefabs";
 
     /// <summary>
-    /// Compact, with the encoder the format 2 files are written with, so that &lt;, &amp; and non-ASCII text stay
+    /// Compact, with the encoder the format 3 files are written with, so that &lt;, &amp; and non-ASCII text stay
     /// as they are. The prefab trees nest past System.Text.Json's default depth of 64.
     /// </summary>
     internal static readonly JsonSerializerOptions Json = new()
@@ -58,7 +58,7 @@ internal static class GuiBundle
 
     /// <summary>
     /// The files as the same items the per-build packages give; the Package metadata tells the two apart. It lists
-    /// only the top of gui/, .jsonl as well as .json, because format 2's recursive gui/**/*.json would miss the tables.
+    /// only the top of gui/, .jsonl as well as .json, because format 3's recursive gui/**/*.json would miss the tables.
     /// </summary>
     internal static string Props(string packageId) =>
         $"""
@@ -264,7 +264,7 @@ internal static class GuiBundle
 
     internal static JsonNode? Parse(byte[] bytes) => JsonNode.Parse(bytes, documentOptions: DocumentOptions);
 
-    /// <summary>A format 2 file as the round trip compares it: parsed, and written compact with the bundle's options.</summary>
+    /// <summary>A format 3 file as the round trip compares it: parsed, and written compact with the bundle's options.</summary>
     internal static string Normalize(byte[] bytes) => Parse(bytes)?.ToJsonString(Json) ?? "null";
 
     private static byte[] Bytes(JsonNode node) => Encoding.UTF8.GetBytes(node.ToJsonString(Json) + "\n");
@@ -313,7 +313,7 @@ internal sealed class GameVersionComparer : IComparer<string>
 }
 
 /// <summary>
-/// Reads a bundle back: the format 2 files of each package, rebuilt from bundle.json and the tables. The
+/// Reads a bundle back: the format 3 files of each package, rebuilt from bundle.json and the tables. The
 /// round trip check uses it on the bytes as packed, and it is the reference for a consumer doing the same.
 /// It records every line it reads, so the checks can tell whether any line goes unused.
 /// </summary>
@@ -361,7 +361,7 @@ internal sealed class GuiBundleReader
     /// <summary>The lines of each table that some package was rebuilt from.</summary>
     public IReadOnlyDictionary<string, HashSet<int>> Reached => _reached;
 
-    /// <summary>A package's format 2 files, by path under gui/, each as compact JSON (see <see cref="GuiBundle.Normalize"/>).</summary>
+    /// <summary>A package's format 3 files, by path under gui/, each as compact JSON (see <see cref="GuiBundle.Normalize"/>).</summary>
     public Dictionary<string, string> Rebuild(JsonObject package)
     {
         var files = new Dictionary<string, string>(StringComparer.Ordinal);

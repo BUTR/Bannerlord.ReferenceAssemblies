@@ -8,7 +8,7 @@ using System.Text.Json;
 namespace Bannerlord.ReferenceAssemblies;
 
 /// <summary>
-/// Packs GUI.v2.All from the per-build GUI packages already on the feed: the newest build of each release
+/// Packs GUI.v3.All from the per-build GUI packages already on the feed: the newest build of each release
 /// version, with its DLC packages. Every run rebuilds it whole from its only inputs, the feed and the registry.
 /// When the result matches the newest package on the feed, the run packs nothing.
 /// See gui-packages-v2-all.md.
@@ -145,7 +145,7 @@ internal static class BundleGuiCommand
     /// <summary>
     /// The build of each release version whose GUI packages go into the bundle, oldest version first: the newest
     /// with a GUI package, by changeset, then date, then build id. A beta counts. Early access builds are left
-    /// out: their format 2 data has the errors 50c0a3d fixed, and no mod targets them any more.
+    /// out: no mod targets them any more.
     /// </summary>
     internal static List<BuildEntry> Choose(IReadOnlyList<BuildEntry> builds, Action<string>? log = null)
     {
@@ -198,7 +198,7 @@ internal static class BundleGuiCommand
     }
 
     /// <summary>
-    /// The package is the one asked for: format 2, under its own id. Returns the build its manifest says it was
+    /// The package is the one asked for: format 3, under its own id. Returns the build its manifest says it was
     /// packed from, which the caller matches against the registry.
     /// </summary>
     private static uint CheckManifest(GuiBundleSource source)
@@ -239,7 +239,7 @@ internal static class BundleGuiCommand
             version,
             "Bannerlord Game GUI: every version",
             "The UI of every release version of Mount & Blade II: Bannerlord and its DLC, in one package, for analyzers that check UI patches against all the versions a mod supports. "
-            + "The newest build of each version, as the GUI.v2 packages carry it, with each record stored once. Carries none of the game's files, and adds nothing to compilation.",
+            + "The newest build of each version, as the GUI.v3 packages carry it, with each record stored once. Carries none of the game's files, and adds nothing to compilation.",
             ["bannerlord", "gui", "prefabs", $"appId:{app.AppId}", $"contentHash:{content.ContentHash}"]);
         builder.DevelopmentDependency = true;
         foreach (var (source, target) in files.OrderBy(x => x.Target, StringComparer.Ordinal))

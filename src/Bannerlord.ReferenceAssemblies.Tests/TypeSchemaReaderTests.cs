@@ -57,11 +57,11 @@ public sealed class TypeSchemaReaderTests
         Assert.Equal("TaleWorlds.Library.ViewModel", members.BaseType);
         Assert.Equal(
         [
-            new ViewModelProperty("Items", "TaleWorlds.Library.MBBindingList<Fixtures.Types.MembersVM>", "internal", true, true),
-            new ViewModelProperty("PrivateProperty", "System.Boolean", "private", true, true),
-            new ViewModelProperty("ProtectedProperty", "System.Int32", "protected", true, true),
-            new ViewModelProperty("PublicProperty", "System.String", "public", true, true),
-            new ViewModelProperty("WriteOnly", "System.Int32", "public", false, true),
+            new ViewModelProperty("Items", "TaleWorlds.Library.MBBindingList<Fixtures.Types.MembersVM>", "internal", true, true, "internal", "internal"),
+            new ViewModelProperty("PrivateProperty", "System.Boolean", "private", true, true, "private", "private"),
+            new ViewModelProperty("ProtectedProperty", "System.Int32", "protected", true, true, "protected", "protected"),
+            new ViewModelProperty("PublicProperty", "System.String", "public", true, true, "public", "public"),
+            new ViewModelProperty("WriteOnly", "System.Int32", "public", false, true, null, "public"),
         ], members.Properties);
     }
 
@@ -178,4 +178,70 @@ public sealed class TypeSchemaReaderTests
     [Fact]
     public void A_widget_held_by_a_widget_has_no_assigned_types() =>
         Assert.Null(Assert.Single(Widget("SelfAreaWidget").Properties, x => x.Name == "Area").AssignedTypes);
+
+    private static Dictionary<string, List<string>> Announcements(string widget) =>
+        Widget(widget).Announcements.ToDictionary(x => x.Name, x => x.Types);
+
+    [Fact]
+    public void A_widget_records_what_it_announces_by_name_with_the_type_the_loader_is_handed()
+    {
+        Assert.Equal(new Dictionary<string, List<string>>
+        {
+            // Typed overload, [CallerMemberName]; the generic one with literals and with a field; an enum as its number,
+            // and boxed through the object overload; a name that is no property; another property's setter.
+            ["Alignment"] = ["System.String"],
+            ["Boxed"] = ["Fixtures.Types.Direction"],
+            ["Heading"] = ["System.Int32"],
+            ["IsOn"] = ["System.Boolean"],
+            ["IsVisible"] = ["System.Boolean"],
+            ["OnPress"] = ["System.String"],
+            ["Style"] = ["Fixtures.Types.TextStyle"],
+        }, Announcements("AnnouncingWidget"));
+        Assert.Equal(["Alignment", "Boxed", "Heading", "IsOn", "IsVisible", "OnPress", "Style"], Widget("AnnouncingWidget").Announcements.Select(x => x.Name));
+    }
+
+    [Fact]
+    public void A_literal_null_announces_nothing() =>
+        Assert.DoesNotContain(Widget("AnnouncingWidget").Announcements, x => x.Name == "Cleared");
+
+    [Fact]
+    public void An_announcement_named_by_the_prefab_XML_is_unresolved()
+    {
+        var unresolved = Assert.Single(Widget("AnnouncingWidget").UnresolvedAnnouncements);
+        Assert.Equal("Fixtures.Types.AnnouncingWidget::Announce", unresolved.Caller);
+        Assert.Equal("set from the prefab XML", unresolved.Reason);
+    }
+
+    [Fact]
+    public void An_override_announcing_another_type_announces_it_on_the_subclass_only()
+    {
+        Assert.Equal(new Dictionary<string, List<string>> { ["Value"] = ["System.Int32"] }, Announcements("AnnouncingBaseWidget"));
+        Assert.Equal(new Dictionary<string, List<string>> { ["Value"] = ["System.String"] }, Announcements("AnnouncingDerivedWidget"));
+    }
+
+    [Fact]
+    public void A_type_parameter_announced_is_resolved_per_concrete_subclass()
+    {
+        var generic = Assert.Single(Schema.Value.Widgets, x => x.Type == "Fixtures.Types.GenericAnnouncingWidget<TItem>");
+        Assert.Empty(generic.Announcements);
+        Assert.Equal("generic argument not known", Assert.Single(generic.UnresolvedAnnouncements).Reason);
+        Assert.Equal(new Dictionary<string, List<string>> { ["Item"] = ["Fixtures.Types.TextStyle"] }, Announcements("ConcreteAnnouncingWidget"));
+    }
+
+    [Fact]
+    public void A_widget_that_announces_nothing_has_empty_lists()
+    {
+        Assert.Empty(Widget("ButtonWidget").Announcements);
+        Assert.Empty(Widget("ButtonWidget").UnresolvedAnnouncements);
+    }
+
+    [Fact]
+    public void A_ViewModel_property_records_the_accessibility_of_each_accessor()
+    {
+        Assert.Equal(
+        [
+            new ViewModelProperty("Count", "System.Int32", "public", true, false, "public", null),
+            new ViewModelProperty("Title", "System.String", "public", true, true, "public", "private"),
+        ], ViewModel("Fixtures.Types.AccessorsVM").Properties);
+    }
 }

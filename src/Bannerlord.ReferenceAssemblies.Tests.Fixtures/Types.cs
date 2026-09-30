@@ -197,4 +197,102 @@ namespace Fixtures.Types
 
         public Widget Area { get; set; }
     }
+
+    public enum Direction
+    {
+        Up,
+        Down,
+    }
+
+    /// <summary>One announcement of each shape the loader can be handed a value by.</summary>
+    public class AnnouncingWidget : Widget
+    {
+        private bool _isOn;
+        private TextStyle _style;
+
+        /// <summary>A typed overload, named by [CallerMemberName].</summary>
+        public bool IsOn
+        {
+            get => _isOn;
+            set
+            {
+                _isOn = value;
+                OnPropertyChanged(value);
+            }
+        }
+
+        /// <summary>The generic overload, with a literal and with a field of a class type.</summary>
+        public HorizontalAlignment Alignment
+        {
+            set => OnPropertyChanged(value == HorizontalAlignment.Left ? "Left" : "Other");
+        }
+
+        public TextStyle Style
+        {
+            set
+            {
+                _style = value;
+                OnPropertyChanged(_style);
+            }
+        }
+
+        /// <summary>An enum announced as its number, and one boxed through the object overload.</summary>
+        public Direction Heading
+        {
+            set => OnPropertyChanged((int) value);
+        }
+
+        public Direction Boxed
+        {
+            set => OnPropertyChanged((object) value);
+        }
+
+        /// <summary>A name the prefab XML sets: it cannot be traced.</summary>
+        public string Target { get; set; }
+
+        public void Announce() => OnPropertyChanged(true, Target);
+
+        /// <summary>A name that is no property, and a literal null, which announces nothing.</summary>
+        public void Press() => OnPropertyChanged("MouseDown", "OnPress");
+
+        public void Clear() => OnPropertyChanged<string>(null, "Cleared");
+
+        /// <summary>A property announced by another's setter; its own setter announces nothing.</summary>
+        public bool IsVisible { get; set; }
+
+        public bool IsHidden
+        {
+            set => OnPropertyChanged(!value, "IsVisible");
+        }
+    }
+
+    /// <summary>A base method announcing a number; the override announces text under the same name.</summary>
+    public class AnnouncingBaseWidget : Widget
+    {
+        public virtual void Refresh() => OnPropertyChanged(1, "Value");
+    }
+
+    public class AnnouncingDerivedWidget : AnnouncingBaseWidget
+    {
+        public override void Refresh() => OnPropertyChanged("one", "Value");
+    }
+
+    /// <summary>The generic overload given the class's own type parameter: known per concrete subclass only.</summary>
+    public class GenericAnnouncingWidget<TItem> : Widget where TItem : class
+    {
+        public TItem Item
+        {
+            set => OnPropertyChanged(value);
+        }
+    }
+
+    public class ConcreteAnnouncingWidget : GenericAnnouncingWidget<TextStyle>
+    {
+    }
+
+    public class AccessorsVM : ViewModel
+    {
+        public string Title { get; private set; }
+        public int Count => 0;
+    }
 }

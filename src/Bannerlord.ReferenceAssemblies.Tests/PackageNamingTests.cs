@@ -81,8 +81,8 @@ public sealed class PackageNamingTests
     }
 
     [Theory]
-    [InlineData("", "Bannerlord.ReferenceAssemblies.GUI.v2", "Bannerlord.ReferenceAssemblies.GUI.v2.NavalDLC")]
-    [InlineData(".EarlyAccess", "Bannerlord.ReferenceAssemblies.GUI.v2.EarlyAccess", "Bannerlord.ReferenceAssemblies.GUI.v2.NavalDLC.EarlyAccess")]
+    [InlineData("", "Bannerlord.ReferenceAssemblies.GUI.v3", "Bannerlord.ReferenceAssemblies.GUI.v3.NavalDLC")]
+    [InlineData(".EarlyAccess", "Bannerlord.ReferenceAssemblies.GUI.v3.EarlyAccess", "Bannerlord.ReferenceAssemblies.GUI.v3.NavalDLC.EarlyAccess")]
     public void GUI_package_ids_carry_the_format_version_and_put_a_DLC_module_after_it(string suffix, string expectedBase, string expectedDlc)
     {
         Assert.Equal(expectedBase, App.Game.PackageId(GuiPackager.BaseModule, suffix));
@@ -128,7 +128,7 @@ public sealed class PackageNamingTests
             loaded.Find(1)!.PublishedGuiVersion = "1.4.8.119303";
             loaded.Save();
             var saved = File.ReadAllText(registry);
-            Assert.Contains("\"publishedGuiV2Version\": \"1.4.8.119303\"", saved, StringComparison.Ordinal);
+            Assert.Contains("\"publishedGuiV3Version\": \"1.4.8.119303\"", saved, StringComparison.Ordinal);
             Assert.DoesNotContain("\"publishedGuiVersion\"", saved, StringComparison.Ordinal);
         }
         finally

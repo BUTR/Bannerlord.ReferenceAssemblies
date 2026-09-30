@@ -17,7 +17,15 @@ internal sealed record WidgetType(
     bool Abstract,
     List<string> Events,
     List<UnresolvedEvent> UnresolvedEvents,
+    List<WidgetAnnouncement> Announcements,
+    List<UnresolvedEvent> UnresolvedAnnouncements,
     List<WidgetProperty> Properties);
+
+/// <summary>
+/// A name a widget's own methods announce through OnPropertyChanged, with every type announced under it. The
+/// loader writes the value to the ViewModel property bound to that attribute name, boxed as announced.
+/// </summary>
+internal sealed record WidgetAnnouncement(string Name, List<string> Types);
 
 /// <summary>A public property the loader can set. AssignedTypes is left out when only the declared type can be there.</summary>
 internal sealed record WidgetProperty(
@@ -32,7 +40,11 @@ internal sealed record ObjectType(string Type, string? BaseType, string? Module,
 
 internal sealed record ViewModelType(string Type, string? BaseType, string? Module, string Assembly, bool Abstract, List<ViewModelProperty> Properties, List<ViewModelMethod> Methods);
 
-internal sealed record ViewModelProperty(string Name, string Type, string Accessibility, bool CanRead, bool CanWrite);
+/// <summary>
+/// Accessibility is the most accessible accessor's. Getter and Setter are each accessor's own, null when it
+/// does not exist: the loader reads and writes through public accessors only.
+/// </summary>
+internal sealed record ViewModelProperty(string Name, string Type, string Accessibility, bool CanRead, bool CanWrite, string? Getter, string? Setter);
 
 internal sealed record ViewModelMethod(string Name, string Accessibility, string ReturnType, List<MethodParameter> Parameters);
 
@@ -86,15 +98,19 @@ internal static class TypeSchemaReader
                 }
 
                 var (events, unresolvedEvents) = scanner.EventsOf(type);
+                var (announcements, unresolvedAnnouncements) = scanner.AnnouncementsOf(type);
                 widgets.Add(new WidgetType(type.Name!, TypeNames.Definition(type), BaseType(type), owner.Module, owner.FileName, type.IsAbstract,
-                    [.. events], [.. unresolvedEvents], properties.OrderBy(x => x.Name, StringComparer.Ordinal).ToList()));
+                    [.. events], [.. unresolvedEvents],
+                    announcements.Select(x => new WidgetAnnouncement(x.Key, [.. x.Value])).ToList(), [.. unresolvedAnnouncements],
+                    properties.OrderBy(x => x.Name, StringComparer.Ordinal).ToList()));
             }
             else if (build.DerivesFrom(type, ViewModelType))
             {
                 // The binding table takes properties and methods of every accessibility.
                 var properties = type.Properties
                     .Where(x => !IsIndexer(x) && !IsStatic(x) && x.Signature is not null)
-                    .Select(x => new ViewModelProperty(x.Name!, TypeNames.Format(x.Signature!.ReturnType, type), Accessibility(x), x.GetMethod is not null, x.SetMethod is not null))
+                    .Select(x => new ViewModelProperty(x.Name!, TypeNames.Format(x.Signature!.ReturnType, type), Accessibility(x), x.GetMethod is not null, x.SetMethod is not null,
+                        x.GetMethod is { } getter ? Accessibility(getter) : null, x.SetMethod is { } setter ? Accessibility(setter) : null))
                     .OrderBy(x => x.Name, StringComparer.Ordinal)
                     .ToList();
 

@@ -39,14 +39,15 @@ internal sealed class GuiPackager(Paths paths)
     /// The layout of the package contents, and the version in the package ids. A published package can never
     /// be repacked under its id, so a change the consumer has to handle differently gets a new family of ids,
     /// packed again for every build, old ones included. Format 1 (GUI.v1) carried the game's XML byte for byte;
-    /// format 2 (GUI.v2) carries only data written from it. A consumer references the family it reads, and
-    /// finds it for every build.
+    /// format 2 (GUI.v2) carried only data written from it. Format 3 (GUI.v3) adds what widgets announce and
+    /// each ViewModel accessor's accessibility to types.json, which only regenerating every build gives. A
+    /// consumer references the family it reads, and finds it for every build.
     /// </summary>
-    public const int FormatVersion = 2;
+    public const int FormatVersion = 3;
 
     /// <summary>
-    /// The module part of the package ids, with the format version: Bannerlord.ReferenceAssemblies.GUI.v2, and
-    /// .GUI.v2.&lt;DlcModule&gt; for a DLC.
+    /// The module part of the package ids, with the format version: Bannerlord.ReferenceAssemblies.GUI.v3, and
+    /// .GUI.v3.&lt;DlcModule&gt; for a DLC.
     /// </summary>
     public static readonly string BaseModule = $"GUI.v{FormatVersion}";
 

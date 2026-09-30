@@ -4,7 +4,7 @@ using System.Text.Json.Nodes;
 namespace Bannerlord.ReferenceAssemblies;
 
 /// <summary>
-/// The checks every GUI.v2.All runs before it is packed, on the bytes it will carry. Unlike <see cref="GuiChecks"/>,
+/// The checks every GUI.v3.All runs before it is packed, on the bytes it will carry. Unlike <see cref="GuiChecks"/>,
 /// which only logs what the game's own files get wrong, any failure here stops the run: it means the bundle
 /// does not say what the per-build packages say.
 /// </summary>

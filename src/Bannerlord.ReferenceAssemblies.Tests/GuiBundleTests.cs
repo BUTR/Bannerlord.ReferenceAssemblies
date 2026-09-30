@@ -6,13 +6,13 @@ using Xunit;
 namespace Bannerlord.ReferenceAssemblies.Tests;
 
 /// <summary>
-/// GUI.v2.All from fake format 2 packages: two versions of the base package, written indented as the real ones
+/// GUI.v3.All from fake format 3 packages: two versions of the base package, written indented as the real ones
 /// are, and a DLC package of the second. What they share is stored once, and every file rebuilds as it was.
 /// </summary>
 public sealed class GuiBundleTests
 {
-    private const string BaseId = "Bannerlord.ReferenceAssemblies.GUI.v2";
-    private const string DlcId = "Bannerlord.ReferenceAssemblies.GUI.v2.NavalDLC";
+    private const string BaseId = "Bannerlord.ReferenceAssemblies.GUI.v3";
+    private const string DlcId = "Bannerlord.ReferenceAssemblies.GUI.v3.NavalDLC";
 
     private static readonly string SharedTree = Tree("Shared", "Native", """
         {"n":"Prefab","c":[{"n":"Window","c":[{"n":"Widget","a":{"Id":"Root","Text":"<b>&é</b>"},"c":["some text",{"n":"Children"}]}]}]}
@@ -58,7 +58,7 @@ public sealed class GuiBundleTests
         var properties = manifest["properties"]!.AsArray().Select(x => x!).ToList();
 
         Assert.Equal(["formatVersion", "package", "gameVersion", "changeSet", "buildId", "modules"], properties.Select(x => x["name"]!.GetValue<string>()));
-        Assert.Equal(2, properties[0]["value"]!.GetValue<int>());
+        Assert.Equal(GuiPackager.FormatVersion, properties[0]["value"]!.GetValue<int>());
         Assert.Null(properties[3]["value"]);   // changeSet: null stays null
         Assert.Equal("records.manifest.modules.jsonl", properties[5]["table"]!.GetValue<string>());
         Assert.Equal("[[0,0]]", properties[5]["runs"]!.ToJsonString());
@@ -123,7 +123,7 @@ public sealed class GuiBundleTests
     public void A_changed_record_changes_the_hash()
     {
         var sources = Sources();
-        var changed = sources.Select(x => x.PackageId == DlcId ? x with { ReadFiles = () => With(x.ReadFiles(), "fonts.json", """{ "formatVersion": 2, "fonts": ["Other"], "sources": [] }""") } : x);
+        var changed = sources.Select(x => x.PackageId == DlcId ? x with { ReadFiles = () => With(x.ReadFiles(), "fonts.json", """{ "formatVersion": 3, "fonts": ["Other"], "sources": [] }""") } : x);
         Assert.NotEqual(GuiBundle.Build(sources, BaseId).ContentHash, GuiBundle.Build(changed, BaseId).ContentHash);
     }
 
@@ -162,10 +162,10 @@ public sealed class GuiBundleTests
     [Fact]
     public void The_props_list_the_json_and_jsonl_files_at_the_top_of_gui()
     {
-        var props = GuiBundle.Props("Bannerlord.ReferenceAssemblies.GUI.v2.All");
+        var props = GuiBundle.Props("Bannerlord.ReferenceAssemblies.GUI.v3.All");
         Assert.Contains("""Include="$(MSBuildThisFileDirectory)../gui/*.json;$(MSBuildThisFileDirectory)../gui/*.jsonl" """, props);
-        Assert.Contains("""Package="Bannerlord.ReferenceAssemblies.GUI.v2.All" """, props);
-        Assert.Equal("Bannerlord.ReferenceAssemblies.GUI.v2.All", App.Game.PackageId(GuiBundle.Module, ""));
+        Assert.Contains("""Package="Bannerlord.ReferenceAssemblies.GUI.v3.All" """, props);
+        Assert.Equal("Bannerlord.ReferenceAssemblies.GUI.v3.All", App.Game.PackageId(GuiBundle.Module, ""));
     }
 
     [Theory]
@@ -267,8 +267,8 @@ public sealed class GuiBundleTests
             Source(newer, DlcId, new()
             {
                 ["manifest.json"] = Manifest(DlcId, newer, """[{ "folder": "NavalDLC", "dlc": true }]"""),
-                ["fonts.json"] = """{ "formatVersion": 2, "fonts": [], "sources": [] }""",
-                ["types.json"] = """{ "formatVersion": 2, "widgets": [{ "type": "ShipWidget", "events": [] }], "enums": [] }""",
+                ["fonts.json"] = """{ "formatVersion": 3, "fonts": [], "sources": [] }""",
+                ["types.json"] = """{ "formatVersion": 3, "widgets": [{ "type": "ShipWidget", "events": [] }], "enums": [] }""",
                 ["prefabs.json"] = Prefabs(("Shared", "NavalDLC", "NavalDLC/GUI/Prefabs/Shared.json")),
                 ["NavalDLC/GUI/Prefabs/Shared.json"] = SharedTree.Replace("\"module\":\"Native\"", "\"module\":\"NavalDLC\""),
             }),
@@ -279,10 +279,10 @@ public sealed class GuiBundleTests
         static Dictionary<string, string> Base(BuildEntry build, string buttonEvents, string optionsHeight) => new()
         {
             ["manifest.json"] = Manifest(BaseId, build, """[{ "folder": "Native", "dlc": false }]"""),
-            ["fonts.json"] = """{ "formatVersion": 2, "fonts": ["Galahad"], "sources": [] }""",
+            ["fonts.json"] = """{ "formatVersion": 3, "fonts": ["Galahad"], "sources": [] }""",
             ["types.json"] = $$"""
                 {
-                  "formatVersion": 2,
+                  "formatVersion": 3,
                   "widgets": [
                     { "type": "TextWidget", "doc": "<Text> & ünïcode", "events": [] },
                     { "type": "ButtonWidget", "events": {{buttonEvents}} }
@@ -300,7 +300,7 @@ public sealed class GuiBundleTests
 
     private static string Manifest(string packageId, BuildEntry build, string modules) => $$"""
         {
-          "formatVersion": 2,
+          "formatVersion": 3,
           "package": "{{packageId}}",
           "gameVersion": "{{build.Version}}",
           "changeSet": null,
@@ -312,12 +312,12 @@ public sealed class GuiBundleTests
     private static string Prefabs(params (string Name, string Module, string File)[] prefabs) =>
         new JsonObject
         {
-            ["formatVersion"] = 2,
+            ["formatVersion"] = GuiPackager.FormatVersion,
             ["prefabs"] = new JsonArray(prefabs.Select(x => (JsonNode?) new JsonObject { ["name"] = x.Name, ["module"] = x.Module, ["file"] = x.File, ["tags"] = new JsonArray() }).ToArray()),
         }.ToJsonString(new() { WriteIndented = true });
 
     private static string Tree(string name, string module, string root) =>
-        $$$"""{"formatVersion":2,"name":"{{{name}}}","module":"{{{module}}}","root":{{{root.Trim()}}}}""";
+        $$$"""{"formatVersion":3,"name":"{{{name}}}","module":"{{{module}}}","root":{{{root.Trim()}}}}""";
 
     private static GuiBundleSource Source(BuildEntry build, string packageId, Dictionary<string, string> files) =>
         new(build, packageId, build.PackageVersion, () => files.ToDictionary(x => x.Key, x => Encoding.UTF8.GetBytes(x.Value), StringComparer.Ordinal));

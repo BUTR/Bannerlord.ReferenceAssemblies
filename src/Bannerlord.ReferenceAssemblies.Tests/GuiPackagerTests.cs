@@ -14,8 +14,8 @@ namespace Bannerlord.ReferenceAssemblies.Tests;
 /// </summary>
 public sealed class GuiPackagerTests : IDisposable
 {
-    private const string BasePackage = "Bannerlord.ReferenceAssemblies.GUI.v2";
-    private const string DlcPackage = "Bannerlord.ReferenceAssemblies.GUI.v2.NavalDLC";
+    private const string BasePackage = "Bannerlord.ReferenceAssemblies.GUI.v3";
+    private const string DlcPackage = "Bannerlord.ReferenceAssemblies.GUI.v3.NavalDLC";
 
     private readonly string _root = Path.Combine(Path.GetTempPath(), $"gui-packager-{Guid.NewGuid():N}");
     private string Game => Path.Combine(_root, "depots", "24573425");
@@ -242,7 +242,7 @@ public sealed class GuiPackagerTests : IDisposable
     {
         using var manifest = JsonDocument.Parse(Entries(PackageOf(Pack(), BasePackage))["gui/manifest.json"]);
         var root = manifest.RootElement;
-        Assert.Equal(2, root.GetProperty("formatVersion").GetInt32());
+        Assert.Equal(GuiPackager.FormatVersion, root.GetProperty("formatVersion").GetInt32());
         Assert.Equal(BasePackage, root.GetProperty("package").GetString());
         Assert.Equal("v1.4.8", root.GetProperty("gameVersion").GetString());
         Assert.Equal(119303, root.GetProperty("changeSet").GetInt32());
@@ -285,10 +285,10 @@ public sealed class GuiPackagerTests : IDisposable
     {
         var packages = Pack(version: "e1.4.8");
         Assert.Equal(
-            ["Bannerlord.ReferenceAssemblies.GUI.v2.EarlyAccess.1.4.8.119303.nupkg", "Bannerlord.ReferenceAssemblies.GUI.v2.NavalDLC.EarlyAccess.1.4.8.119303.nupkg"],
+            ["Bannerlord.ReferenceAssemblies.GUI.v3.EarlyAccess.1.4.8.119303.nupkg", "Bannerlord.ReferenceAssemblies.GUI.v3.NavalDLC.EarlyAccess.1.4.8.119303.nupkg"],
             packages.Select(Path.GetFileName).Order(StringComparer.Ordinal));
         var entries = Entries(packages[0]);
-        Assert.Contains("build/Bannerlord.ReferenceAssemblies.GUI.v2.EarlyAccess.props", entries.Keys);
+        Assert.Contains("build/Bannerlord.ReferenceAssemblies.GUI.v3.EarlyAccess.props", entries.Keys);
     }
 
     [Fact]
@@ -335,13 +335,13 @@ public sealed class GuiPackagerTests : IDisposable
     }
 
     [Fact]
-    public void Every_JSON_file_is_format_version_2()
+    public void Every_JSON_file_is_of_the_current_format_version()
     {
         foreach (var package in Pack())
         foreach (var (name, bytes) in Entries(package).Where(x => x.Key.EndsWith(".json", StringComparison.Ordinal)))
         {
             using var json = JsonDocument.Parse(bytes);
-            Assert.True(json.RootElement.GetProperty("formatVersion").GetInt32() == 2, $"{Path.GetFileName(package)}: {name}");
+            Assert.True(json.RootElement.GetProperty("formatVersion").GetInt32() == GuiPackager.FormatVersion, $"{Path.GetFileName(package)}: {name}");
         }
     }
 

@@ -15,9 +15,9 @@ See the .NET documentation on [reference assemblies](https://docs.microsoft.com/
 | Dedicated server, engine only | `Bannerlord.ReferenceAssemblies.Server.Core` | `Bannerlord.ReferenceAssemblies.Server.Core.EarlyAccess` |
 | Modding Kit, everything | `Bannerlord.ReferenceAssemblies.ModdingKit` | `Bannerlord.ReferenceAssemblies.ModdingKit.EarlyAccess` |
 | Modding Kit, engine only | `Bannerlord.ReferenceAssemblies.ModdingKit.Core` | `Bannerlord.ReferenceAssemblies.ModdingKit.Core.EarlyAccess` |
-| Game GUI, without DLC | `Bannerlord.ReferenceAssemblies.GUI.v2` | `Bannerlord.ReferenceAssemblies.GUI.v2.EarlyAccess` |
-| Game GUI, one DLC module | `Bannerlord.ReferenceAssemblies.GUI.v2.NavalDLC` | `Bannerlord.ReferenceAssemblies.GUI.v2.NavalDLC.EarlyAccess` |
-| Game GUI, every version with its DLC | `Bannerlord.ReferenceAssemblies.GUI.v2.All` | — |
+| Game GUI, without DLC | `Bannerlord.ReferenceAssemblies.GUI.v3` | `Bannerlord.ReferenceAssemblies.GUI.v3.EarlyAccess` |
+| Game GUI, one DLC module | `Bannerlord.ReferenceAssemblies.GUI.v3.NavalDLC` | `Bannerlord.ReferenceAssemblies.GUI.v3.NavalDLC.EarlyAccess` |
+| Game GUI, every version with its DLC | `Bannerlord.ReferenceAssemblies.GUI.v3.All` | — |
 
 Choose the package family for the application you target. Use the all-modules package for the game,
 or select Core and individual module packages as needed; SandBox is shown above as an example.
@@ -58,8 +58,12 @@ of it JSON. Each package contains:
   loaded in every mission;
 - `gui/fonts.json`: the fonts the game loads, by name;
 - `gui/uiSounds.json`: the sound names a brush can give as `Audio`;
-- `gui/types.json`: the widget classes with the events they raise, the ViewModels, and the objects widget
-  properties hold, with their members;
+- `gui/types.json`: the widget classes with the events they raise and what they announce, the ViewModels, and
+  the objects widget properties hold, with their members. A widget announces a change through
+  `OnPropertyChanged(value, name)`, and the loader writes the value to the ViewModel property bound to that name:
+  `announcements` lists each name with the types announced under it, which need not be the property's own (the
+  alignments are announced as `System.String` from v1.1.0 on). Each ViewModel property carries the accessibility of
+  its `getter` and `setter`, null when there is none, since the loader uses public accessors only;
 - `build/<PackageId>.props`, which lists every file, `gui/**/*.json`, as `BannerlordGameGuiData` items.
 
 The base package holds every module of the game itself. Each DLC module gets a package of its own, because a
@@ -67,30 +71,31 @@ DLC is optional: an analyzer checks a patch without it, and with it when the mod
 The packages are versioned exactly like the reference packages, so a mod restores the base and the DLC package
 of the same build with the same `$(GameVersion).*`. Only the game app has GUI packages.
 
-The `v2` in the id is the format of the contents, the same number as `formatVersion` in the JSON files. A published
-package cannot be changed, so a format a consumer has to read differently is published under new ids for every
-build, old ones included, and a consumer references the format it reads. Format 1, `GUI.v1`, carried the game's
-prefab, brush and sprite data XML byte for byte; its packages are unlisted.
+The `v3` in the id is the format of the contents, the same number as `formatVersion` in the JSON files. A published
+package cannot be changed, so a format a consumer has to read differently, or new data every build must carry, is
+published under new ids for every build, old ones included, and a consumer references the format it reads. Format 1,
+`GUI.v1`, carried the game's prefab, brush and sprite data XML byte for byte; its packages are unlisted. Format 2,
+`GUI.v2`, carried the same files as format 3 without the announcements and the ViewModel accessors.
 
 ## GUI package for every version
 
 A project restores one version of a package id, so the per-build GUI packages show an analyzer only the game
-version the project compiles against. `Bannerlord.ReferenceAssemblies.GUI.v2.All` holds every release version at
+version the project compiles against. `Bannerlord.ReferenceAssemblies.GUI.v3.All` holds every release version at
 once, so an analyzer can check a mod against all the versions it supports in one build.
 
-It holds the `GUI.v2` package of the newest build of each release version (`v…`), with that build's DLC packages;
-a version still in beta is there as its beta. Early access versions are not. The data is format 2, value for value
+It holds the `GUI.v3` package of the newest build of each release version (`v…`), with that build's DLC packages;
+a version still in beta is there as its beta. Early access versions are not. The data is format 3, value for value
 as the per-build packages carry it, with every distinct record stored once:
 
 - `gui/bundle.json`: every game version and its packages with their builds, and which table lines each of
   their files is made of;
-- `gui/records.<file>.<property>.jsonl`: the records of one array of one format 2 file, such as
+- `gui/records.<file>.<property>.jsonl`: the records of one array of one format 3 file, such as
   `records.types.widgets.jsonl`, one per line;
 - `gui/nodes.jsonl`: every prefab node, one per line, with its child elements as line numbers;
-- `build/Bannerlord.ReferenceAssemblies.GUI.v2.All.props`, which lists `gui/*.json` and `gui/*.jsonl` as
-  `BannerlordGameGuiData` items, with `Package="Bannerlord.ReferenceAssemblies.GUI.v2.All"`.
+- `build/Bannerlord.ReferenceAssemblies.GUI.v3.All.props`, which lists `gui/*.json` and `gui/*.jsonl` as
+  `BannerlordGameGuiData` items, with `Package="Bannerlord.ReferenceAssemblies.GUI.v3.All"`.
 
-A consumer rebuilds a version's format 2 files from these, and reads them as it reads a per-build package. The
+A consumer rebuilds a version's format 3 files from these, and reads them as it reads a per-build package. The
 package holds every game version, so its version is the date it was packed and a run number: `YYYY.M.D.R`, such
 as `2026.9.28.57`. Take the newest with `Version="*"`. Its `contentHash:` tag changes only when its content does.
 
@@ -140,8 +145,9 @@ Use `--buildId` to regenerate specific builds, or `--dryRun` to list pending bui
 Pass `--checkFeed` to check NuGet for published packages before selecting builds.
 
 Pass `--gui` to pack the GUI packages of each game build as well. Their build ids are written to
-`final/generated-gui-builds.txt`. To pack only the GUI packages of builds that lack them, such as builds
-published before the GUI packages existed, use `--guiOnly`:
+`final/generated-gui-builds.txt`. To pack only the GUI packages of builds that lack them, such as a build whose
+GUI packing failed after its reference packages were published, or every build after a new GUI format, use
+`--guiOnly`:
 
 ```sh
 $TOOL generate --app game --guiOnly --maxBuilds 20
@@ -152,7 +158,7 @@ game folder, as Steam installs it.
 
 ### Bundle the GUI packages
 
-Pack `GUI.v2.All` from the GUI packages the feed already has, for the builds the registry marks published:
+Pack `GUI.v3.All` from the GUI packages the feed already has, for the builds the registry marks published:
 
 ```sh
 $TOOL bundle-gui --app game --revision 57
@@ -193,8 +199,8 @@ is none. The result is also written to `final/versions.json` and, in a workflow,
 [Update Build Registry](.github/workflows/update-builds.yml) checks for builds every three hours and
 requests [generation](.github/workflows/generate-references.yml) when packages are missing.
 [Verify Feed](.github/workflows/verify-feed.yml) checks the registries against NuGet nightly.
-Whenever the generate workflow publishes GUI packages, it packs and publishes `GUI.v2.All` as well. Its
-`bundleOnly` input does only that.
+Whenever the generate workflow publishes GUI packages, it packs and publishes `GUI.v3.All` as well. Run it
+by hand with `pack` set to `references`, `gui` or `bundle` to do only that part; `all` is the default.
 
 Once the packages for both the stable and the beta build are published, the update and generate
 workflows send the current versions to [BUTR/.github](https://github.com/BUTR/.github) as a

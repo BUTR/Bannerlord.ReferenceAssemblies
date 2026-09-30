@@ -12,7 +12,7 @@ namespace Bannerlord.ReferenceAssemblies;
 /// mark-published - records which builds the feed carries, so the other two never have to ask NuGet.
 /// versions       - reports the current stable and beta versions from the registry, for the org variables
 ///                  the mod repositories build against.
-/// bundle-gui     - packs the published GUI packages of every release version into one package, GUI.v2.All.
+/// bundle-gui     - packs the published GUI packages of every release version into one package, GUI.v3.All.
 /// </summary>
 public static class Program
 {
