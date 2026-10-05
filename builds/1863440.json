@@ -2,7 +2,7 @@
   "appId": 1863440,
   "current": {
     "public": 24571419,
-    "beta": 25318031,
+    "beta": 25670928,
     "v1.4.7": 24085374
   },
   "builds": [
@@ -1120,6 +1120,26 @@
       },
       "manifests": {
         "1863441": "3169154181421106263"
+      }
+    },
+    {
+      "buildId": 25670928,
+      "date": "2026-10-05T14:33:25Z",
+      "title": "Beta v1.5.4",
+      "branches": [
+        "beta"
+      ],
+      "version": "v1.5.4",
+      "changeSet": 123627,
+      "moduleVersions": {
+        "ModdingAnimationsResources": "v1.5.4",
+        "ExampleSoundMod": "v1.5.4",
+        "HeadlessClientLauncher": "v1.5.4",
+        "Multiplayer": "v1.5.4",
+        "Native": "v1.5.4"
+      },
+      "manifests": {
+        "1863441": "3240116034622194174"
       }
     }
   ]
