@@ -1131,6 +1131,7 @@
       ],
       "version": "v1.5.4",
       "changeSet": 123627,
+      "publishedVersion": "1.5.4.123627-beta",
       "moduleVersions": {
         "ModdingAnimationsResources": "v1.5.4",
         "ExampleSoundMod": "v1.5.4",
