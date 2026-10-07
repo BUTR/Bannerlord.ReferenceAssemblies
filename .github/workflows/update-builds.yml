@@ -2,9 +2,11 @@ name: Update Build Registry
 
 # Steam only exposes the manifests of the branches that exist right now. Once TaleWorlds moves a branch
 # to a new build, the manifest of the old one is gone from the app info and nothing but our own record
-# can point at it again. So this runs often, writes what Steam currently shows into builds/<appId>.json
+# can point at it again. So this runs often, writes what Steam currently shows into builds/steam/<appId>.json
 # for the game, the dedicated server and the Modding Kit, and reads the version of anything new from a
-# few small files.
+# few small files. It also records GOG's public builds of the game in builds/gog/<productId>.json and
+# which Steam builds they are the same as in builds/links.json; GOG lists only its five newest builds,
+# so a run each day is enough to catch every one.
 
 on:
   schedule:
@@ -65,6 +67,10 @@ jobs:
 
       - name: Update the Modding Kit registry
         run: $TOOL update --app moddingkit --fillVersions ${{github.event.inputs.fillVersions || 25}}
+
+      - name: Update the GOG registry and the Steam/GOG links
+        continue-on-error: true
+        run: $TOOL gog
 
       - name: Commit the registries
         id: commit

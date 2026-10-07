@@ -1,0 +1,2551 @@
+{
+  "productId": 1564781494,
+  "current": {
+    "public": "59926016360892274"
+  },
+  "builds": [
+    {
+      "buildId": "54217448357797922",
+      "date": "2021-03-15T11:13:49Z",
+      "label": "1.5.8.263183",
+      "version": "e1.5.8",
+      "changeSet": 263183,
+      "verified": true,
+      "metaId": "5ab70a875d3be4d20630f7beddd11cb1",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "2041f1826b2d0519ee4b21cce2d56194",
+          "size": 45669901766
+        }
+      ]
+    },
+    {
+      "buildId": "54220904526406597",
+      "date": "2021-03-16T15:48:52Z",
+      "label": "1.5.8.263439",
+      "version": "e1.5.8",
+      "changeSet": 263439,
+      "verified": true,
+      "metaId": "7960066c11040333dbb2a7febe1b9cad",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "506dfd42b325181367a25502011ba04d",
+          "size": 45669906389
+        }
+      ]
+    },
+    {
+      "buildId": "54240912071784828",
+      "date": "2021-03-23T13:31:06Z",
+      "label": "1.5.8.264172",
+      "version": "e1.5.8",
+      "changeSet": 264172,
+      "verified": true,
+      "metaId": "500f15224b482dca0e5f620a35743a60",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "bb7302454639a20b1efe34e7dfca80de",
+          "size": 45669819527
+        }
+      ]
+    },
+    {
+      "buildId": "54258539954407033",
+      "date": "2021-03-29T15:27:45Z",
+      "label": "1.5.8.264807",
+      "version": "e1.5.8",
+      "changeSet": 264807,
+      "verified": true,
+      "metaId": "19f554d293bbc794ceb0aa7a93f8bd64",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "2005010ba58cc8bd5de156061d81ef4e",
+          "size": 45669821063
+        }
+      ]
+    },
+    {
+      "buildId": "54264343296165358",
+      "date": "2021-03-31T15:43:56Z",
+      "label": "1.5.8.265256",
+      "version": "e1.5.8",
+      "changeSet": 265256,
+      "verified": true,
+      "metaId": "16999db2194a4e5ffc8da805b248d64c",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "f685d9910ac7c9f3ac54ee4e63f7c8f1",
+          "size": 45669822087
+        }
+      ]
+    },
+    {
+      "buildId": "54287381343171765",
+      "date": "2021-04-08T15:04:01Z",
+      "label": "1.5.9.266180",
+      "version": "e1.5.9",
+      "changeSet": 266180,
+      "verified": true,
+      "metaId": "0420ef6e1ace0ad30ab515d50164994c",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "37170648d4c5793fc2cd2704bf5f377d",
+          "size": 46152477240
+        }
+      ]
+    },
+    {
+      "buildId": "54290668558334684",
+      "date": "2021-04-09T18:38:32Z",
+      "label": "1.5.9.266354",
+      "version": "e1.5.9",
+      "changeSet": 266354,
+      "verified": true,
+      "metaId": "4d6c712910a5eef0e5547297750585c9",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "34016f2bcf2321d0ffbaf9841db3d304",
+          "size": 46152477752
+        }
+      ]
+    },
+    {
+      "buildId": "54304543513470011",
+      "date": "2021-04-14T12:17:42Z",
+      "label": "1.5.9.266721",
+      "version": "e1.5.9",
+      "changeSet": 266721,
+      "verified": true,
+      "metaId": "592a0edadc2d1cfda0c1fb95ada90800",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "7bd1f7e7fd966c6d807eaed3be80b107",
+          "size": 46151023672
+        }
+      ]
+    },
+    {
+      "buildId": "54319295376789059",
+      "date": "2021-04-19T14:23:20Z",
+      "label": "test",
+      "version": "e1.5.9",
+      "changeSet": 267291,
+      "verified": true,
+      "labelMismatch": true,
+      "metaId": "e3fb124707cb500b5a93f22032cebb72",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "4f558f77a9913d443ee64c97f4017a5e",
+          "size": 46151026407
+        }
+      ]
+    },
+    {
+      "buildId": "54324893950433756",
+      "date": "2021-04-21T12:47:07Z",
+      "label": "1.5.9.267611",
+      "version": "e1.5.9",
+      "changeSet": 267611,
+      "verified": true,
+      "metaId": "2cffd17449b03a46cf0fa3e4dd40f002",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "5452aeb195f4586bfe4ca60792216e63",
+          "size": 46151026969
+        }
+      ]
+    },
+    {
+      "buildId": "54341935899198456",
+      "date": "2021-04-27T09:48:43Z",
+      "label": "1.5.9.268121",
+      "version": "e1.5.9",
+      "changeSet": 268121,
+      "verified": true,
+      "metaId": "0a4895540d648c9bce582ef107cebe98",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "da0cb416b386fb491d760f716c932340",
+          "size": 46151033113
+        }
+      ]
+    },
+    {
+      "buildId": "54348212684737111",
+      "date": "2021-04-29T13:49:45Z",
+      "label": "1.5.9.268540",
+      "version": "e1.5.9",
+      "changeSet": 268540,
+      "verified": true,
+      "metaId": "30929c5918c988f86389f92d6443e84e",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "fdb22e9e6656860d7891653262ca9872",
+          "size": 46151027065
+        }
+      ]
+    },
+    {
+      "buildId": "54362205449551732",
+      "date": "2021-05-04T12:03:22Z",
+      "label": "1.5.9.268958",
+      "version": "e1.5.9",
+      "changeSet": 268958,
+      "verified": true,
+      "metaId": "fb0947e7d0272527d63108857cf0f790",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "e2421317fadd262f01f3b99772f93870",
+          "size": 46154765778
+        }
+      ]
+    },
+    {
+      "buildId": "54400140147731975",
+      "date": "2021-05-17T11:47:47Z",
+      "label": "1.5.9.270154",
+      "version": "e1.5.9",
+      "changeSet": 270154,
+      "verified": true,
+      "metaId": "8c0341e28dbb4b6f09db82535d84bc8a",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "50e3ef7733ce9af581d4983839865eaa",
+          "size": 46154461490
+        }
+      ]
+    },
+    {
+      "buildId": "54443818307390593",
+      "date": "2021-06-01T14:13:35Z",
+      "label": "1.5.9.271857",
+      "version": "e1.5.9",
+      "changeSet": 271857,
+      "verified": true,
+      "metaId": "e55a12c38e78f648013653e48bdbfce1",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "cac85be36936b5131793ac30305f92c8",
+          "size": 46154461490
+        }
+      ]
+    },
+    {
+      "buildId": "54533262118588068",
+      "date": "2021-07-02T09:37:19Z",
+      "label": "1.5.10.275443",
+      "version": "e1.5.10",
+      "changeSet": 275443,
+      "verified": true,
+      "metaId": "2857eb4902c544a4eb4386ae0fb88b01",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "c4754b1094c62746c093c96998f38ed1",
+          "size": 48114873322
+        }
+      ]
+    },
+    {
+      "buildId": "54545446173713968",
+      "date": "2021-07-06T14:38:57Z",
+      "label": "1.5.10.275761",
+      "version": "e1.5.10",
+      "changeSet": 275761,
+      "verified": true,
+      "metaId": "6e599ebd8e173225f51d9719441e5509",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "28efb250a4ccce9d9701331ff96f86ca",
+          "size": 48114873322
+        }
+      ]
+    },
+    {
+      "buildId": "54547790879421091",
+      "date": "2021-07-07T11:13:11Z",
+      "label": "1.5.10.275855",
+      "version": "e1.5.10",
+      "changeSet": 275855,
+      "verified": true,
+      "metaId": "6561822777a64d83edd5fe9f4ee038b1",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "0adf54460b3275ff7b82fb071b0ac92f",
+          "size": 47584556120
+        }
+      ]
+    },
+    {
+      "buildId": "54550930442267399",
+      "date": "2021-07-08T12:01:43Z",
+      "label": "1.5.10.275993",
+      "version": "e1.5.10",
+      "changeSet": 275993,
+      "verified": true,
+      "metaId": "5f4e5d0672c70c72471fade5e3522f3e",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "c17bc4a2181458bb89870d92bc6ac822",
+          "size": 47584556632
+        }
+      ]
+    },
+    {
+      "buildId": "54563025466783728",
+      "date": "2021-07-12T16:05:02Z",
+      "label": "1.5.10.276353",
+      "version": "e1.5.10",
+      "changeSet": 276353,
+      "verified": true,
+      "metaId": "51abea023bd4c8549024e69bbee812ec",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "4efac82a5bf8c149ff440ffe2fd9abcf",
+          "size": 47584558182
+        }
+      ]
+    },
+    {
+      "buildId": "54563171429656829",
+      "date": "2021-07-12T17:21:32Z",
+      "label": "1.5.10.276370",
+      "version": "e1.5.10",
+      "changeSet": 276370,
+      "verified": true,
+      "metaId": "25196dc875169b06bc49d0535ea7128c",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "82fdd0f2cb0986add67dc0c8d4a22dfe",
+          "size": 47584558182
+        }
+      ]
+    },
+    {
+      "buildId": "54608450153827386",
+      "date": "2021-07-28T08:12:43Z",
+      "label": "1.5.10.276976",
+      "version": "e1.5.10",
+      "changeSet": 276976,
+      "verified": true,
+      "metaId": "167128abb0ecda6078101c84da3765fa",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "28189084d5cded2a24ff31a5ff7d0ec5",
+          "size": 47584558182
+        }
+      ]
+    },
+    {
+      "buildId": "54623499459995436",
+      "date": "2021-08-02T13:08:48Z",
+      "label": "1.6.0.277436",
+      "version": "e1.6.0",
+      "changeSet": 277436,
+      "verified": true,
+      "metaId": "a3a3cd4d96afe6a97b5e0f031767c8a0",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "e8314ddd5f3e0f3d11ed038ac8b273b9",
+          "size": 47990742062
+        }
+      ]
+    },
+    {
+      "buildId": "54632252947327035",
+      "date": "2021-08-05T13:08:43Z",
+      "label": "1.6.0.278032",
+      "version": "e1.6.0",
+      "changeSet": 278032,
+      "verified": true,
+      "metaId": "24c33e99301286b599ebed041a4ecb8a",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "288198edc9fdffff24994307ec846438",
+          "size": 47990749189
+        }
+      ]
+    },
+    {
+      "buildId": "54649234782261759",
+      "date": "2021-08-11T14:49:02Z",
+      "label": "1.6.0.278648",
+      "version": "e1.6.0",
+      "changeSet": 278648,
+      "verified": true,
+      "metaId": "d610d4f8467beaa0c89d9af1dd1a6c24",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "e2e0f0ba345efa0a1cbb108e43ce8504",
+          "size": 47979675975
+        }
+      ]
+    },
+    {
+      "buildId": "54673099933554733",
+      "date": "2021-08-19T16:26:42Z",
+      "label": "1.6.1.279527",
+      "version": "e1.6.1",
+      "changeSet": 279527,
+      "verified": true,
+      "metaId": "dd5c080731e608cf2524630d5d387aa0",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "4eef59421dcf45764439495fea874977",
+          "size": 49192049333
+        }
+      ]
+    },
+    {
+      "buildId": "54684030827705262",
+      "date": "2021-08-23T10:03:21Z",
+      "label": "1.6.1.279810",
+      "version": "e1.6.1",
+      "changeSet": 279810,
+      "verified": true,
+      "metaId": "4d4a095a44f49945df7a9e8fb91589de",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "381e216094cdafe41a4bdc6bd6e8af36",
+          "size": 49191717684
+        }
+      ]
+    },
+    {
+      "buildId": "54690626865540500",
+      "date": "2021-08-26T07:52:53Z",
+      "label": "1.6.1.280285",
+      "version": "e1.6.1",
+      "changeSet": 280285,
+      "verified": true,
+      "metaId": "ad7c6c27df26812a9f8bea43e2524d59",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "f170ce8a851e111e1ba537857ac452e7",
+          "size": 49191727680
+        }
+      ]
+    },
+    {
+      "buildId": "54733645360272588",
+      "date": "2021-09-09T12:31:13Z",
+      "label": "1.6.1.282007",
+      "version": "e1.6.1",
+      "changeSet": 282007,
+      "verified": true,
+      "metaId": "715379686cb6fdbc42832603f1a32650",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "45807d227e1335857979168d93289a72",
+          "size": 49191731776
+        }
+      ]
+    },
+    {
+      "buildId": "54753916979260991",
+      "date": "2021-09-16T12:37:55Z",
+      "label": "1.6.1.282881",
+      "version": "e1.6.1",
+      "changeSet": 282881,
+      "verified": true,
+      "metaId": "b399c27010828633d8a66c626d3e9eb4",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "e014cfbf5470dfcc7d8d1d40d875cb81",
+          "size": 49192014652
+        }
+      ]
+    },
+    {
+      "buildId": "54765646596782189",
+      "date": "2021-09-20T14:27:09Z",
+      "label": "1.6.1.283221",
+      "version": "e1.6.1",
+      "changeSet": 283221,
+      "verified": true,
+      "metaId": "975a71ccbca9c08bca0db882f0521699",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "3e8943040e3b7863c1acc7614b55aebf",
+          "size": 49192014652
+        }
+      ]
+    },
+    {
+      "buildId": "54771575555308156",
+      "date": "2021-09-22T14:39:44Z",
+      "label": "1.6.2.283738",
+      "version": "e1.6.2",
+      "changeSet": 283738,
+      "verified": true,
+      "metaId": "74712917557181737c74e80dd7e2d28e",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "2cfb614b3b5cb197994aff406fb31c4e",
+          "size": 50222570446
+        }
+      ]
+    },
+    {
+      "buildId": "54777547643252952",
+      "date": "2021-09-24T16:33:14Z",
+      "label": "1.6.2.284092",
+      "version": "e1.6.2",
+      "changeSet": 284092,
+      "verified": true,
+      "metaId": "413e1b895d945b87c836106f52c426ea",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "264fec206b04ee06b7ba5555da776c39",
+          "size": 50222569998
+        }
+      ]
+    },
+    {
+      "buildId": "54785847755622417",
+      "date": "2021-09-27T13:14:06Z",
+      "label": "1.6.2.284274",
+      "version": "e1.6.2",
+      "changeSet": 284274,
+      "verified": true,
+      "metaId": "ed5f269ca24022b7d7c8c3d130c5ba12",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "f65e2579948235f3768693c2d8d3efb8",
+          "size": 50222569998
+        }
+      ]
+    },
+    {
+      "buildId": "54788768186000124",
+      "date": "2021-09-28T13:17:54Z",
+      "label": "1.6.2.284399",
+      "version": "e1.6.2",
+      "changeSet": 284399,
+      "verified": true,
+      "metaId": "9295f3562ceb0753f0a90de0f13eb3e2",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "d6fb00fe78ef0112176fb4f85b02b428",
+          "size": 50222562830
+        }
+      ]
+    },
+    {
+      "buildId": "54794344076600848",
+      "date": "2021-09-30T14:11:04Z",
+      "label": "e1.6.2.284832",
+      "version": "e1.6.2",
+      "changeSet": 284832,
+      "verified": true,
+      "metaId": "ba544232eb184416f4d20b584c0c687d",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "b28e1ec551bdb14f9c76f31ba6a7d2aa",
+          "size": 50222563854
+        }
+      ]
+    },
+    {
+      "buildId": "54811957485077133",
+      "date": "2021-10-06T12:47:17Z",
+      "label": "1.6.3.285789",
+      "version": "e1.6.3",
+      "changeSet": 285789,
+      "verified": true,
+      "metaId": "23cf0ece8e5bcc02e93bbc397fd650a5",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "3b3ebbe610fd27f3b1cae03132e0c6ad",
+          "size": 50226415037
+        }
+      ]
+    },
+    {
+      "buildId": "54817281877092403",
+      "date": "2021-10-08T08:54:49Z",
+      "label": "1.6.3.286135",
+      "version": "e1.6.3",
+      "changeSet": 286135,
+      "verified": true,
+      "metaId": "62af392dae95da74f607e6e808179673",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "b7ee922618f9b6eee19ceceffc1a2f7b",
+          "size": 50226419079
+        }
+      ]
+    },
+    {
+      "buildId": "54817492424959964",
+      "date": "2021-10-08T10:40:21Z",
+      "label": "1.6.3.286182",
+      "version": "e1.6.3",
+      "changeSet": 286182,
+      "verified": true,
+      "metaId": "fefe5ea781fbaae355b2b02e825da66a",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "8325dc8e5eb314cbaae5e0ad59a6f025",
+          "size": 50226419079
+        }
+      ]
+    },
+    {
+      "buildId": "54834838502660604",
+      "date": "2021-10-14T10:13:26Z",
+      "label": "1.6.3.287068",
+      "version": "e1.6.3",
+      "changeSet": 287068,
+      "verified": true,
+      "metaId": "50854b2851a15e1321bfa20d5254ceda",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "5991a331824d0a2cc23fb60fcdfba6f3",
+          "size": 50226370328
+        }
+      ]
+    },
+    {
+      "buildId": "54866676180934704",
+      "date": "2021-10-25T09:56:25Z",
+      "label": "1.6.4.288289",
+      "version": "e1.6.4",
+      "changeSet": 288289,
+      "verified": true,
+      "metaId": "7e430820a0801afe4257a55f98cede56",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "cc30190bee27532756f224cd4eb08d50",
+          "size": 50439091229
+        }
+      ]
+    },
+    {
+      "buildId": "54889640061208114",
+      "date": "2021-11-02T09:31:02Z",
+      "label": "1.6.4.288965",
+      "version": "e1.6.4",
+      "changeSet": 288965,
+      "verified": true,
+      "metaId": "285db2d8350e38843a4dcffdbadb49a7",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "d51dcf628f4eefecc12a691a1318ebcd",
+          "size": 50439295521
+        }
+      ]
+    },
+    {
+      "buildId": "54918647490605107",
+      "date": "2021-11-12T09:53:24Z",
+      "label": "1.6.4.290476",
+      "version": "e1.6.4",
+      "changeSet": 290476,
+      "verified": true,
+      "metaId": "7d2656fcd36c0ca7b9af304468b00b12",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "458df045bf55651d987a4e7a5ae3fdbe",
+          "size": 50434028284
+        }
+      ]
+    },
+    {
+      "buildId": "54919316734226656",
+      "date": "2021-11-12T13:57:41Z",
+      "label": "1.6.4.290626",
+      "version": "e1.6.4",
+      "changeSet": 290626,
+      "verified": true,
+      "metaId": "82d5912ae5dee8ac0cbb2c9979b0a985",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "030fecbec77e948185ac967dceb8535e",
+          "size": 50434028281
+        }
+      ]
+    },
+    {
+      "buildId": "54927851767318027",
+      "date": "2021-11-15T12:23:28Z",
+      "label": "1.6.4.290771",
+      "version": "e1.6.4",
+      "changeSet": 290771,
+      "verified": true,
+      "metaId": "835bfd53325a4fc8283808c1399bd480",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "70df6ea20eb7138ec15e38ce61722798",
+          "size": 50434032642
+        }
+      ]
+    },
+    {
+      "buildId": "54936610786467652",
+      "date": "2021-11-18T14:39:28Z",
+      "label": "1.6.4.291416",
+      "version": "e1.6.4",
+      "changeSet": 291416,
+      "verified": true,
+      "metaId": "e3444d83934891d367961e23235cbefa",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "43abf0bace2e425ffd991f41a19028d6",
+          "size": 50434032816
+        }
+      ]
+    },
+    {
+      "buildId": "54950905762124102",
+      "date": "2021-11-23T12:14:35Z",
+      "label": "1.6.4.291839",
+      "version": "e1.6.4",
+      "changeSet": 291839,
+      "verified": true,
+      "metaId": "830a3519d446226eaf19951d6fa99154",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "7c355f284297d8dc72c497b2d207dee7",
+          "size": 50439147031
+        }
+      ]
+    },
+    {
+      "buildId": "54976968080458483",
+      "date": "2021-12-02T10:57:41Z",
+      "label": "1.6.4.293326",
+      "version": "e1.6.4",
+      "changeSet": 293326,
+      "verified": true,
+      "metaId": "9edb916109a7f86cf5bb9d5cae36b2a9",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "d18727f882b064da1a0d154079203b5b",
+          "size": 50439147031
+        }
+      ]
+    },
+    {
+      "buildId": "55000240779324448",
+      "date": "2021-12-10T11:29:28Z",
+      "label": "1.6.5.294486",
+      "version": "e1.6.5",
+      "changeSet": 294486,
+      "verified": true,
+      "metaId": "c9e5fd832b88bc8ed21cb46a114676a1",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "fa591d454f420884e35bf7b24c67cb9d",
+          "size": 50173372631
+        }
+      ]
+    },
+    {
+      "buildId": "55017258095703143",
+      "date": "2021-12-16T10:40:37Z",
+      "label": "1.6.5.294871",
+      "version": "e1.6.5",
+      "changeSet": 294871,
+      "verified": true,
+      "metaId": "894f6c98bdad46f8f00f45cd56251b10",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "1bad1d81dcede5a546db4a2e8a604cc7",
+          "size": 50173703294
+        }
+      ]
+    },
+    {
+      "buildId": "55031894793729921",
+      "date": "2021-12-21T10:41:44Z",
+      "label": "1.6.5.295466",
+      "version": "e1.6.5",
+      "changeSet": 295466,
+      "verified": true,
+      "metaId": "5920165b9b7cedd0242bb0dde4d08b73",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "2a1a50a213410f7051740ee6cc42bb00",
+          "size": 50173704056
+        }
+      ]
+    },
+    {
+      "buildId": "55040428889515608",
+      "date": "2021-12-24T08:13:07Z",
+      "label": "1.6.5.295820",
+      "version": "e1.6.5",
+      "changeSet": 295820,
+      "verified": true,
+      "metaId": "eaf18ec13a589e195c83af61c5be29bc",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "219426ec8dafe1c0de2c4f4aa7dbbf0d",
+          "size": 50336326742
+        }
+      ]
+    },
+    {
+      "buildId": "55052796164671972",
+      "date": "2021-12-28T15:15:20Z",
+      "label": "1.6.5.296352",
+      "version": "e1.6.5",
+      "changeSet": 296352,
+      "verified": true,
+      "metaId": "720b0586090b87535b845b8acbb9ac26",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "7253d65c9fe89163ecfaf0a192b6cd7c",
+          "size": 50336326750
+        }
+      ]
+    },
+    {
+      "buildId": "55078618584984168",
+      "date": "2022-01-06T12:29:38Z",
+      "branch": "Legacy",
+      "label": "1.7.0.298049",
+      "version": "e1.7.0",
+      "changeSet": 298049,
+      "verified": true,
+      "metaId": "0b9a3224cc458e6eae3ac11a3539bee9",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "3fafcd9b8ec3d8484c384c50515f9387",
+          "size": 48472789603
+        }
+      ]
+    },
+    {
+      "buildId": "55081141279231694",
+      "date": "2022-01-07T09:50:06Z",
+      "label": "1.7.0.298189",
+      "version": "e1.7.0",
+      "changeSet": 298189,
+      "verified": true,
+      "metaId": "0787930f3033291b658d306ed6b23c97",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "852cd34502dd3cf9f6e07cbfd2282242",
+          "size": 48472791139
+        }
+      ]
+    },
+    {
+      "buildId": "55098850603046222",
+      "date": "2022-01-13T12:03:13Z",
+      "label": "1.7.0.298904",
+      "version": "e1.7.0",
+      "changeSet": 298904,
+      "verified": true,
+      "metaId": "5779e62e3501fe3ef91cffc1163cc2ac",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "65fdb720be95304558b3f0cbfc83b600",
+          "size": 48472801341
+        }
+      ]
+    },
+    {
+      "buildId": "55101965348379003",
+      "date": "2022-01-14T13:43:18Z",
+      "label": "1.7.0.299098",
+      "version": "e1.7.0",
+      "changeSet": 299098,
+      "verified": true,
+      "metaId": "c837db361e88ee3086336053d1de3b30",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "df2caf4e662d2bebf9911a914583cb91",
+          "size": 48472801853
+        }
+      ]
+    },
+    {
+      "buildId": "55113132548657488",
+      "date": "2022-01-18T10:04:02Z",
+      "label": "1.7.0.299494",
+      "version": "e1.7.0",
+      "changeSet": 299494,
+      "verified": true,
+      "metaId": "2769ddc4a3515c601807e042ff16535a",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "3c434df2d2d843d658a548150fbe7f31",
+          "size": 48472802373
+        }
+      ]
+    },
+    {
+      "buildId": "55139141703043200",
+      "date": "2022-01-27T09:27:23Z",
+      "label": "1.7.0.300623",
+      "version": "e1.7.0",
+      "changeSet": 300623,
+      "verified": true,
+      "metaId": "3ebebd0f8afc03cdc4496423b3363b6c",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "59e217968ab00134d334f0c8ee8716e2",
+          "size": 48472802373
+        }
+      ]
+    },
+    {
+      "buildId": "55159467088331611",
+      "date": "2022-02-03T10:04:31Z",
+      "label": "1.7.0.301499",
+      "version": "e1.7.0",
+      "changeSet": 301499,
+      "verified": true,
+      "metaId": "eba20828a21a5b4bbac14cca92095792",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "9a5288e9b83a6e8bd5664dd3dfb6354c",
+          "size": 48472808745
+        }
+      ]
+    },
+    {
+      "buildId": "55182554292984575",
+      "date": "2022-02-11T09:54:38Z",
+      "label": "1.7.0.302472",
+      "version": "e1.7.0",
+      "changeSet": 302472,
+      "verified": true,
+      "metaId": "df79bf5b23e25a98e0fdd3cb5428c587",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "216a60fb078a8fc2c78537706b8ef578",
+          "size": 48472808241
+        }
+      ]
+    },
+    {
+      "buildId": "55217331850926428",
+      "date": "2022-02-23T08:52:27Z",
+      "label": "1.7.0.304003",
+      "version": "e1.7.0",
+      "changeSet": 304003,
+      "verified": true,
+      "metaId": "930f04fc046aeb590b047a01feb002cf",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "5d8fe9b2319bcce6b3374fe0dfd94a8b",
+          "size": 48473007135
+        }
+      ]
+    },
+    {
+      "buildId": "55260800455691338",
+      "date": "2022-03-10T09:05:06Z",
+      "label": "1.7.1.305759",
+      "version": "e1.7.1",
+      "changeSet": 305759,
+      "verified": true,
+      "metaId": "de091ffebfd2df1003eb2ff0ab14d1c0",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "dcef15aa9a6fa8adc899397ebbe59597",
+          "size": 48471906301
+        }
+      ]
+    },
+    {
+      "buildId": "55275700866476481",
+      "date": "2022-03-15T12:58:50Z",
+      "label": "1.7.1.306438",
+      "version": "e1.7.1",
+      "changeSet": 306438,
+      "verified": true,
+      "metaId": "952dc0a4da5f79f63af38420f85c3d43",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "9303727e1f79e18af6ffa77a59027e1b",
+          "size": 48471907845
+        }
+      ]
+    },
+    {
+      "buildId": "55334179554844629",
+      "date": "2022-04-05T07:07:43Z",
+      "label": "1.7.1.308750",
+      "version": "e1.7.1",
+      "changeSet": 308750,
+      "verified": true,
+      "metaId": "4fae5f4e626f20aa7a46be0afb912997",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "2ce7866eefc4975fcb1eb717cd0c1208",
+          "size": 48576968835
+        }
+      ]
+    },
+    {
+      "buildId": "55345450094214143",
+      "date": "2022-04-11T08:00:17Z",
+      "label": "1.7.1.309490",
+      "version": "e1.7.1",
+      "changeSet": 309490,
+      "verified": true,
+      "metaId": "8661f789836e92f0172fc9ea3367f00f",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "b7f3f1f26f89bd898a1766294eaa39cb",
+          "size": 48576968835
+        }
+      ]
+    },
+    {
+      "buildId": "55360110967123972",
+      "date": "2022-04-13T14:46:50Z",
+      "label": "1.7.1.309992",
+      "version": "e1.7.1",
+      "changeSet": 309992,
+      "verified": true,
+      "metaId": "c90237b6c088c59e4bc76789b0449a98",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "2e33fbc9fa29d6550b0d477514e1af7c",
+          "size": 48576970883
+        }
+      ]
+    },
+    {
+      "buildId": "55385761566957977",
+      "date": "2022-04-22T11:21:39Z",
+      "label": "1.7.1.310948",
+      "version": "e1.7.1",
+      "changeSet": 310948,
+      "verified": true,
+      "metaId": "d317be37a5f3b107483e934c45fcbbd1",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "9a96b0d113221897edaa4eae8789396d",
+          "size": 48576961251
+        }
+      ]
+    },
+    {
+      "buildId": "55486969809757679",
+      "date": "2022-05-27T12:00:05Z",
+      "label": "1.7.2.314157",
+      "version": "e1.7.2",
+      "changeSet": 314157,
+      "verified": true,
+      "metaId": "e9a9c14f9055d7e9734ccddc7bbee458",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "5d71e195e2ac7210529a75bed7bec8a6",
+          "size": 46123703836
+        }
+      ]
+    },
+    {
+      "buildId": "55504895763735806",
+      "date": "2022-06-02T13:26:23Z",
+      "label": "1.7.2.314809",
+      "version": "e1.7.2",
+      "changeSet": 314809,
+      "verified": true,
+      "metaId": "f2ae9d75402c327b2e3950e1129a99fc",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "8c69799476407ab4b910d6ce3b86e271",
+          "size": 46123705467
+        }
+      ]
+    },
+    {
+      "buildId": "55545226254960566",
+      "date": "2022-06-16T14:32:30Z",
+      "label": "1.7.2.316284",
+      "version": "e1.7.2",
+      "changeSet": 316284,
+      "verified": true,
+      "metaId": "cd6a340d8372e0d5b007d662da7395e6",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "eebe7130151664b7f68e4419a81ad120",
+          "size": 46126101994
+        }
+      ]
+    },
+    {
+      "buildId": "55725187769540579",
+      "date": "2022-08-17T13:29:34Z",
+      "label": "1.8.0.321460",
+      "version": "e1.8.0",
+      "changeSet": 321460,
+      "verified": true,
+      "metaId": "4d1b1acd089c0c2b2be2f14f32598e55",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "042a44f1e8090fb32bbccffc1245d946",
+          "size": 48319249437
+        }
+      ]
+    },
+    {
+      "buildId": "55850088337207717",
+      "date": "2022-09-29T15:14:50Z",
+      "label": "1.8.1.1942",
+      "version": "e1.8.1",
+      "changeSet": 1942,
+      "verified": true,
+      "metaId": "1cacea742f076f7f489cc23ad4671d3d",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "5c031bd3ea5a2235e35a74828f6302b6",
+          "size": 48346552633
+        }
+      ]
+    },
+    {
+      "buildId": "55864382315690929",
+      "date": "2022-10-04T13:33:24Z",
+      "label": "1.8.1.2192",
+      "version": "e1.8.1",
+      "changeSet": 2192,
+      "verified": true,
+      "metaId": "861f580e35f1bb8bb3e7ffd8869f1211",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "7a2f61ebfa44665bbbb0d002d8880418",
+          "size": 48346552633
+        }
+      ]
+    },
+    {
+      "buildId": "55892960668505440",
+      "date": "2022-10-14T12:07:53Z",
+      "label": "1.8.1.2860",
+      "version": "e1.8.1",
+      "changeSet": 2778,
+      "verified": true,
+      "labelMismatch": true,
+      "metaId": "3666e94621c386be6a3b8a486eb9afab",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "cc1db2cac7f3bd5e679e2d0d6bdac03a",
+          "size": 48346554175
+        }
+      ]
+    },
+    {
+      "buildId": "55913905372834519",
+      "date": "2022-10-21T15:16:37Z",
+      "label": "1.0.0.3539",
+      "version": "v1.0.0",
+      "changeSet": 3539,
+      "verified": true,
+      "metaId": "6232995efcc40503f2b5faffad93a352",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "5d0acf4080480c79a2c238f45d689fa9",
+          "size": 48725263436
+        }
+      ]
+    },
+    {
+      "buildId": "55922716690000088",
+      "date": "2022-10-24T16:42:03Z",
+      "label": "1.0.0.3624",
+      "version": "v1.0.0",
+      "changeSet": 3624,
+      "verified": true,
+      "metaId": "3e5b88ff8e36f4e34401fad19375230a",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "f57611030c39f4f4da1c761e66cedc66",
+          "size": 48725263436
+        }
+      ]
+    },
+    {
+      "buildId": "55928175723362692",
+      "date": "2022-10-26T16:35:16Z",
+      "label": "1.0.0.3746",
+      "version": "v1.0.0",
+      "changeSet": 3746,
+      "verified": true,
+      "metaId": "785c1d2490e93b77a3301130cbc73513",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "d6f4022620ac9999e7c77b48b0ab608b",
+          "size": 48725263948
+        }
+      ]
+    },
+    {
+      "buildId": "55930506718669682",
+      "date": "2022-10-27T09:06:15Z",
+      "label": "1.0.0.3783",
+      "version": "v1.0.0",
+      "changeSet": 3783,
+      "verified": true,
+      "metaId": "d07b86563a0c328c7846cee24ed8fbc6",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "992a8af9744cc643a07f37f786bb6833",
+          "size": 48725269580
+        }
+      ]
+    },
+    {
+      "buildId": "55951346749641988",
+      "date": "2022-11-03T13:37:46Z",
+      "label": "1.0.0.4373",
+      "version": "v1.0.0",
+      "changeSet": 4373,
+      "verified": true,
+      "metaId": "cd7dd0c48e97ec3d1f5aba92d1a6c6e9",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "b3b529db9074af35593785cb29f61b06",
+          "size": 48725270610
+        }
+      ]
+    },
+    {
+      "buildId": "55954418878873554",
+      "date": "2022-11-04T14:46:46Z",
+      "label": "1.0.0.4407",
+      "version": "v1.0.0",
+      "changeSet": 4407,
+      "verified": true,
+      "metaId": "9c72839154d55e1d35ce88d3a0cf22f2",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "503e2040c991857626891bea526933a1",
+          "size": 48725270098
+        }
+      ]
+    },
+    {
+      "buildId": "55954526788552870",
+      "date": "2022-11-04T15:31:50Z",
+      "label": "1.0.1.4441",
+      "version": "v1.0.1",
+      "changeSet": 4441,
+      "verified": true,
+      "metaId": "8f700eb4c36e70dd4ef47654b8fa03f8",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "375ef5e9feca9a872a219d7b2550e1b5",
+          "size": 48725319917
+        }
+      ]
+    },
+    {
+      "buildId": "55974147053188529",
+      "date": "2022-11-11T10:13:34Z",
+      "label": "1.0.1.4790",
+      "version": "v1.0.1",
+      "changeSet": 4790,
+      "verified": true,
+      "metaId": "70e6a8f2ef642bfcd486417c00135a84",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "32fbb4e255149eb93d7575082e689b45",
+          "size": 48725319917
+        }
+      ]
+    },
+    {
+      "buildId": "55974474772493898",
+      "date": "2022-11-11T12:53:09Z",
+      "label": "1.0.1.4833",
+      "version": "v1.0.1",
+      "changeSet": 4833,
+      "verified": true,
+      "metaId": "4a050d6fb6140b8afeb8ef2d6a57cd71",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "91bb58b171877bb0c42fcc791b219df2",
+          "size": 48725320429
+        }
+      ]
+    },
+    {
+      "buildId": "55991543214149052",
+      "date": "2022-11-17T12:07:13Z",
+      "label": "1.0.1.5218",
+      "version": "v1.0.1",
+      "changeSet": 5218,
+      "verified": true,
+      "metaId": "f7361c2dab22a944873cc13127728858",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "06020f6f14909d250e440d8d3bb0f89a",
+          "size": 48725320429
+        }
+      ]
+    },
+    {
+      "buildId": "55994261970635998",
+      "date": "2022-11-18T09:50:45Z",
+      "label": "1.0.1.5325",
+      "version": "v1.0.1",
+      "changeSet": 5325,
+      "verified": true,
+      "metaId": "9bba486f691d77ff4a7880de0e94d8d9",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "27bbe20eddeb14d211dbb044c997a1b2",
+          "size": 48725320947
+        }
+      ]
+    },
+    {
+      "buildId": "56026219009582601",
+      "date": "2022-11-29T09:40:43Z",
+      "label": "1.0.2.6150",
+      "version": "v1.0.2",
+      "changeSet": 6150,
+      "verified": true,
+      "metaId": "577bc9802d840cd724fa8f4550089f23",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "d8d77e6aec8284a7c37881f757e1fbe6",
+          "size": 48781901843
+        }
+      ]
+    },
+    {
+      "buildId": "56035162869034302",
+      "date": "2022-12-02T11:03:41Z",
+      "label": "1.0.2.6549",
+      "version": "v1.0.2",
+      "changeSet": 6549,
+      "verified": true,
+      "metaId": "076a5708fbfcfc90ff999193fcaa4f46",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "ab68a8fcb980d3bfcbdd11a6fea339e4",
+          "size": 48781901843
+        }
+      ]
+    },
+    {
+      "buildId": "56049289408392644",
+      "date": "2022-12-09T16:37:59Z",
+      "label": "1.0.2.6967",
+      "version": "v1.0.2",
+      "changeSet": 6967,
+      "verified": true,
+      "metaId": "18a171abbb968fa528eb45b57bf5c963",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "75027d3344c16e3109b11b164214f3b1",
+          "size": 48815099949
+        }
+      ]
+    },
+    {
+      "buildId": "56067377069543424",
+      "date": "2022-12-13T13:43:19Z",
+      "label": "1.0.2.7585",
+      "version": "v1.0.2",
+      "changeSet": 7585,
+      "verified": true,
+      "metaId": "1b44cba8ba4970c75e7c2cc601abdbe5",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "91147672cc4201d4f0d1cadee56c0a21",
+          "size": 48815101485
+        },
+        {
+          "productId": "1664230388",
+          "manifest": "496eb68cd5d0aa4869b0f2785773e706",
+          "size": 700272430
+        }
+      ]
+    },
+    {
+      "buildId": "56070717424434267",
+      "date": "2022-12-14T17:14:23Z",
+      "label": "DLC.Test.02",
+      "version": "v1.0.2",
+      "changeSet": 7585,
+      "verified": true,
+      "labelMismatch": true,
+      "metaId": "7d3f64eace2fc6e5318b40c686648f17",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "91147672cc4201d4f0d1cadee56c0a21",
+          "size": 48815101485
+        },
+        {
+          "productId": "1664230388",
+          "manifest": "4da4a4f7662d56a07e9459597439fea3",
+          "size": 1210058736
+        }
+      ]
+    },
+    {
+      "buildId": "56075746431681633",
+      "date": "2022-12-16T10:52:32Z",
+      "label": "1.0.2.7919",
+      "version": "v1.0.2",
+      "changeSet": 7919,
+      "verified": true,
+      "metaId": "21eaea56af78d1077835155fa7afd757",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "d190d8ea7b4fd340b7a99ce60f366abb",
+          "size": 48813310213
+        },
+        {
+          "productId": "1664230388",
+          "manifest": "4da4a4f7662d56a07e9459597439fea3",
+          "size": 1210058736
+        }
+      ]
+    },
+    {
+      "buildId": "56095910044087738",
+      "date": "2022-12-23T11:25:59Z",
+      "label": "1.0.2.8368",
+      "version": "v1.0.2",
+      "changeSet": 8368,
+      "verified": true,
+      "metaId": "f79043dc743dc71a9f0f80d5965e0d4a",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "7a7dcb4184bd4fa728ec3d5865f87c03",
+          "size": 48813310373
+        },
+        {
+          "productId": "1664230388",
+          "manifest": "4da4a4f7662d56a07e9459597439fea3",
+          "size": 1210058736
+        }
+      ]
+    },
+    {
+      "buildId": "56133785066739757",
+      "date": "2023-01-05T11:22:17Z",
+      "label": "1.0.3.9055",
+      "version": "v1.0.3",
+      "changeSet": 9055,
+      "verified": true,
+      "metaId": "76ac9224d0cb04ff77365c1cf75cb79d",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "a6647ab3c4f4ead85dd397fbae5d77d1",
+          "size": 48813310754
+        },
+        {
+          "productId": "1664230388",
+          "manifest": "4da4a4f7662d56a07e9459597439fea3",
+          "size": 1210058736
+        }
+      ]
+    },
+    {
+      "buildId": "56165720217872172",
+      "date": "2023-01-18T07:53:37Z",
+      "label": "1.0.3.9860",
+      "version": "v1.0.3",
+      "changeSet": 9860,
+      "verified": true,
+      "metaId": "191803a21cf471bb37d77ba5b9054f64",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "196707e589f42df97b323d0f0d1751cf",
+          "size": 48813311273
+        },
+        {
+          "productId": "1664230388",
+          "manifest": "4da4a4f7662d56a07e9459597439fea3",
+          "size": 1210058736
+        }
+      ]
+    },
+    {
+      "buildId": "56290116874945569",
+      "date": "2023-02-28T09:30:42Z",
+      "label": "1.1.0.12734",
+      "version": "v1.1.0",
+      "changeSet": 12734,
+      "verified": true,
+      "metaId": "3ccb72dc923d440a87b02a9f8a02458f",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "1c630d797a0077f2fc8a5f69876cf5a7",
+          "size": 49354270113
+        },
+        {
+          "productId": "1664230388",
+          "manifest": "4da4a4f7662d56a07e9459597439fea3",
+          "size": 1210058736
+        }
+      ]
+    },
+    {
+      "buildId": "56319422297842875",
+      "date": "2023-03-10T12:30:05Z",
+      "label": "1.1.1.14148",
+      "version": "v1.1.1",
+      "changeSet": 14148,
+      "verified": true,
+      "metaId": "2a15a435fb3946812cf39ecf620e29d9",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "2f1e57f3b949b6c9e73bc8f856c468b1",
+          "size": 49339284590
+        },
+        {
+          "productId": "1664230388",
+          "manifest": "4da4a4f7662d56a07e9459597439fea3",
+          "size": 1210058736
+        }
+      ]
+    },
+    {
+      "buildId": "56339188445864134",
+      "date": "2023-03-17T07:49:27Z",
+      "label": "1.1.2.14580",
+      "version": "v1.1.2",
+      "changeSet": 14580,
+      "verified": true,
+      "metaId": "1a33802656d4dc7f15ac886c102e3e76",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "e16d106bc05eb6eea7ab5a4c98bb0026",
+          "size": 49339286137
+        },
+        {
+          "productId": "1664230388",
+          "manifest": "4da4a4f7662d56a07e9459597439fea3",
+          "size": 1210058736
+        }
+      ]
+    },
+    {
+      "buildId": "56400720165220267",
+      "date": "2023-04-07T14:23:03Z",
+      "label": "1.1.3.16165",
+      "version": "v1.1.3",
+      "changeSet": 16165,
+      "verified": true,
+      "metaId": "1075ec3b53ce4b96ea137f8ee1255405",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "c4ec29dd87238870450999ae8fd948c5",
+          "size": 49339290240
+        },
+        {
+          "productId": "1664230388",
+          "manifest": "4da4a4f7662d56a07e9459597439fea3",
+          "size": 1210058736
+        }
+      ]
+    },
+    {
+      "buildId": "56481828219222242",
+      "date": "2023-05-05T12:39:58Z",
+      "label": "1.1.4.17949",
+      "version": "v1.1.4",
+      "changeSet": 17949,
+      "verified": true,
+      "metaId": "d54d1090f5a344bf5ad6428517f1e9a1",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "f4999d82c215fd53142357f6e2313615",
+          "size": 49339293312
+        },
+        {
+          "productId": "1664230388",
+          "manifest": "4da4a4f7662d56a07e9459597439fea3",
+          "size": 1210058736
+        }
+      ]
+    },
+    {
+      "buildId": "56615157036555357",
+      "date": "2023-06-20T12:21:52Z",
+      "label": "1.1.5.21456",
+      "version": "v1.1.5",
+      "changeSet": 21456,
+      "verified": true,
+      "metaId": "ce25d65e2883d44cd9aebc79a4c3df75",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "76e2df2f8476deb37f977e4eccf434a9",
+          "size": 49339296419
+        },
+        {
+          "productId": "1664230388",
+          "manifest": "4da4a4f7662d56a07e9459597439fea3",
+          "size": 1210058736
+        }
+      ]
+    },
+    {
+      "buildId": "56841399337329271",
+      "date": "2023-09-06T13:54:50Z",
+      "label": "1.1.6.26219",
+      "version": "v1.1.6",
+      "changeSet": 26219,
+      "verified": true,
+      "metaId": "bed8ec56e07bb49454d05ba5574bcb97",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "ee1cd51e425fbb6fa9d3fc8699419f91",
+          "size": 49339721008
+        },
+        {
+          "productId": "1664230388",
+          "manifest": "4da4a4f7662d56a07e9459597439fea3",
+          "size": 1210058736
+        }
+      ]
+    },
+    {
+      "buildId": "57125889334373063",
+      "date": "2023-12-13T17:26:22Z",
+      "label": "1.2.7.31207",
+      "version": "v1.2.7",
+      "changeSet": 31207,
+      "verified": true,
+      "metaId": "4f0d1458077991ab0860d8cabd292784",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "78dc6b8174bca2b16363a51df8d7fc90",
+          "size": 52229439995
+        },
+        {
+          "productId": "1664230388",
+          "manifest": "4da4a4f7662d56a07e9459597439fea3",
+          "size": 1210058736
+        }
+      ]
+    },
+    {
+      "buildId": "57146087624544647",
+      "date": "2023-12-20T16:53:21Z",
+      "label": "1.2.8.31530",
+      "version": "v1.2.8",
+      "changeSet": 31530,
+      "verified": true,
+      "metaId": "77cf8e38bfa8d38ba671347eed3e9082",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "06da82319042adfd36ba91279e02204c",
+          "size": 52288139862
+        },
+        {
+          "productId": "1664230388",
+          "manifest": "4da4a4f7662d56a07e9459597439fea3",
+          "size": 1210058736
+        }
+      ]
+    },
+    {
+      "buildId": "57270074673679446",
+      "date": "2024-02-01T11:46:35Z",
+      "label": "1.2.9.33689",
+      "version": "v1.2.9",
+      "changeSet": 33689,
+      "verified": true,
+      "metaId": "ba413bb692b77572fee4f3c59de2b7ce",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "7e2816e799d71f40e3cbd66997e40546",
+          "size": 52292311253
+        },
+        {
+          "productId": "1664230388",
+          "manifest": "4da4a4f7662d56a07e9459597439fea3",
+          "size": 1210058736
+        }
+      ]
+    },
+    {
+      "buildId": "57287784476643613",
+      "date": "2024-02-07T12:50:46Z",
+      "label": "1.2.9.34019",
+      "version": "v1.2.9",
+      "changeSet": 34019,
+      "verified": true,
+      "metaId": "33fd235442e500f61c85ab99548c3d6e",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "d58dbf15d984893e7033ae73a6b8dab6",
+          "size": 52292318428
+        },
+        {
+          "productId": "1664230388",
+          "manifest": "4da4a4f7662d56a07e9459597439fea3",
+          "size": 1210058736
+        }
+      ]
+    },
+    {
+      "buildId": "57313262190578059",
+      "date": "2024-02-16T07:39:52Z",
+      "label": "1.2.9.34269",
+      "version": "v1.2.9",
+      "changeSet": 34269,
+      "verified": true,
+      "metaId": "8a58884b7b49d8ad81ebdbbbbbc870bb",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "d885a4d53c1e5d757d98df4238576e1f",
+          "size": 52292318428
+        },
+        {
+          "productId": "1664230388",
+          "manifest": "4da4a4f7662d56a07e9459597439fea3",
+          "size": 1210058736
+        }
+      ]
+    },
+    {
+      "buildId": "57371339848155280",
+      "date": "2024-03-08T12:40:31Z",
+      "label": "1.2.9.35636",
+      "version": "v1.2.9",
+      "changeSet": 35636,
+      "verified": true,
+      "metaId": "9fb5247105088da86ae3b42638667bad",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "aa0a15466ca6733680aa58f0cc11fd2e",
+          "size": 52292323043
+        },
+        {
+          "productId": "1664230388",
+          "manifest": "4da4a4f7662d56a07e9459597439fea3",
+          "size": 1210058736
+        }
+      ]
+    },
+    {
+      "buildId": "57516936956389132",
+      "date": "2024-04-26T13:58:26Z",
+      "label": "1.2.9.38256",
+      "version": "v1.2.9",
+      "changeSet": 38256,
+      "verified": true,
+      "metaId": "b7f5ddc5c0a3e65cb46b28f541af5b36",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "156619a507dc0eeb4c43752e17ed8143",
+          "size": 52292377564
+        },
+        {
+          "productId": "1664230388",
+          "manifest": "4da4a4f7662d56a07e9459597439fea3",
+          "size": 1210058736
+        }
+      ]
+    },
+    {
+      "buildId": "57693548690342162",
+      "date": "2024-06-27T11:48:44Z",
+      "label": "1.2.10.42197",
+      "version": "v1.2.10",
+      "changeSet": 42197,
+      "verified": true,
+      "metaId": "1661ecaf802dcbfc5a5da96896c9b6ca",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "745ddd0c7c0d2f16db7a98f07f9b0e28",
+          "size": 52273135836
+        },
+        {
+          "productId": "1664230388",
+          "manifest": "4da4a4f7662d56a07e9459597439fea3",
+          "size": 1210058736
+        }
+      ]
+    },
+    {
+      "buildId": "57774412557064326",
+      "date": "2024-07-24T09:51:32Z",
+      "label": "1.2.10.44489",
+      "version": "v1.2.10",
+      "changeSet": 44489,
+      "verified": true,
+      "metaId": "1183b4e16346a9d2fd2872f2e5b2a09f",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "487f18f07dd5177b40f8c2b0802992a9",
+          "size": 52273135836
+        },
+        {
+          "productId": "1664230388",
+          "manifest": "4da4a4f7662d56a07e9459597439fea3",
+          "size": 1210058736
+        }
+      ]
+    },
+    {
+      "buildId": "57812318984040672",
+      "date": "2024-08-06T11:20:14Z",
+      "label": "1.2.11.45697",
+      "version": "v1.2.11",
+      "changeSet": 45697,
+      "verified": true,
+      "metaId": "17bd30bb370d7873c5fe5c488c69e402",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "f2b35b0ea9f32dd1abf1bfcd2f24314a",
+          "size": 52273136348
+        },
+        {
+          "productId": "1664230388",
+          "manifest": "4da4a4f7662d56a07e9459597439fea3",
+          "size": 1210058736
+        }
+      ]
+    },
+    {
+      "buildId": "58144211672156653",
+      "date": "2024-11-29T07:29:44Z",
+      "label": "1.2.12.54620",
+      "version": "v1.2.12",
+      "changeSet": 54620,
+      "verified": true,
+      "metaId": "78fe2854cfb5f9fdf9385fab97ab51ae",
+      "depots": [
+        {
+          "productId": "1564781494",
+          "manifest": "5d1858534220b4fe666fa846ba8f3f95",
+          "size": 52273103692
+        },
+        {
+          "productId": "1664230388",
+          "manifest": "4da4a4f7662d56a07e9459597439fea3",
+          "size": 1210058736
+        }
+      ]
+    },
+    {
+      "buildId": "59186309772329963",
+      "date": "2025-11-23T11:02:14Z",
+      "label": "1.3.4.101915",
+      "version": "v1.3.4",
+      "changeSet": 101915,
+      "verified": true,
+      "metaId": "23ca2b9747dd760ca8d677dff4095b9f",
+      "depots": [
+        {
+          "productId": "1500569639",
+          "manifest": "7cbe0b9a5cbc771cbd8c1b35ee83adeb",
+          "size": 33093593915
+        },
+        {
+          "productId": "1564781494",
+          "manifest": "17a426854c8723ad1d520a7aaa3b5e25",
+          "size": 61220309994
+        }
+      ]
+    },
+    {
+      "buildId": "59193430092819219",
+      "date": "2025-11-26T04:52:06Z",
+      "label": "1.3.4.102350",
+      "version": "v1.3.4",
+      "changeSet": 102350,
+      "verified": true,
+      "metaId": "f9bb8d5827b570b2d622a60e3b94656b",
+      "depots": [
+        {
+          "productId": "1500569639",
+          "manifest": "3c11f1cfb463a07a174cf2f8311ace9f",
+          "size": 33199359100
+        },
+        {
+          "productId": "1564781494",
+          "manifest": "455f021b9095a5da6f005d7562ca9d57",
+          "size": 61220311303
+        }
+      ]
+    },
+    {
+      "buildId": "59195702527131482",
+      "date": "2025-11-26T15:51:37Z",
+      "label": "1.3.5.102453",
+      "version": "v1.3.5",
+      "changeSet": 102453,
+      "verified": true,
+      "metaId": "d5eb65687d9fb9abf8f0676d17bf2c55",
+      "depots": [
+        {
+          "productId": "1500569639",
+          "manifest": "1381c0c826c92b0b4d084a63bf6a4041",
+          "size": 33199409338
+        },
+        {
+          "productId": "1564781494",
+          "manifest": "9e48cedaa9810b7a9ba8b28539541a74",
+          "size": 61219057757
+        }
+      ]
+    },
+    {
+      "buildId": "59198706253359991",
+      "date": "2025-11-27T17:07:24Z",
+      "label": "1.3.6.102656",
+      "version": "v1.3.6",
+      "changeSet": 102656,
+      "verified": true,
+      "metaId": "c70d01decbb622db8cd022f59947681e",
+      "depots": [
+        {
+          "productId": "1500569639",
+          "manifest": "6e59ba1b6edf440a201ac55b2d0796c8",
+          "size": 33203204300
+        },
+        {
+          "productId": "1564781494",
+          "manifest": "eff984c3ef06dce847c7e1fd955aea35",
+          "size": 61219066393
+        }
+      ]
+    },
+    {
+      "buildId": "59201680938343132",
+      "date": "2025-11-28T17:21:13Z",
+      "label": "1.3.7.102919",
+      "version": "v1.3.7",
+      "changeSet": 102919,
+      "verified": true,
+      "metaId": "80422c67b81a957b6a3a2cb96ac715e3",
+      "depots": [
+        {
+          "productId": "1500569639",
+          "manifest": "2d0a5d1aeed08ae8975b35c3552141ce",
+          "size": 33203205441
+        },
+        {
+          "productId": "1564781494",
+          "manifest": "2a8e668b8b21bbb4a4fb485e8dec5382",
+          "size": 61213001156
+        }
+      ]
+    },
+    {
+      "buildId": "59204809601205215",
+      "date": "2025-11-29T19:05:32Z",
+      "label": "1.3.8.103102",
+      "version": "v1.3.8",
+      "changeSet": 103102,
+      "verified": true,
+      "metaId": "63e8371e4fc8ff21861924df357c011e",
+      "depots": [
+        {
+          "productId": "1500569639",
+          "manifest": "fd78e438ab4d0871dd913423328ccc64",
+          "size": 33203209884
+        },
+        {
+          "productId": "1564781494",
+          "manifest": "985fe76fa00e20f7d11be4d071433e57",
+          "size": 61212981293
+        }
+      ]
+    },
+    {
+      "buildId": "59210807481210296",
+      "date": "2025-12-02T10:51:41Z",
+      "label": "1.3.9.103334",
+      "version": "v1.3.9",
+      "changeSet": 103334,
+      "verified": true,
+      "metaId": "c0db1aa40756f80d847e821168bdba2a",
+      "depots": [
+        {
+          "productId": "1500569639",
+          "manifest": "51d7e4a03e8ce23b2bac0b325146be58",
+          "size": 33203212956
+        },
+        {
+          "productId": "1564781494",
+          "manifest": "179b913f3418e56f15a7e318c01b0d64",
+          "size": 61212984877
+        }
+      ]
+    },
+    {
+      "buildId": "59230171490481135",
+      "date": "2025-12-08T13:06:53Z",
+      "label": "1.3.10.103977",
+      "version": "v1.3.10",
+      "changeSet": 103977,
+      "verified": true,
+      "metaId": "3f654587ab57f69bbee96c6c7172427a",
+      "depots": [
+        {
+          "productId": "1500569639",
+          "manifest": "8d96409ff5ea2dca5fcebace33b5be17",
+          "size": 33203218693
+        },
+        {
+          "productId": "1564781494",
+          "manifest": "346e67921ffd1672fc4ba6d940346963",
+          "size": 61213226822
+        }
+      ]
+    },
+    {
+      "buildId": "59232865240911546",
+      "date": "2025-12-09T14:21:05Z",
+      "label": "1.3.10.104176",
+      "version": "v1.3.10",
+      "changeSet": 104176,
+      "verified": true,
+      "metaId": "773edc32293e6fd1b453ecca6ac97db2",
+      "depots": [
+        {
+          "productId": "1500569639",
+          "manifest": "28b73e752a3a1801c246a4aa5e088ccc",
+          "size": 33203218693
+        },
+        {
+          "productId": "1564781494",
+          "manifest": "bc0f713442503ef37e32cc8c8a15a83c",
+          "size": 61213235014
+        }
+      ]
+    },
+    {
+      "buildId": "59236503091846201",
+      "date": "2025-12-10T18:55:40Z",
+      "label": "1.3.10.104371",
+      "version": "v1.3.10",
+      "changeSet": 104371,
+      "verified": true,
+      "metaId": "f2a38fb01b3d051894d2f410a90dd233",
+      "depots": [
+        {
+          "productId": "1500569639",
+          "manifest": "37363f9471071abffa9d578b9832722c",
+          "size": 33203218693
+        },
+        {
+          "productId": "1564781494",
+          "manifest": "619e0d1dfacd27047b4075b26813c711",
+          "size": 61213230918
+        }
+      ]
+    },
+    {
+      "buildId": "59253553473354771",
+      "date": "2025-12-16T14:45:45Z",
+      "label": "1.3.11.104956",
+      "version": "v1.3.11",
+      "changeSet": 104956,
+      "verified": true,
+      "metaId": "985cf0b0ed89f8d393419cf794257663",
+      "depots": [
+        {
+          "productId": "1500569639",
+          "manifest": "6c0ecd97a8744a1a864dee0b31e65028",
+          "size": 33203600325
+        },
+        {
+          "productId": "1564781494",
+          "manifest": "2ceba440825cc2a2b6acb1d83d2f6117",
+          "size": 61273128100
+        }
+      ]
+    },
+    {
+      "buildId": "59259150541488062",
+      "date": "2025-12-19T09:00:04Z",
+      "label": "1.3.11.105254",
+      "version": "v1.3.11",
+      "changeSet": 105254,
+      "verified": true,
+      "metaId": "1073c1fccbce1c186d3e407b3483f42b",
+      "depots": [
+        {
+          "productId": "1500569639",
+          "manifest": "2ac2050e0da6431eccd63e1a9b59f08c",
+          "size": 33203600325
+        },
+        {
+          "productId": "1564781494",
+          "manifest": "e4b036bbaf4c55d7103ab97df635dff8",
+          "size": 61270722388
+        }
+      ]
+    },
+    {
+      "buildId": "59276848652845331",
+      "date": "2025-12-24T16:09:25Z",
+      "label": "1.3.13.105726",
+      "version": "v1.3.13",
+      "changeSet": 105726,
+      "verified": true,
+      "metaId": "408365bd276dc8d07766797b104e0860",
+      "depots": [
+        {
+          "productId": "1500569639",
+          "manifest": "41b397da15f7eb882444f72ba1dc7ef9",
+          "size": 33382823508
+        },
+        {
+          "productId": "1564781494",
+          "manifest": "22c8fddbae0c843fd877e755e8e1d87c",
+          "size": 61313748994
+        }
+      ]
+    },
+    {
+      "buildId": "59291415036642795",
+      "date": "2026-01-05T11:35:41Z",
+      "label": "1.3.13.106033",
+      "version": "v1.3.13",
+      "changeSet": 106033,
+      "verified": true,
+      "metaId": "c82156f2317cb9b428381e29231b2fbd",
+      "depots": [
+        {
+          "productId": "1500569639",
+          "manifest": "1b80bf87386907dd3ad788c44cdad107",
+          "size": 33382823508
+        },
+        {
+          "productId": "1564781494",
+          "manifest": "d688d23ef6f6da3594a3c628d010088d",
+          "size": 61313748989
+        },
+        {
+          "productId": "1664230388",
+          "manifest": "4da4a4f7662d56a07e9459597439fea3",
+          "size": 1210058736
+        }
+      ]
+    },
+    {
+      "buildId": "59380705963403529",
+      "date": "2026-01-29T11:16:42Z",
+      "label": "1.3.14.107738",
+      "version": "v1.3.14",
+      "changeSet": 107738,
+      "verified": true,
+      "metaId": "b8656d79544a11ec84a6ae8d6c3052b6",
+      "depots": [
+        {
+          "productId": "1500569639",
+          "manifest": "b2cc3c225cb0ac253d53cb3f079f6429",
+          "size": 33392635174
+        },
+        {
+          "productId": "1564781494",
+          "manifest": "6c6159dec5a34e9244b21c9e8c620adc",
+          "size": 61316577534
+        },
+        {
+          "productId": "1664230388",
+          "manifest": "4da4a4f7662d56a07e9459597439fea3",
+          "size": 1210058736
+        }
+      ]
+    },
+    {
+      "buildId": "59453452294316855",
+      "date": "2026-02-23T13:50:37Z",
+      "label": "1.3.15.109330",
+      "version": "v1.3.15",
+      "changeSet": 109330,
+      "verified": true,
+      "metaId": "69abc6d757c49de13bf04415e3d10677",
+      "depots": [
+        {
+          "productId": "1500569639",
+          "manifest": "65759c9a361a396cb6b834afc3786785",
+          "size": 33392648866
+        },
+        {
+          "productId": "1564781494",
+          "manifest": "5245428755057b8599c35e39668be673",
+          "size": 61325217178
+        },
+        {
+          "productId": "1664230388",
+          "manifest": "4da4a4f7662d56a07e9459597439fea3",
+          "size": 1210058736
+        }
+      ]
+    },
+    {
+      "buildId": "59464685251688721",
+      "date": "2026-03-02T12:56:07Z",
+      "label": "1.3.15.109797",
+      "version": "v1.3.15",
+      "changeSet": 109797,
+      "verified": true,
+      "metaId": "fe8c1b8598dfc3e99be29509f5da5ab3",
+      "depots": [
+        {
+          "productId": "1500569639",
+          "manifest": "c1ef61623bcc51272a2cff9498ef77de",
+          "size": 33393276540
+        },
+        {
+          "productId": "1564781494",
+          "manifest": "d3785ce8b7075f5f4e2906da51a4edeb",
+          "size": 61335591097
+        },
+        {
+          "productId": "1664230388",
+          "manifest": "4da4a4f7662d56a07e9459597439fea3",
+          "size": 1210058736
+        }
+      ]
+    },
+    {
+      "buildId": "59574750799664213",
+      "date": "2026-04-06T13:20:26Z",
+      "label": "1.3.15.110062",
+      "version": "v1.3.15",
+      "changeSet": 110062,
+      "verified": true,
+      "metaId": "d23fe3518167c69b75cb2cb762262a6e",
+      "depots": [
+        {
+          "productId": "1500569639",
+          "manifest": "b8bf28895c0e2bb41b6def45c84a604d",
+          "size": 33393276540
+        },
+        {
+          "productId": "1564781494",
+          "manifest": "d9ae12b24ce5c323d4007f8595866053",
+          "size": 61335591097
+        },
+        {
+          "productId": "1664230388",
+          "manifest": "4da4a4f7662d56a07e9459597439fea3",
+          "size": 1210058736
+        }
+      ]
+    },
+    {
+      "buildId": "59705717203540738",
+      "date": "2026-05-21T13:49:49Z",
+      "label": "1.4.5.114896",
+      "version": "v1.4.5",
+      "changeSet": 114896,
+      "verified": true,
+      "metaId": "fa622c747234a731f4ba1be3b775de60",
+      "depots": [
+        {
+          "productId": "1500569639",
+          "manifest": "279dee6f613760640f696ec96d3158e3",
+          "size": 31475372026
+        },
+        {
+          "productId": "1564781494",
+          "manifest": "9d4f18288daee40f59c71c951bccb5c7",
+          "size": 63976368208
+        },
+        {
+          "productId": "1664230388",
+          "manifest": "4da4a4f7662d56a07e9459597439fea3",
+          "size": 1210058736
+        }
+      ]
+    },
+    {
+      "buildId": "59708548742792544",
+      "date": "2026-05-22T13:51:33Z",
+      "label": "1.4.5.114927",
+      "version": "v1.4.5",
+      "changeSet": 114927,
+      "verified": true,
+      "metaId": "9c1bfdcd6dc14172f4c6187282938a5e",
+      "depots": [
+        {
+          "productId": "1500569639",
+          "manifest": "575bc8d2da3fdfffe03e143e2b7f7946",
+          "size": 31475372026
+        },
+        {
+          "productId": "1564781494",
+          "manifest": "6bf277b419704c0a13cbc1836c967cfc",
+          "size": 63976368720
+        },
+        {
+          "productId": "1664230388",
+          "manifest": "4da4a4f7662d56a07e9459597439fea3",
+          "size": 1210058736
+        }
+      ]
+    },
+    {
+      "buildId": "59740920873972822",
+      "date": "2026-06-02T18:03:09Z",
+      "label": "1.4.5.115026",
+      "version": "v1.4.5",
+      "changeSet": 115026,
+      "verified": true,
+      "metaId": "fffdcd4db3cce53c317368db441e5846",
+      "depots": [
+        {
+          "productId": "1500569639",
+          "manifest": "b2267297c746a6167f62a70da5e62294",
+          "size": 31475372026
+        },
+        {
+          "productId": "1564781494",
+          "manifest": "9363e93fc5505fe236611e465306c773",
+          "size": 63976370256
+        },
+        {
+          "productId": "1664230388",
+          "manifest": "4da4a4f7662d56a07e9459597439fea3",
+          "size": 1210058736
+        }
+      ]
+    },
+    {
+      "buildId": "59763526590910241",
+      "date": "2026-06-10T12:45:49Z",
+      "label": "1.4.6.115439",
+      "version": "v1.4.6",
+      "changeSet": 115439,
+      "verified": true,
+      "metaId": "4e9026241d30c634d627c24b824c9d45",
+      "depots": [
+        {
+          "productId": "1500569639",
+          "manifest": "0bc6d18aa5ec3e8bfbf317eb66686156",
+          "size": 31468021573
+        },
+        {
+          "productId": "1564781494",
+          "manifest": "b02952db3d2d6bbad74c72737305f397",
+          "size": 63976158087
+        },
+        {
+          "productId": "1664230388",
+          "manifest": "4da4a4f7662d56a07e9459597439fea3",
+          "size": 1210058736
+        }
+      ]
+    },
+    {
+      "buildId": "59767091734854423",
+      "date": "2026-06-11T17:56:09Z",
+      "label": "1.4.6.115628",
+      "version": "v1.4.6",
+      "changeSet": 115628,
+      "verified": true,
+      "metaId": "37cbf5866978df1a14c4e9fb803419e0",
+      "depots": [
+        {
+          "productId": "1500569639",
+          "manifest": "9a559536cc815ba25cd9d66556dfd5ed",
+          "size": 31468021061
+        },
+        {
+          "productId": "1564781494",
+          "manifest": "2926d38200a77a18119c1b50f1b50611",
+          "size": 63976158087
+        },
+        {
+          "productId": "1664230388",
+          "manifest": "4da4a4f7662d56a07e9459597439fea3",
+          "size": 1210058736
+        }
+      ]
+    },
+    {
+      "buildId": "59841239437831187",
+      "date": "2026-07-07T07:47:36Z",
+      "label": "1.4.7.117131",
+      "version": "v1.4.7",
+      "changeSet": 117131,
+      "verified": true,
+      "metaId": "1c4e30d4f46f423e9e1d4eda3602944c",
+      "depots": [
+        {
+          "productId": "1500569639",
+          "manifest": "4594bffa141eec6460cdef7109945470",
+          "size": 31468032258
+        },
+        {
+          "productId": "1564781494",
+          "manifest": "002f3bff93778e1e67a8c859bcdaef62",
+          "size": 63976164492
+        },
+        {
+          "productId": "1664230388",
+          "manifest": "4da4a4f7662d56a07e9459597439fea3",
+          "size": 1210058736
+        }
+      ]
+    },
+    {
+      "buildId": "59847705676268774",
+      "date": "2026-07-09T13:17:55Z",
+      "label": "1.4.7.117484",
+      "version": "v1.4.7",
+      "changeSet": 117484,
+      "verified": true,
+      "metaId": "481da8da7c11d223313664d0d40ed2ba",
+      "depots": [
+        {
+          "productId": "1500569639",
+          "manifest": "596f4551235c094e992f2bcd0f7ba655",
+          "size": 31468032258
+        },
+        {
+          "productId": "1564781494",
+          "manifest": "10f66d89ff4453e0b54a1a963de146d5",
+          "size": 63976165004
+        },
+        {
+          "productId": "1664230388",
+          "manifest": "4da4a4f7662d56a07e9459597439fea3",
+          "size": 1210058736
+        }
+      ]
+    },
+    {
+      "buildId": "59926016360892274",
+      "date": "2026-08-05T14:14:38Z",
+      "label": "1.4.8.119303",
+      "version": "v1.4.8",
+      "changeSet": 119303,
+      "verified": true,
+      "metaId": "e881ad8a03ab41c8f766cac678291f96",
+      "depots": [
+        {
+          "productId": "1500569639",
+          "manifest": "73f3cfec8d3b7f176b1470a257f5e27d",
+          "size": 31468422600
+        },
+        {
+          "productId": "1564781494",
+          "manifest": "545e1a149929cb57c6234fe5e98a8336",
+          "size": 63974177578
+        },
+        {
+          "productId": "1664230388",
+          "manifest": "4da4a4f7662d56a07e9459597439fea3",
+          "size": 1210058736
+        }
+      ]
+    }
+  ]
+}

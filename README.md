@@ -104,8 +104,16 @@ as `2026.9.28.57`. Take the newest with `Version="*"`. Its `contentHash:` tag ch
 Packages are generated from Steam builds. The game packages cover the Windows build distributed through
 Steam, GOG and Epic. Xbox, Game Pass and Microsoft Store builds are outside this project's scope.
 
-The [build registries](builds) record known builds and their versions. Some historical beta builds
-cannot currently be downloaded from Steam, so reference assemblies may be missing for them.
+The [Steam build registries](builds/steam) record known builds and their versions. Some historical beta
+builds cannot currently be downloaded from Steam, so reference assemblies may be missing for them.
+
+The [GOG build registry](builds/gog) records GOG's public builds of the game since March 2021, for
+information only: packages are never made from GOG builds. Each build's version and changeset come from
+its GOG label until they have been checked against the build's own files. Then the entry is marked
+`verified`, plus `labelMismatch` when the files disagree with the label (the files' values are kept), or
+`unverifiable` when GOG no longer serves the files. [`builds/links.json`](builds/links.json) lists which
+Steam and GOG builds are the same build, by matching version and changeset. Each link says whether its
+GOG side is `verified`.
 
 ## Generating packages
 
@@ -120,7 +128,7 @@ TOOL=src/Bannerlord.ReferenceAssemblies/bin/Release/net10.0/Bannerlord.Reference
 ```
 
 Every command accepts `--app game`, `--app server` or `--app moddingkit`.
-The default registry is `builds/<appId>.json`; use `--registry` to select another file.
+The default registry is `builds/steam/<appId>.json`; use `--registry` to select another file.
 Packages are written to `final/` next to the executable. Use `--workDir` to change the output root.
 
 ### Update build metadata
@@ -171,6 +179,26 @@ nothing is packed. It is packed into `final-bundle/` only when its content diffe
 feed. Without `--revision` its version ends in 0, for inspection only. `--prerelease` makes a package to test
 with locally, and skips the comparison with the feed.
 
+### Record GOG builds
+
+Record the game's public GOG builds and rebuild the Steam/GOG links. No GOG login is needed, and the
+command never takes `--app`:
+
+```sh
+$TOOL gog
+$TOOL gog --fromGogDb
+```
+
+GOG lists only its five newest public builds, so the command has to run regularly to see each one.
+`--fromGogDb` also adds the older builds from [GOGDB](https://www.gogdb.org/product/1564781494). It is
+needed only once.
+
+Checking labels against the builds' files needs a GOG account that owns the game, so the workflow does
+not do it. Run the command by hand with `GOG_REFRESH_TOKEN` set, or with `--gogRefreshToken`, to a GOG
+Galaxy refresh token. The token is tried first; when it is missing, GOG rejects it, or the account does
+not own the game, the check is skipped and the rest of the command runs as usual. `--verify` limits how
+many builds are checked in one run (25 by default). Each check downloads a few small files.
+
 ### Record published packages
 
 After publishing, mark the builds in the registry, or refresh their publication status from NuGet:
@@ -197,7 +225,8 @@ is none. The result is also written to `final/versions.json` and, in a workflow,
 ## Automation
 
 [Update Build Registry](.github/workflows/update-builds.yml) checks for builds every three hours and
-requests [generation](.github/workflows/generate-references.yml) when packages are missing.
+requests [generation](.github/workflows/generate-references.yml) when packages are missing. It also
+records new GOG builds and refreshes the Steam/GOG links.
 [Verify Feed](.github/workflows/verify-feed.yml) checks the registries against NuGet nightly.
 Whenever the generate workflow publishes GUI packages, it packs and publishes `GUI.v3.All` as well. Run it
 by hand with `pack` set to `references`, `gui` or `bundle` to do only that part; `all` is the default.

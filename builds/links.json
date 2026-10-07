@@ -1,0 +1,1464 @@
+{
+  "steamAppId": 261550,
+  "gogProductId": 1564781494,
+  "builds": [
+    {
+      "version": "e1.5.8",
+      "changeSet": 263183,
+      "steam": [
+        6382284
+      ],
+      "gog": [
+        "54217448357797922"
+      ],
+      "verified": true
+    },
+    {
+      "version": "e1.5.8",
+      "changeSet": 263439,
+      "steam": [
+        6389721
+      ],
+      "gog": [
+        "54220904526406597"
+      ],
+      "verified": true
+    },
+    {
+      "version": "e1.5.8",
+      "changeSet": 264172,
+      "steam": [
+        6425913
+      ],
+      "gog": [
+        "54240912071784828"
+      ],
+      "verified": true
+    },
+    {
+      "version": "e1.5.8",
+      "changeSet": 264807,
+      "steam": [
+        6457394
+      ],
+      "gog": [
+        "54258539954407033"
+      ],
+      "verified": true
+    },
+    {
+      "version": "e1.5.8",
+      "changeSet": 265256,
+      "steam": [
+        6470275
+      ],
+      "gog": [
+        "54264343296165358"
+      ],
+      "verified": true
+    },
+    {
+      "version": "e1.5.9",
+      "changeSet": 266180,
+      "steam": [
+        6509250
+      ],
+      "gog": [
+        "54287381343171765"
+      ],
+      "verified": true
+    },
+    {
+      "version": "e1.5.9",
+      "changeSet": 266354,
+      "steam": [
+        6516885
+      ],
+      "gog": [
+        "54290668558334684"
+      ],
+      "verified": true
+    },
+    {
+      "version": "e1.5.9",
+      "changeSet": 266721,
+      "steam": [
+        6539421
+      ],
+      "gog": [
+        "54304543513470011"
+      ],
+      "verified": true
+    },
+    {
+      "version": "e1.5.9",
+      "changeSet": 267291,
+      "steam": [
+        6563984
+      ],
+      "gog": [
+        "54319295376789059"
+      ],
+      "verified": true
+    },
+    {
+      "version": "e1.5.9",
+      "changeSet": 267611,
+      "steam": [
+        6576825
+      ],
+      "gog": [
+        "54324893950433756"
+      ],
+      "verified": true
+    },
+    {
+      "version": "e1.5.9",
+      "changeSet": 268121,
+      "steam": [
+        6606752
+      ],
+      "gog": [
+        "54341935899198456"
+      ],
+      "verified": true
+    },
+    {
+      "version": "e1.5.9",
+      "changeSet": 268540,
+      "steam": [
+        6621361
+      ],
+      "gog": [
+        "54348212684737111"
+      ],
+      "verified": true
+    },
+    {
+      "version": "e1.5.9",
+      "changeSet": 268958,
+      "steam": [
+        6644668
+      ],
+      "gog": [
+        "54362205449551732"
+      ],
+      "verified": true
+    },
+    {
+      "version": "e1.5.9",
+      "changeSet": 270154,
+      "steam": [
+        6711094
+      ],
+      "gog": [
+        "54400140147731975"
+      ],
+      "verified": true
+    },
+    {
+      "version": "e1.5.9",
+      "changeSet": 271857,
+      "steam": [
+        6793000
+      ],
+      "gog": [
+        "54443818307390593"
+      ],
+      "verified": true
+    },
+    {
+      "version": "e1.5.10",
+      "changeSet": 275443,
+      "steam": [
+        6969226
+      ],
+      "gog": [
+        "54533262118588068"
+      ],
+      "verified": true
+    },
+    {
+      "version": "e1.5.10",
+      "changeSet": 275761,
+      "steam": [
+        6986908
+      ],
+      "gog": [
+        "54545446173713968"
+      ],
+      "verified": true
+    },
+    {
+      "version": "e1.5.10",
+      "changeSet": 275855,
+      "steam": [
+        6991893
+      ],
+      "gog": [
+        "54547790879421091"
+      ],
+      "verified": true
+    },
+    {
+      "version": "e1.5.10",
+      "changeSet": 275993,
+      "steam": [
+        6998782
+      ],
+      "gog": [
+        "54550930442267399"
+      ],
+      "verified": true
+    },
+    {
+      "version": "e1.5.10",
+      "changeSet": 276353,
+      "steam": [
+        7016778
+      ],
+      "gog": [
+        "54563025466783728"
+      ],
+      "verified": true
+    },
+    {
+      "version": "e1.5.10",
+      "changeSet": 276370,
+      "steam": [
+        7017265
+      ],
+      "gog": [
+        "54563171429656829"
+      ],
+      "verified": true
+    },
+    {
+      "version": "e1.5.10",
+      "changeSet": 276976,
+      "steam": [
+        7099253
+      ],
+      "gog": [
+        "54608450153827386"
+      ],
+      "verified": true
+    },
+    {
+      "version": "e1.6.0",
+      "changeSet": 277436,
+      "steam": [
+        7124616
+      ],
+      "gog": [
+        "54623499459995436"
+      ],
+      "verified": true
+    },
+    {
+      "version": "e1.6.0",
+      "changeSet": 278032,
+      "steam": [
+        7143361
+      ],
+      "gog": [
+        "54632252947327035"
+      ],
+      "verified": true
+    },
+    {
+      "version": "e1.6.0",
+      "changeSet": 278648,
+      "steam": [
+        7171938
+      ],
+      "gog": [
+        "54649234782261759"
+      ],
+      "verified": true
+    },
+    {
+      "version": "e1.6.1",
+      "changeSet": 279527,
+      "steam": [
+        7216935
+      ],
+      "gog": [
+        "54673099933554733"
+      ],
+      "verified": true
+    },
+    {
+      "version": "e1.6.1",
+      "changeSet": 279810,
+      "steam": [
+        7233301
+      ],
+      "gog": [
+        "54684030827705262"
+      ],
+      "verified": true
+    },
+    {
+      "version": "e1.6.1",
+      "changeSet": 280285,
+      "steam": [
+        7249312
+      ],
+      "gog": [
+        "54690626865540500"
+      ],
+      "verified": true
+    },
+    {
+      "version": "e1.6.1",
+      "changeSet": 282007,
+      "steam": [
+        7331081
+      ],
+      "gog": [
+        "54733645360272588"
+      ],
+      "verified": true
+    },
+    {
+      "version": "e1.6.1",
+      "changeSet": 282881,
+      "steam": [
+        7369954
+      ],
+      "gog": [
+        "54753916979260991"
+      ],
+      "verified": true
+    },
+    {
+      "version": "e1.6.1",
+      "changeSet": 283221,
+      "steam": [
+        7389748
+      ],
+      "gog": [
+        "54765646596782189"
+      ],
+      "verified": true
+    },
+    {
+      "version": "e1.6.2",
+      "changeSet": 283738,
+      "steam": [
+        7404549
+      ],
+      "gog": [
+        "54771575555308156"
+      ],
+      "verified": true
+    },
+    {
+      "version": "e1.6.2",
+      "changeSet": 284092,
+      "steam": [
+        7419587
+      ],
+      "gog": [
+        "54777547643252952"
+      ],
+      "verified": true
+    },
+    {
+      "version": "e1.6.2",
+      "changeSet": 284274,
+      "steam": [
+        7430955
+      ],
+      "gog": [
+        "54785847755622417"
+      ],
+      "verified": true
+    },
+    {
+      "version": "e1.6.2",
+      "changeSet": 284399,
+      "steam": [
+        7438262
+      ],
+      "gog": [
+        "54788768186000124"
+      ],
+      "verified": true
+    },
+    {
+      "version": "e1.6.2",
+      "changeSet": 284832,
+      "steam": [
+        7452298
+      ],
+      "gog": [
+        "54794344076600848"
+      ],
+      "verified": true
+    },
+    {
+      "version": "e1.6.3",
+      "changeSet": 285789,
+      "steam": [
+        7487578
+      ],
+      "gog": [
+        "54811957485077133"
+      ],
+      "verified": true
+    },
+    {
+      "version": "e1.6.3",
+      "changeSet": 286135,
+      "steam": [
+        7500170
+      ],
+      "gog": [
+        "54817281877092403"
+      ],
+      "verified": true
+    },
+    {
+      "version": "e1.6.3",
+      "changeSet": 286182,
+      "steam": [
+        7500713
+      ],
+      "gog": [
+        "54817492424959964"
+      ],
+      "verified": true
+    },
+    {
+      "version": "e1.6.3",
+      "changeSet": 287068,
+      "steam": [
+        7532008
+      ],
+      "gog": [
+        "54834838502660604"
+      ],
+      "verified": true
+    },
+    {
+      "version": "e1.6.4",
+      "changeSet": 288289,
+      "steam": [
+        7592990
+      ],
+      "gog": [
+        "54866676180934704"
+      ],
+      "verified": true
+    },
+    {
+      "version": "e1.6.4",
+      "changeSet": 288965,
+      "steam": [
+        7641339
+      ],
+      "gog": [
+        "54889640061208114"
+      ],
+      "verified": true
+    },
+    {
+      "version": "e1.6.4",
+      "changeSet": 290476,
+      "steam": [
+        7701146
+      ],
+      "gog": [
+        "54918647490605107"
+      ],
+      "verified": true
+    },
+    {
+      "version": "e1.6.4",
+      "changeSet": 290626,
+      "steam": [
+        7702789
+      ],
+      "gog": [
+        "54919316734226656"
+      ],
+      "verified": true
+    },
+    {
+      "version": "e1.6.4",
+      "changeSet": 290771,
+      "steam": [
+        7714483
+      ],
+      "gog": [
+        "54927851767318027"
+      ],
+      "verified": true
+    },
+    {
+      "version": "e1.6.4",
+      "changeSet": 291416,
+      "steam": [
+        7735894
+      ],
+      "gog": [
+        "54936610786467652"
+      ],
+      "verified": true
+    },
+    {
+      "version": "e1.6.4",
+      "changeSet": 291839,
+      "steam": [
+        7762365
+      ],
+      "gog": [
+        "54950905762124102"
+      ],
+      "verified": true
+    },
+    {
+      "version": "e1.6.4",
+      "changeSet": 293326,
+      "steam": [
+        7814956
+      ],
+      "gog": [
+        "54976968080458483"
+      ],
+      "verified": true
+    },
+    {
+      "version": "e1.6.5",
+      "changeSet": 294486,
+      "steam": [
+        7861690
+      ],
+      "gog": [
+        "55000240779324448"
+      ],
+      "verified": true
+    },
+    {
+      "version": "e1.6.5",
+      "changeSet": 295466,
+      "steam": [
+        7919762
+      ],
+      "gog": [
+        "55031894793729921"
+      ],
+      "verified": true
+    },
+    {
+      "version": "e1.6.5",
+      "changeSet": 295820,
+      "steam": [
+        7936598
+      ],
+      "gog": [
+        "55040428889515608"
+      ],
+      "verified": true
+    },
+    {
+      "version": "e1.6.5",
+      "changeSet": 296352,
+      "steam": [
+        7948003
+      ],
+      "gog": [
+        "55052796164671972"
+      ],
+      "verified": true
+    },
+    {
+      "version": "e1.7.0",
+      "changeSet": 298049,
+      "steam": [
+        7979364
+      ],
+      "gog": [
+        "55078618584984168"
+      ],
+      "verified": true
+    },
+    {
+      "version": "e1.7.0",
+      "changeSet": 298189,
+      "steam": [
+        7984076
+      ],
+      "gog": [
+        "55081141279231694"
+      ],
+      "verified": true
+    },
+    {
+      "version": "e1.7.0",
+      "changeSet": 298904,
+      "steam": [
+        8014203
+      ],
+      "gog": [
+        "55098850603046222"
+      ],
+      "verified": true
+    },
+    {
+      "version": "e1.7.0",
+      "changeSet": 299098,
+      "steam": [
+        8021392
+      ],
+      "gog": [
+        "55101965348379003"
+      ],
+      "verified": true
+    },
+    {
+      "version": "e1.7.0",
+      "changeSet": 299494,
+      "steam": [
+        8039632
+      ],
+      "gog": [
+        "55113132548657488"
+      ],
+      "verified": true
+    },
+    {
+      "version": "e1.7.0",
+      "changeSet": 300623,
+      "steam": [
+        8095951
+      ],
+      "gog": [
+        "55139141703043200"
+      ],
+      "verified": true
+    },
+    {
+      "version": "e1.7.0",
+      "changeSet": 301499,
+      "steam": [
+        8137284
+      ],
+      "gog": [
+        "55159467088331611"
+      ],
+      "verified": true
+    },
+    {
+      "version": "e1.7.0",
+      "changeSet": 302472,
+      "steam": [
+        8185356
+      ],
+      "gog": [
+        "55182554292984575"
+      ],
+      "verified": true
+    },
+    {
+      "version": "e1.7.0",
+      "changeSet": 304003,
+      "steam": [
+        8257780,
+        10926117,
+        10994613
+      ],
+      "gog": [
+        "55217331850926428"
+      ],
+      "verified": true
+    },
+    {
+      "version": "e1.7.1",
+      "changeSet": 305759,
+      "steam": [
+        8345915
+      ],
+      "gog": [
+        "55260800455691338"
+      ],
+      "verified": true
+    },
+    {
+      "version": "e1.7.1",
+      "changeSet": 306438,
+      "steam": [
+        8374911
+      ],
+      "gog": [
+        "55275700866476481"
+      ],
+      "verified": true
+    },
+    {
+      "version": "e1.7.1",
+      "changeSet": 308750,
+      "steam": [
+        8494831
+      ],
+      "gog": [
+        "55334179554844629"
+      ],
+      "verified": true
+    },
+    {
+      "version": "e1.7.1",
+      "changeSet": 309490,
+      "steam": [
+        8522932
+      ],
+      "gog": [
+        "55345450094214143"
+      ],
+      "verified": true
+    },
+    {
+      "version": "e1.7.1",
+      "changeSet": 309992,
+      "steam": [
+        8551670
+      ],
+      "gog": [
+        "55360110967123972"
+      ],
+      "verified": true
+    },
+    {
+      "version": "e1.7.1",
+      "changeSet": 310948,
+      "steam": [
+        8604749,
+        9795343
+      ],
+      "gog": [
+        "55385761566957977"
+      ],
+      "verified": true
+    },
+    {
+      "version": "e1.7.2",
+      "changeSet": 314157,
+      "steam": [
+        8820909
+      ],
+      "gog": [
+        "55486969809757679"
+      ],
+      "verified": true
+    },
+    {
+      "version": "e1.7.2",
+      "changeSet": 314809,
+      "steam": [
+        8859524
+      ],
+      "gog": [
+        "55504895763735806"
+      ],
+      "verified": true
+    },
+    {
+      "version": "e1.7.2",
+      "changeSet": 316284,
+      "steam": [
+        8948740
+      ],
+      "gog": [
+        "55545226254960566"
+      ],
+      "verified": true
+    },
+    {
+      "version": "e1.8.0",
+      "changeSet": 321460,
+      "steam": [
+        9332085
+      ],
+      "gog": [
+        "55725187769540579"
+      ],
+      "verified": true
+    },
+    {
+      "version": "e1.8.1",
+      "changeSet": 1942,
+      "steam": [
+        9618680
+      ],
+      "gog": [
+        "55850088337207717"
+      ],
+      "verified": true
+    },
+    {
+      "version": "e1.8.1",
+      "changeSet": 2192,
+      "steam": [
+        9650648
+      ],
+      "gog": [
+        "55864382315690929"
+      ],
+      "verified": true
+    },
+    {
+      "version": "e1.8.1",
+      "changeSet": 2778,
+      "steam": [
+        9713800,
+        9720790
+      ],
+      "gog": [
+        "55892960668505440"
+      ],
+      "verified": true
+    },
+    {
+      "version": "v1.0.0",
+      "changeSet": 3624,
+      "steam": [
+        9787489
+      ],
+      "gog": [
+        "55922716690000088"
+      ],
+      "verified": true
+    },
+    {
+      "version": "v1.0.0",
+      "changeSet": 4373,
+      "steam": [
+        9861765
+      ],
+      "gog": [
+        "55951346749641988"
+      ],
+      "verified": true
+    },
+    {
+      "version": "v1.0.0",
+      "changeSet": 4407,
+      "steam": [
+        9870937
+      ],
+      "gog": [
+        "55954418878873554"
+      ],
+      "verified": true
+    },
+    {
+      "version": "v1.0.1",
+      "changeSet": 4441,
+      "steam": [
+        9871358
+      ],
+      "gog": [
+        "55954526788552870"
+      ],
+      "verified": true
+    },
+    {
+      "version": "v1.0.1",
+      "changeSet": 4790,
+      "steam": [
+        9916285
+      ],
+      "gog": [
+        "55974147053188529"
+      ],
+      "verified": true
+    },
+    {
+      "version": "v1.0.1",
+      "changeSet": 4833,
+      "steam": [
+        9917710
+      ],
+      "gog": [
+        "55974474772493898"
+      ],
+      "verified": true
+    },
+    {
+      "version": "v1.0.1",
+      "changeSet": 5218,
+      "steam": [
+        9957641
+      ],
+      "gog": [
+        "55991543214149052"
+      ],
+      "verified": true
+    },
+    {
+      "version": "v1.0.1",
+      "changeSet": 5325,
+      "steam": [
+        9966143
+      ],
+      "gog": [
+        "55994261970635998"
+      ],
+      "verified": true
+    },
+    {
+      "version": "v1.0.2",
+      "changeSet": 6150,
+      "steam": [
+        10036976
+      ],
+      "gog": [
+        "56026219009582601"
+      ],
+      "verified": true
+    },
+    {
+      "version": "v1.0.2",
+      "changeSet": 6549,
+      "steam": [
+        10064132
+      ],
+      "gog": [
+        "56035162869034302"
+      ],
+      "verified": true
+    },
+    {
+      "version": "v1.0.2",
+      "changeSet": 6967,
+      "steam": [
+        10095048
+      ],
+      "gog": [
+        "56049289408392644"
+      ],
+      "verified": true
+    },
+    {
+      "version": "v1.0.2",
+      "changeSet": 7585,
+      "steam": [
+        10137549
+      ],
+      "gog": [
+        "56067377069543424",
+        "56070717424434267"
+      ],
+      "verified": true
+    },
+    {
+      "version": "v1.0.2",
+      "changeSet": 7919,
+      "steam": [
+        10161704
+      ],
+      "gog": [
+        "56075746431681633"
+      ],
+      "verified": true
+    },
+    {
+      "version": "v1.0.2",
+      "changeSet": 8368,
+      "steam": [
+        10205754
+      ],
+      "gog": [
+        "56095910044087738"
+      ],
+      "verified": true
+    },
+    {
+      "version": "v1.0.3",
+      "changeSet": 9055,
+      "steam": [
+        10260969
+      ],
+      "gog": [
+        "56133785066739757"
+      ],
+      "verified": true
+    },
+    {
+      "version": "v1.0.3",
+      "changeSet": 9860,
+      "steam": [
+        10331258
+      ],
+      "gog": [
+        "56165720217872172"
+      ],
+      "verified": true
+    },
+    {
+      "version": "v1.1.0",
+      "changeSet": 12734,
+      "steam": [
+        10653869
+      ],
+      "gog": [
+        "56290116874945569"
+      ],
+      "verified": true
+    },
+    {
+      "version": "v1.1.1",
+      "changeSet": 14148,
+      "steam": [
+        10738883
+      ],
+      "gog": [
+        "56319422297842875"
+      ],
+      "verified": true
+    },
+    {
+      "version": "v1.1.2",
+      "changeSet": 14580,
+      "steam": [
+        10792497
+      ],
+      "gog": [
+        "56339188445864134"
+      ],
+      "verified": true
+    },
+    {
+      "version": "v1.1.3",
+      "changeSet": 16165,
+      "steam": [
+        10955286
+      ],
+      "gog": [
+        "56400720165220267"
+      ],
+      "verified": true
+    },
+    {
+      "version": "v1.1.4",
+      "changeSet": 17949,
+      "steam": [
+        11164013
+      ],
+      "gog": [
+        "56481828219222242"
+      ],
+      "verified": true
+    },
+    {
+      "version": "v1.1.5",
+      "changeSet": 21456,
+      "steam": [
+        11515116
+      ],
+      "gog": [
+        "56615157036555357"
+      ],
+      "verified": true
+    },
+    {
+      "version": "v1.1.6",
+      "changeSet": 26219,
+      "steam": [
+        12122855
+      ],
+      "gog": [
+        "56841399337329271"
+      ],
+      "verified": true
+    },
+    {
+      "version": "v1.2.7",
+      "changeSet": 31207,
+      "steam": [
+        12952896
+      ],
+      "gog": [
+        "57125889334373063"
+      ],
+      "verified": true
+    },
+    {
+      "version": "v1.2.8",
+      "changeSet": 31530,
+      "steam": [
+        13011854
+      ],
+      "gog": [
+        "57146087624544647"
+      ],
+      "verified": true
+    },
+    {
+      "version": "v1.2.9",
+      "changeSet": 33689,
+      "steam": [
+        13334629
+      ],
+      "gog": [
+        "57270074673679446"
+      ],
+      "verified": true
+    },
+    {
+      "version": "v1.2.9",
+      "changeSet": 34019,
+      "steam": [
+        13389853
+      ],
+      "gog": [
+        "57287784476643613"
+      ],
+      "verified": true
+    },
+    {
+      "version": "v1.2.9",
+      "changeSet": 34269,
+      "steam": [
+        13442478
+      ],
+      "gog": [
+        "57313262190578059"
+      ],
+      "verified": true
+    },
+    {
+      "version": "v1.2.9",
+      "changeSet": 35636,
+      "steam": [
+        13666536
+      ],
+      "gog": [
+        "57371339848155280"
+      ],
+      "verified": true
+    },
+    {
+      "version": "v1.2.9",
+      "changeSet": 38256,
+      "steam": [
+        14186255
+      ],
+      "gog": [
+        "57516936956389132"
+      ],
+      "verified": true
+    },
+    {
+      "version": "v1.2.10",
+      "changeSet": 42197,
+      "steam": [
+        14844224
+      ],
+      "gog": [
+        "57693548690342162"
+      ],
+      "verified": true
+    },
+    {
+      "version": "v1.2.10",
+      "changeSet": 44489,
+      "steam": [
+        15134835
+      ],
+      "gog": [
+        "57774412557064326"
+      ],
+      "verified": true
+    },
+    {
+      "version": "v1.2.11",
+      "changeSet": 45697,
+      "steam": [
+        15275630
+      ],
+      "gog": [
+        "57812318984040672"
+      ],
+      "verified": true
+    },
+    {
+      "version": "v1.2.12",
+      "changeSet": 54620,
+      "steam": [
+        16570121
+      ],
+      "gog": [
+        "58144211672156653"
+      ],
+      "verified": true
+    },
+    {
+      "version": "v1.3.4",
+      "changeSet": 102350,
+      "steam": [
+        20939955
+      ],
+      "gog": [
+        "59193430092819219"
+      ],
+      "verified": true
+    },
+    {
+      "version": "v1.3.5",
+      "changeSet": 102453,
+      "steam": [
+        20951294
+      ],
+      "gog": [
+        "59195702527131482"
+      ],
+      "verified": true
+    },
+    {
+      "version": "v1.3.6",
+      "changeSet": 102656,
+      "steam": [
+        20967600
+      ],
+      "gog": [
+        "59198706253359991"
+      ],
+      "verified": true
+    },
+    {
+      "version": "v1.3.7",
+      "changeSet": 102919,
+      "steam": [
+        20982519
+      ],
+      "gog": [
+        "59201680938343132"
+      ],
+      "verified": true
+    },
+    {
+      "version": "v1.3.8",
+      "changeSet": 103102,
+      "steam": [
+        20991215
+      ],
+      "gog": [
+        "59204809601205215"
+      ],
+      "verified": true
+    },
+    {
+      "version": "v1.3.9",
+      "changeSet": 103334,
+      "steam": [
+        21011884
+      ],
+      "gog": [
+        "59210807481210296"
+      ],
+      "verified": true
+    },
+    {
+      "version": "v1.3.10",
+      "changeSet": 103977,
+      "steam": [
+        21070160
+      ],
+      "gog": [
+        "59230171490481135"
+      ],
+      "verified": true
+    },
+    {
+      "version": "v1.3.10",
+      "changeSet": 104176,
+      "steam": [
+        21112791
+      ],
+      "gog": [
+        "59232865240911546"
+      ],
+      "verified": true
+    },
+    {
+      "version": "v1.3.10",
+      "changeSet": 104371,
+      "steam": [
+        21128576
+      ],
+      "gog": [
+        "59236503091846201"
+      ],
+      "verified": true
+    },
+    {
+      "version": "v1.3.11",
+      "changeSet": 104956,
+      "steam": [
+        21204828
+      ],
+      "gog": [
+        "59253553473354771"
+      ],
+      "verified": true
+    },
+    {
+      "version": "v1.3.11",
+      "changeSet": 105254,
+      "steam": [
+        21239239
+      ],
+      "gog": [
+        "59259150541488062"
+      ],
+      "verified": true
+    },
+    {
+      "version": "v1.3.13",
+      "changeSet": 105726,
+      "steam": [
+        21305518
+      ],
+      "gog": [
+        "59276848652845331"
+      ],
+      "verified": true
+    },
+    {
+      "version": "v1.3.13",
+      "changeSet": 106033,
+      "steam": [
+        21337201
+      ],
+      "gog": [
+        "59291415036642795"
+      ],
+      "verified": true
+    },
+    {
+      "version": "v1.3.14",
+      "changeSet": 107738,
+      "steam": [
+        21697755
+      ],
+      "gog": [
+        "59380705963403529"
+      ],
+      "verified": true
+    },
+    {
+      "version": "v1.3.15",
+      "changeSet": 109330,
+      "steam": [
+        22051939
+      ],
+      "gog": [
+        "59453452294316855"
+      ],
+      "verified": true
+    },
+    {
+      "version": "v1.3.15",
+      "changeSet": 110062,
+      "steam": [
+        22159160
+      ],
+      "gog": [
+        "59574750799664213"
+      ],
+      "verified": true
+    },
+    {
+      "version": "v1.4.5",
+      "changeSet": 114896,
+      "steam": [
+        23344486
+      ],
+      "gog": [
+        "59705717203540738"
+      ],
+      "verified": true
+    },
+    {
+      "version": "v1.4.5",
+      "changeSet": 114927,
+      "steam": [
+        23363498
+      ],
+      "gog": [
+        "59708548742792544"
+      ],
+      "verified": true
+    },
+    {
+      "version": "v1.4.5",
+      "changeSet": 115026,
+      "steam": [
+        23524942
+      ],
+      "gog": [
+        "59740920873972822"
+      ],
+      "verified": true
+    },
+    {
+      "version": "v1.4.6",
+      "changeSet": 115439,
+      "steam": [
+        23656194
+      ],
+      "gog": [
+        "59763526590910241"
+      ],
+      "verified": true
+    },
+    {
+      "version": "v1.4.6",
+      "changeSet": 115628,
+      "steam": [
+        23685442
+      ],
+      "gog": [
+        "59767091734854423"
+      ],
+      "verified": true
+    },
+    {
+      "version": "v1.4.7",
+      "changeSet": 117131,
+      "steam": [
+        24085777
+      ],
+      "gog": [
+        "59841239437831187"
+      ],
+      "verified": true
+    },
+    {
+      "version": "v1.4.7",
+      "changeSet": 117484,
+      "steam": [
+        24127665,
+        24492971
+      ],
+      "gog": [
+        "59847705676268774"
+      ],
+      "verified": true
+    },
+    {
+      "version": "v1.4.8",
+      "changeSet": 119303,
+      "steam": [
+        24573425
+      ],
+      "gog": [
+        "59926016360892274"
+      ],
+      "verified": true
+    }
+  ]
+}

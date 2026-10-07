@@ -3,7 +3,8 @@ using CommandLine;
 namespace Bannerlord.ReferenceAssemblies;
 
 /// <summary>
-/// Three verbs over one build registry per app (builds/&lt;appId&gt;.json):
+/// Verbs over one Steam build registry per app (builds/steam/&lt;appId&gt;.json), and one that records GOG's
+/// builds of the game beside it (builds/gog/&lt;productId&gt;.json):
 ///
 /// update         - asks Steam which branches exist right now, records their build ids and depot
 ///                  manifests, then reads the version of builds whose version is still unknown.
@@ -13,6 +14,7 @@ namespace Bannerlord.ReferenceAssemblies;
 /// versions       - reports the current stable and beta versions from the registry, for the org variables
 ///                  the mod repositories build against.
 /// bundle-gui     - packs the published GUI packages of every release version into one package, GUI.v3.All.
+/// gog            - records GOG's public builds of the game and which Steam builds they are the same as.
 /// </summary>
 public static class Program
 {
@@ -30,12 +32,13 @@ public static class Program
         var exitCode = 0;
         try
         {
-            await Parser.Default.ParseArguments<UpdateOptions, GenerateOptions, MarkPublishedOptions, VersionsOptions, BundleGuiOptions>(args).MapResult(
+            await Parser.Default.ParseArguments<UpdateOptions, GenerateOptions, MarkPublishedOptions, VersionsOptions, BundleGuiOptions, GogOptions>(args).MapResult(
                 (UpdateOptions o) => UpdateCommand.RunAsync(o, ctrlC.Token),
                 (GenerateOptions o) => GenerateCommand.RunAsync(o, ctrlC.Token),
                 (MarkPublishedOptions o) => MarkPublishedCommand.RunAsync(o, ctrlC.Token),
                 (VersionsOptions o) => VersionsCommand.RunAsync(o),
                 (BundleGuiOptions o) => BundleGuiCommand.RunAsync(o, ctrlC.Token),
+                (GogOptions o) => GogCommand.RunAsync(o, ctrlC.Token),
                 _ =>
                 {
                     exitCode = 1;

@@ -6,13 +6,13 @@ using System.Text.Json.Serialization;
 namespace Bannerlord.ReferenceAssemblies;
 
 /// <summary>
-/// builds/&lt;appId&gt;.json: every build of the app we know about, with the depot manifests needed to
+/// builds/steam/&lt;appId&gt;.json: every build of the app we know about, with the depot manifests needed to
 /// download it. Steam only exposes the manifests of current branches, so this file is what lets past
 /// builds be requested again.
 /// </summary>
 internal sealed class BuildRegistry
 {
-    private static readonly JsonSerializerOptions JsonOptions = new()
+    internal static readonly JsonSerializerOptions JsonOptions = new()
     {
         WriteIndented = true,
         NewLine = "\n",

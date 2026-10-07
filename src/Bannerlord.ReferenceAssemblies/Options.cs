@@ -7,7 +7,7 @@ internal abstract class CommonOptions
     [Option("app", Required = true, HelpText = "Which app to work on: game or server.")]
     public string AppName { get; set; } = default!;
 
-    [Option("registry", HelpText = "Path to the build registry. Default: builds/<appId>.json in the current directory.")]
+    [Option("registry", HelpText = "Path to the build registry. Default: builds/steam/<appId>.json in the current directory.")]
     public string? Registry { get; set; }
 
     [Option("workDir", HelpText = "Where downloads, stripped assemblies and packages go. Default: next to the executable.")]
@@ -15,7 +15,7 @@ internal abstract class CommonOptions
 
     public App App => App.Parse(AppName);
 
-    public string RegistryPath => Path.GetFullPath(Registry ?? Path.Combine("builds", $"{App.AppId}.json"));
+    public string RegistryPath => Path.GetFullPath(Registry ?? Path.Combine("builds", "steam", $"{App.AppId}.json"));
 
     public Paths Paths => new(Path.GetFullPath(WorkDir ?? AppContext.BaseDirectory));
 }
@@ -113,6 +113,39 @@ internal sealed class BundleGuiOptions : CommonOptions
 
     [Option("prerelease", HelpText = "A prerelease label for a package made to test with locally, such as beta. The workflow never passes one.")]
     public string? Prerelease { get; set; }
+}
+
+[Verb("gog", HelpText = "Records GOG's public builds of the game in builds/gog/<productId>.json and rebuilds builds/links.json, which pairs them with the same Steam builds. Needs no GOG login; with a refresh token it also checks build labels against a few small files of each build.")]
+internal sealed class GogOptions
+{
+    [Option("registry", HelpText = "Path to the GOG build registry. Default: builds/gog/<productId>.json in the current directory.")]
+    public string? Registry { get; set; }
+
+    [Option("steamRegistry", HelpText = "Path to the game's Steam build registry. Default: builds/steam/<appId>.json in the current directory.")]
+    public string? SteamRegistry { get; set; }
+
+    [Option("links", HelpText = "Path to the Steam and GOG build links. Default: builds/links.json in the current directory.")]
+    public string? Links { get; set; }
+
+    [Option("fromGogDb", Default = false, HelpText = "Also record the builds GOG no longer lists, from GOGDB. Needed once; GOG's own list covers the rest.")]
+    public bool FromGogDb { get; set; }
+
+    [Option("gogDbUrl", Default = GogClient.GogDbUrl, HelpText = "GOGDB's product data, with {0} for the product id.")]
+    public string GogDbUrl { get; set; } = GogClient.GogDbUrl;
+
+    [Option("gogRefreshToken", HelpText = "A GOG Galaxy refresh token of an account that owns the game, to check build labels against the builds' files. Defaults to the GOG_REFRESH_TOKEN environment variable; without one, nothing is checked.")]
+    public string? GogRefreshToken { get; set; }
+
+    [Option("verify", Default = 25, HelpText = "How many builds may be checked against their files in this run. Each one downloads a few small files.")]
+    public int Verify { get; set; } = 25;
+
+    public string? RefreshToken => GogRefreshToken ?? Environment.GetEnvironmentVariable("GOG_REFRESH_TOKEN");
+
+    public string RegistryPath => Path.GetFullPath(Registry ?? Path.Combine("builds", "gog", $"{GogRegistry.GameProductId}.json"));
+
+    public string SteamRegistryPath => Path.GetFullPath(SteamRegistry ?? Path.Combine("builds", "steam", $"{App.Game.AppId}.json"));
+
+    public string LinksPath => Path.GetFullPath(Links ?? Path.Combine("builds", "links.json"));
 }
 
 /// <summary>Where the work lands. Only <c>final</c> is read by anything else: the workflows pick the packages up there.</summary>
