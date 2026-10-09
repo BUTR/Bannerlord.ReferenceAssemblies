@@ -8550,6 +8550,8 @@
       ],
       "version": "v1.5.5",
       "changeSet": 124170,
+      "publishedVersion": "1.5.5.124170-beta",
+      "publishedGuiV3Version": "1.5.5.124170-beta",
       "moduleVersions": {
         "NavalDLC": "v1.3.5",
         "SandBox": "v1.5.5",
