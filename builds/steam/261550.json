@@ -8604,6 +8604,8 @@
       ],
       "version": "v1.5.6",
       "changeSet": 125270,
+      "publishedVersion": "1.5.6.125270-beta",
+      "publishedGuiV3Version": "1.5.6.125270-beta",
       "moduleVersions": {
         "BirthAndDeath": "v1.5.6",
         "SandBoxCore": "v1.5.6",
