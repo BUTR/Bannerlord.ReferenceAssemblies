@@ -2,7 +2,7 @@
   "appId": 1863440,
   "current": {
     "public": 24571419,
-    "beta": 26320246,
+    "beta": 26431508,
     "v1.4.7": 24085374
   },
   "builds": [
@@ -1180,6 +1180,23 @@
       },
       "manifests": {
         "1863441": "1629917016570769767"
+      }
+    },
+    {
+      "buildId": 26431508,
+      "date": "2026-11-04T13:08:43Z",
+      "title": "Beta v1.5.6",
+      "branches": [
+        "beta"
+      ],
+      "version": "v1.5.6",
+      "changeSet": 125272,
+      "moduleVersions": {
+        "Multiplayer": "v1.5.6",
+        "Native": "v1.5.6"
+      },
+      "manifests": {
+        "1863441": "7529987663144772772"
       }
     }
   ]
