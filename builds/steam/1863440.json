@@ -1191,6 +1191,7 @@
       ],
       "version": "v1.5.6",
       "changeSet": 125272,
+      "publishedVersion": "1.5.6.125272-beta",
       "moduleVersions": {
         "Multiplayer": "v1.5.6",
         "Native": "v1.5.6"
