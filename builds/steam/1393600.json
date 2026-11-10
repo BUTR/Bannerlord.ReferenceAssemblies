@@ -2542,6 +2542,7 @@
       ],
       "version": "v1.5.7",
       "changeSet": 125802,
+      "publishedVersion": "1.5.7.125802-beta",
       "moduleVersions": {},
       "manifests": {
         "1393601": "7858921687433210902"
