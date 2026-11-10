@@ -8631,6 +8631,8 @@
       ],
       "version": "v1.5.7",
       "changeSet": 125802,
+      "publishedVersion": "1.5.7.125802-beta",
+      "publishedGuiV3Version": "1.5.7.125802-beta",
       "moduleVersions": {
         "CustomBattle": "v1.5.7",
         "StoryMode": "v1.5.7",
