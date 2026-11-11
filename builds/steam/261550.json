@@ -1,8 +1,9 @@
 {
   "appId": 261550,
   "current": {
-    "public": 24573425,
+    "public": 26566465,
     "beta": 26566465,
+    "v1.4.8": 24573425,
     "v1.4.7": 24127665,
     "v1.4.6": 23685442,
     "v1.4.5": 23524942,
@@ -8366,7 +8367,8 @@
       "date": "2026-08-10T11:56:33Z",
       "title": "War Sails Modding Kit Release & Patch WS v1.2.8 / BL v1.4.8",
       "branches": [
-        "public"
+        "public",
+        "v1.4.8"
       ],
       "version": "v1.4.8",
       "changeSet": 119303,
@@ -8627,7 +8629,8 @@
       "date": "2026-11-10T15:56:50Z",
       "title": "Beta v1.5.7",
       "branches": [
-        "beta"
+        "beta",
+        "public"
       ],
       "version": "v1.5.7",
       "changeSet": 125802,

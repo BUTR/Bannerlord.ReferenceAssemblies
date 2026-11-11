@@ -1,7 +1,7 @@
 {
   "productId": 1564781494,
   "current": {
-    "public": "59926016360892274"
+    "public": "60210141644970478"
   },
   "builds": [
     {
@@ -2539,6 +2539,31 @@
           "productId": "1564781494",
           "manifest": "545e1a149929cb57c6234fe5e98a8336",
           "size": 63974177578
+        },
+        {
+          "productId": "1664230388",
+          "manifest": "4da4a4f7662d56a07e9459597439fea3",
+          "size": 1210058736
+        }
+      ]
+    },
+    {
+      "buildId": "60210141644970478",
+      "date": "2026-11-11T14:07:56Z",
+      "label": "1.5.7.125802",
+      "version": "1.5.7",
+      "changeSet": 125802,
+      "metaId": "7296237fe864d3a027d7eb2b3654dfd3",
+      "depots": [
+        {
+          "productId": "1500569639",
+          "manifest": "942b1092210b23878c6e6d1ea05e36e6",
+          "size": 31386273571
+        },
+        {
+          "productId": "1564781494",
+          "manifest": "826d7fa6eabfbf37db6d1357a846835d",
+          "size": 63051440305
         },
         {
           "productId": "1664230388",

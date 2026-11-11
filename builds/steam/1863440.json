@@ -1,8 +1,9 @@
 {
   "appId": 1863440,
   "current": {
-    "public": 24571419,
+    "public": 26569029,
     "beta": 26569029,
+    "v1.4.8": 24571419,
     "v1.4.7": 24085374
   },
   "builds": [
@@ -1066,7 +1067,8 @@
       "buildId": 24571419,
       "date": "2026-08-10T11:59:56Z",
       "branches": [
-        "public"
+        "public",
+        "v1.4.8"
       ],
       "version": "v1.4.8",
       "changeSet": 118999,
@@ -1205,7 +1207,8 @@
       "date": "2026-11-10T15:58:19Z",
       "title": "Beta v1.5.7",
       "branches": [
-        "beta"
+        "beta",
+        "public"
       ],
       "version": "v1.5.7",
       "changeSet": 125802,
